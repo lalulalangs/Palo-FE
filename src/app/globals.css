@@ -1,0 +1,333 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   PALORINJANI / Palo Mountain Goods — Design Tokens
+   Sumber: outdoor_editorial/DESIGN.md (baris 51-151) + PRD §4.4
+
+   Catatan penting:
+   1. DESIGN.md baris 173 menulis "DM Serif Display", tetapi YAML `typography`
+      (baris 62-134) dan seluruh mockup memakai **Source Serif 4**. YAML +
+      mockup menang karena itu yang benar-benar dirender dan yang konsisten
+      dengan karakter editorial brand.
+   2. `--radius-full` dipaksa 9999px. Mockup lama menimpa `borderRadius.full`
+      menjadi `0.75rem` sehingga `rounded-full` TIDAK lagi berbentuk pil
+      (lihat `palo_mountain_goods_katalog_pencarian_desktop/code.html`
+      baris 85). Di sini token itu dikunci sebagai pill sungguhan.
+   3. Breakpoint mengikuti brief: mobile 375 (base, tanpa breakpoint),
+      tablet 768, desktop 1280. Utilitas `tablet:` dan `desktop:` dipakai di
+      seluruh komponen — JANGAN pakai `sm:`/`md:`/`lg:`/`xl:` supaya tidak
+      ada ambiguitas breakpoint.
+   ========================================================================== */
+
+@theme {
+  /* --- Brand ---------------------------------------------------------------- */
+  --color-brand-forest: #1f6048; /* CTA utama, link aktif, brand label */
+  --color-brand-deep: #123f31; /* Hover tombol, footer, blok editorial gelap */
+  --color-brand-pine: #2c7357; /* Aksen sekunder */
+  /*
+   * `brand-ink` — latar paling gelap, lebih pekat dari `brand-deep`.
+   *
+   * Mockup beranda memakai `bg-[#161D19]` untuk lookbook split, panel
+   * manifesyo, dan blok promo. Nilai itu ditulis sebagai arbitrary value,
+   * sehingga tidak punya nama token dan tidak bisa dipakai ulang.
+   *
+   * Dipromosikan jadi token supaya section-section gelap itu satu warna,
+   * dan supaya tidak ada hex yang ditulis ulang di beberapa komponen.
+   */
+  --color-brand-ink: #161d19;
+
+  /* --- Accent --------------------------------------------------------------- */
+  --color-accent-earth: #b58957; /* Ornamen kecil bernuansa tanah */
+
+  /* --- Surface -------------------------------------------------------------- */
+  --color-surface-paper: #f7f5ef; /* Latar hangat editorial */
+  --color-surface-white: #ffffff; /* Kartu produk, panel form, container logo */
+  --color-surface-sage: #e5eee7; /* Highlight lembut, badge aktif */
+  /*
+   * `surface-dim` — teks redup DI ATAS latar gelap.
+   *
+   * Mockup memakai `text-surface-dim/80` di footer dan panel manifesyo, tapi
+   * `surface-dim` TIDAK didefinisikan di Tailwind config miliknya sendiri —
+   * jadi kelas itu tidak pernah menghasilkan apa-apa dan teksnya diam-diam
+   * mewarisi warna induk. Bug itu tidak sengaja ditiru: tokennya dibuat di
+   * sini supaya teks redup benar-benar redup.
+   */
+  --color-surface-dim: #b9c9c0;
+
+  /* --- Text ----------------------------------------------------------------- */
+  --color-text-primary: #1e2c25;
+  --color-text-secondary: #62766d;
+
+  /* --- Border --------------------------------------------------------------- */
+  --color-border-soft: #d8e1d9;
+  --color-line-inverse: #3a6152; /* Pemisah di dalam blok brand-deep */
+
+  /* --- Feedback (dari DESIGN.md color.error & palette-derived) --------------- */
+  --color-feedback-error: #ba1a1a;
+  --color-feedback-error-soft: #ffdad6;
+  --color-feedback-warn: #7c572a; /* DESIGN.md `secondary` */
+
+  /* --- Radius --------------------------------------------------------------- */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  /* Lihat catatan 2 di atas: nilai ini WAJIB pill, bukan 0.75rem. */
+  --radius-full: 9999px;
+
+  /* --- Shadow --------------------------------------------------------------- */
+  --shadow-editorial: 0 8px 30px rgb(18 63 49 / 6%);
+  --shadow-editorial-strong: 0 8px 30px rgb(18 63 49 / 12%);
+
+  /* --- Breakpoint ----------------------------------------------------------- */
+  --breakpoint-tablet: 48rem; /* 768px */
+  --breakpoint-desktop: 80rem; /* 1280px */
+
+  /* --- Spacing (DESIGN.md baris 143-151) ------------------------------------ */
+  --spacing-gutter: 1.5rem;
+  --spacing-gutter-mobile: 1rem;
+  --spacing-section: 3rem;
+  --spacing-section-mobile: 1.25rem;
+
+  /* --- Typography -----------------------------------------------------------
+     Skala diambil persis dari YAML `typography` DESIGN.md. Format:
+     --text-<nama> + --text-<nama>--line-height / --letter-spacing / --font-weight
+     ---------------------------------------------------------------------- */
+  --text-display-lg: 4rem; /* 64px */
+  --text-display-lg--line-height: 4.5rem; /* 72px */
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 400;
+
+  --text-display-mobile: 2.75rem; /* 44px */
+  --text-display-mobile--line-height: 3.25rem; /* 52px */
+  --text-display-mobile--letter-spacing: -0.01em;
+  --text-display-mobile--font-weight: 400;
+
+  --text-headline-lg: 3rem; /* 48px */
+  --text-headline-lg--line-height: 3.5rem; /* 56px */
+  --text-headline-lg--letter-spacing: -0.015em;
+  --text-headline-lg--font-weight: 400;
+
+  --text-headline-lg-mobile: 2rem; /* 32px */
+  --text-headline-lg-mobile--line-height: 2.5rem; /* 40px */
+  --text-headline-lg-mobile--letter-spacing: -0.01em;
+  --text-headline-lg-mobile--font-weight: 400;
+
+  --text-headline-md: 2.25rem; /* 36px */
+  --text-headline-md--line-height: 2.75rem; /* 44px */
+  --text-headline-md--letter-spacing: -0.01em;
+  --text-headline-md--font-weight: 400;
+
+  --text-headline-sm: 1.5rem; /* 24px */
+  --text-headline-sm--line-height: 2rem; /* 32px */
+  --text-headline-sm--letter-spacing: -0.005em;
+  --text-headline-sm--font-weight: 600;
+
+  --text-title-lg: 1.25rem; /* 20px */
+  --text-title-lg--line-height: 1.75rem; /* 28px */
+  --text-title-lg--font-weight: 600;
+
+  --text-title-md: 1.125rem; /* 18px */
+  --text-title-md--line-height: 1.625rem; /* 26px */
+  --text-title-md--font-weight: 600;
+
+  --text-body-lg: 1.125rem; /* 18px */
+  --text-body-lg--line-height: 1.75rem; /* 28px */
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 1rem; /* 16px */
+  --text-body-md--line-height: 1.5rem; /* 24px */
+  --text-body-md--font-weight: 400;
+
+  --text-label-md: 0.875rem; /* 14px */
+  --text-label-md--line-height: 1.25rem; /* 20px */
+  --text-label-md--letter-spacing: 0.01em;
+  --text-label-md--font-weight: 500;
+
+  --text-label-sm: 0.8125rem; /* 13px */
+  --text-label-sm--line-height: 1.125rem; /* 18px */
+  --text-label-sm--letter-spacing: 0.02em;
+  --text-label-sm--font-weight: 500;
+
+  --text-caption: 0.75rem; /* 12px */
+  --text-caption--line-height: 1rem; /* 16px */
+  --text-caption--font-weight: 400;
+}
+
+/* Font family pulled dari next/font/local (lihat src/app/layout.tsx).
+   `@theme inline` dipakai karena nilainya harus resolve ke CSS variable yang
+   di-inject Next, bukan di-copy ke :root sebagai nilai statis. */
+@theme inline {
+  /* Ketiga peran ini sekarang menunjuk ke BlinkMacSystemFont yang sama.
+     Nilai variabelnya sengaja DIPERTAHANKAN sebagai tiga nama terpisah,
+     bukan jadi satu, karena pasangan token `text-*` di file ini sengaja
+     memisahkan "teks" dari "judul" — menggabungkannya jadi satu nama
+     akan membuat `font-headline` di mana pun ikut hilang tak terlihat, dan
+     mengembalikan ke serif di kemudian hari berarti mengedit tiap kelas
+     yang memakainya. */
+  --font-sans: var(--font-blink), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-headline: var(--font-blink), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* `--font-mono` masih ada karena kelas `font-mono` dipakai luas di komponen
+     (label editorial, angka voucher, pill kategori). Nilai-nya dulu JetBrains
+     Mono; sekarang ikut BlinkMacSystemFont sesuai permintaan pemilik.
+
+     Efek sampingnya perlu diketahui: label seperti "FORM. 01 — RINJANI SERIES"
+     dulu dirangkai dengan font monospace + `tracking-widest` sehingga
+     terlihat seperti cap editorial. Sekarang proporsional, jadi label itu
+     terbaca sebagai teks kapital biasa. `tracking-widest` masih bekerja,
+     hanya tidak lagi memberi kesan "stamp". */
+  --font-mono: var(--font-blink), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-paper);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fokus keyboard harus selalu terlihat (ARSITEKTUR §10 — WCAG 2.1 AA).
+     Mockup lama memakai `focus:outline-none` tanpa pengganti, membuat
+     pengguna keyboard kehilangan posisi navigasi. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-forest);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Jangan pernah membuang outline dari elemen yang punya fokus programatis. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-forest);
+    color: var(--color-surface-white);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-headline);
+    color: var(--color-text-primary);
+  }
+
+  /* `hr` dekoratif sering dipakai mockup sebagai pembatas; beri warna token
+     supaya tidak jatuh ke warna default browser yang kontrasnya tidak
+     terkontrol. */
+  hr {
+    border-color: var(--color-border-soft);
+  }
+}
+
+@layer components {
+  /* Konten dekoratif tidak boleh bocor ke accessibility tree. */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    left: 0.5rem;
+    top: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-surface-white);
+    color: var(--color-brand-deep);
+    border: 2px solid var(--color-brand-forest);
+  }
+
+  /* =======================================================================
+   *  RASIO KOTAK HERO
+   * =======================================================================
+   * Tinggi hero WAJIB diturunkan dari lebar viewport lewat `aspect-ratio`,
+   * bukan dari tinggi viewport (`78vh` seperti sebelumnya).
+   *
+   * Alasannya bukan selera tampilan. Dengan `78vh`, rasio kotak hero
+   * berbeda di tiap perangkat -- dari 0,59 di iPhone 14 sampai 2,67 di
+   * 1920x1080. `object-cover` hanya bisa memotong, tidak pernah
+   * menambah, jadi satu berkas foto selalu kehilangan sebagian besar di
+   * salah satu ujung rentang itu. Di HP, foto landscape kehilangan
+   * dua pertiga lebarnya; di desktop, foto potret kehilangan 61%
+   * tingginya. Tidak ada satu aset pun yang cocok untuk semua ukuran.
+   *
+   * Kalau rasio kotak dikunci per kelompok perangkat, crop dibuat pada
+   * rasio yang sama, dan hasilnya potong nol. Nilai di bawah ini harus
+   * SAMA PERSIS dengan rasio crop di `scripts/prepare_banner_crops.py`:
+   *
+   *     HP        4:5 = 0,800   crop 1080x1350
+   *     tablet    6:5 = 1,200   crop 1200x1000
+   *     desktop   2:1 = 2,000   crop 1600x800
+   *
+   * Kalau salah satu sisi diubah, sisi lain ikut harus diubah -- kalau
+   * tidak, gambar diam-diam mulai terpotong lagi tanpa error apa pun.
+   *
+   * Breakpoint juga harus sama dengan `--breakpoint-tablet` (48rem) dan
+   * `--breakpoint-desktop` (80rem) di `@theme` atas.
+   */
+  .hero-frame {
+    aspect-ratio: 4 / 5;
+  }
+
+  @media (min-width: 48rem) {
+    .hero-frame {
+      aspect-ratio: 6 / 5;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .hero-frame {
+      aspect-ratio: 2 / 1;
+    }
+  }
+
+  /* -----------------------------------------------------------------------
+   *  LAYAR PENDEK (HP yang dirotasi)
+   * -----------------------------------------------------------------------
+   * `aspect-ratio` dihitung dari lebar, jadi di HP landscape (mis. 844x390)
+   * hero akan setinggi 1055px -- lebih besar dari viewportnya sendiri.
+   * Layar hanya terisi sebagian, dan pengguna tidak pernah sampai ke
+   * katalog.
+   *
+   * Di sini rasio dibuang dan tinggi dikembalikan ke viewport, karena
+   * fokus utamanya "jangan menutupi seluruh layar", bukan "jangan potong
+   * gambar". Frontend sudah menyiapkan crop 2:1 untuk kasus ini.
+   */
+  @media (max-height: 30rem) {
+    .hero-frame {
+      aspect-ratio: auto;
+      min-height: 60svh;
+    }
+  }
+}
+
+/* ARSITEKTUR §10 + WCAG 2.1: animasi non-esensial harus dimatikan untuk
+   pengguna yang evoc-nya `reduce`. Mockup lama tidak punya aturan ini. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

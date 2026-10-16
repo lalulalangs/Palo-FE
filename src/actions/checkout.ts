@@ -1,0 +1,322 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+
+import {
+  addCartItem,
+  createOrder,
+  getCart,
+  getOrder,
+  getShippingQuote,
+  getToken,
+  removeCartItem,
+} from "@/lib/api";
+import { toActionError } from "@/lib/action-result";
+import type { ActionError } from "@/lib/action-result";
+import { isPaymentMethod, type AddressInput } from "@/lib/checkout-form";
+import type {
+  CheckoutLineItem,
+  CreatedOrder,
+  OrderDetail,
+  ShippingQuote,
+  ShippingService,
+} from "@/lib/types";
+
+/**
+ * Server Actions untuk alur checkout pelanggan terdaftar (PRD §3.6 – §3.8).
+ *
+ * Prinsip yang dijaga di seluruh file ini:
+ *
+ * 1. **Cart adalah satu-satunya sumber item.** Client tidak boleh menentukan
+ *    SKU mana yang dibeli. `quoteShipping` dan `placeOrder` membaca cart dari
+ *    server, jadi tidak ada jalan untuk memesan sesuatu yang tidak ada di
+ *    keranjang.
+ * 2. **Ongkir yang dipakai adalah hasil quote server.** Angka ongkir hanya
+ *    dikirim balik sebagai pencocokan; `CreateOrder` di backend memakai quote
+ *    terverifikasi sendiri (lihat `OrderPricingService`).
+ * 3. **503 = blokir.** PRD §3.8 AC: bila API kurir bermasalah, frontend WAJIB
+ *    mencegah buyer lanjut ke pembayaran. Karena itu `quoteShipping` mengembalikan
+ *    `kind: "courier"` yang tidak bisa diabaikan, bukan daftar layanan kosong
+ *    dengan ongkir karangan.
+ *
+ * Catatan: module ini ber-direktif `"use server"`, jadi semua ekspor WAJIB
+ * fungsi async. Helper sinkron seperti validasi alamat ada di
+ * `src/lib/checkout-form.ts`.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Keranjang dari halaman detail produk                                       */
+/* -------------------------------------------------------------------------- */
+
+export async function addSkuToCartAction(
+  skuId: number,
+  quantity: number,
+): Promise<ActionError | null> {
+  if (!Number.isFinite(skuId) || skuId <= 0) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Varian produk belum dipilih.",
+      fieldErrors: {},
+    };
+  }
+
+  try {
+    await addCartItem(skuId, Math.max(1, Math.floor(quantity)));
+  } catch (error) {
+    return toActionError(error);
+  }
+
+  revalidatePath("/keranjang");
+  revalidatePath("/");
+  return null;
+}
+
+export async function removeSkuFromCartAction(
+  skuId: number,
+): Promise<ActionError | null> {
+  try {
+    await removeCartItem(skuId);
+  } catch (error) {
+    return toActionError(error);
+  }
+  revalidatePath("/keranjang");
+  revalidatePath("/");
+  return null;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Langkah 2 — ongkir (PRD §3.8)                                              */
+/* -------------------------------------------------------------------------- */
+
+/** Hasil quote ongkir, sudah dibentuk agar bisa langsung dirender. */
+export interface ShippingQuoteResult {
+  services: ShippingService[];
+  destinationCity: string;
+  destinationCityCode: string;
+  /** `true` hanya bila ongkir terverifikasi dan boleh lanjut. */
+  canProceed: boolean;
+}
+
+/**
+ * Item checkout dari cart server.
+ *
+ * `sku_id` dan `quantity` SELALU dari cart server — client tidak boleh
+ * menentukan apa yang dibeli.
+ *
+ * `price_seen` berbeda: backend tidak menyimpan harga di cart (hanya
+ * `sku_id` + `quantity`; `CartService::formatCart()` menghitung
+ * `unit_price` dari `$sku->effective_price` saat itu). Akibatnya mengirim
+ * `item.unit_price` yang baru dibaca membuat `price_seen` selalu sama dengan
+ * harga terkini, dan deteksi 409 `price_changed` tidak pernah menyala.
+ *
+ * Karena itu `priceSeen` diisi dari SNAPSHOT yang pembeli lihat di halaman
+ * checkout (`CheckoutFlow` menerima `cart` hasil render server). `sku_id` yang
+ * tidak ada di snapshot jatuh ke harga cart saat ini. Field ini murni peringatan
+ * belaka — backend tetap memakai `effective_price` sebagai harga yang ditagih —
+ * jadi mengirim nilai dari client tidak membuka celah harga.
+ */
+async function cartLineItems(
+  priceSeen: Record<number, number> = {},
+): Promise<CheckoutLineItem[]> {
+  const cart = await getCart();
+  return (cart?.items ?? []).map((item) => ({
+    sku_id: item.sku_id,
+    quantity: item.quantity,
+    price_seen: priceSeen[item.sku_id] ?? item.unit_price,
+  }));
+}
+
+export async function quoteShippingAction(
+  address: AddressInput,
+): Promise<ShippingQuoteResult | ActionError> {
+  // Endpoint ini dilindungi `auth:sanctum`. Tanpa token, QuoteController
+  // membalas 401 — dan kita menampilkan "belum masuk", bukan ongkir fiktif.
+  if (!(await getToken())) {
+    return {
+      ok: false,
+      kind: "auth",
+      message: "Sesi Anda berakhir. Masuk kembali untuk menghitung ongkir.",
+      fieldErrors: {},
+    };
+  }
+
+  // Item diambil dari cart server, bukan dari form. Inilah yang membuat quote
+  // tidak bisa dimanipulasi dari client.
+  const items = await cartLineItems();
+  if (items.length === 0) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Keranjang kosong. Tambahkan produk sebelum menghitung ongkir.",
+      fieldErrors: {},
+    };
+  }
+
+  try {
+    const quote: ShippingQuote = await getShippingQuote({
+      destination_city: address.city_code,
+      items,
+    });
+
+    if (quote.services.length === 0) {
+      // Tidak ada layanan berarti tidak ada ongkir terverifikasi. PRD §3.8
+      // melarang menampilkan biaya default, jadi ini harus memblokir.
+      return {
+        ok: false,
+        kind: "courier",
+        message:
+          "Belum ada layanan pengiriman yang bisa dihitung untuk kota ini. Pilih kota lain atau hubungi Customer Service.",
+        fieldErrors: {},
+      };
+    }
+
+    return {
+      services: quote.services,
+      destinationCity: address.city,
+      destinationCityCode: address.city_code,
+      canProceed: true,
+    };
+  } catch (error) {
+    // `getShippingQuote` melempar `ApiError` 503 saat kurir down;
+    // `toActionError` memetakannya ke `kind: "courier"` sehingga UI memblokir
+    // langkah berikutnya alih-alih menampilkan ongkir default.
+    return toActionError(error);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Langkah 3 — buat pesanan (PRD §3.6)                                         */
+/* -------------------------------------------------------------------------- */
+
+export interface PlaceOrderResult {
+  order: CreatedOrder;
+}
+
+export async function placeOrderAction(input: {
+  address: AddressInput;
+  service: ShippingService;
+  paymentMethod: string;
+  voucherCode: string | null;
+  /**
+   * Kirim `true` HANYA setelah pembeli melihat daftar perubahan harga hasil
+   * 409 `price_changed` dan menyetujuinya. Backend menolak order selama flag
+   * ini belum `true` (PRD §3.6 / KONTRAK-API §3).
+   */
+  acknowledgePriceChange?: boolean;
+  /**
+   * Harga yang dilihat pembeli di halaman checkout, dipetakan dari `sku_id`.
+   * Dipakai sebagai `price_seen` supaya backend bisa mendeteksi perubahan
+   * harga sejak halaman dibuka. Lihat catatan `cartLineItems()`.
+   */
+  priceSeen?: Record<number, number>;
+}): Promise<PlaceOrderResult | ActionError> {
+  if (!isPaymentMethod(input.paymentMethod)) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Metode pembayaran belum dipilih.",
+      fieldErrors: {},
+    };
+  }
+
+  if (!(await getToken())) {
+    return {
+      ok: false,
+      kind: "auth",
+      message: "Sesi Anda berakhir. Masuk kembali untuk membuat pesanan.",
+      fieldErrors: {},
+    };
+  }
+
+  const items = await cartLineItems(input.priceSeen);
+  if (items.length === 0) {
+    return {
+      ok: false,
+      kind: "stock",
+      message: "Keranjang kosong. Pesanan tidak dapat dibuat.",
+      fieldErrors: {},
+    };
+  }
+
+  try {
+    const order = await createOrder({
+      shipping_address: input.address,
+      items,
+      shipping_courier: input.service.courier,
+      shipping_service: input.service.service,
+      shipping_cost: input.service.cost,
+      shipping_etd: input.service.etd,
+      payment_method: input.paymentMethod,
+      voucher_code: input.voucherCode,
+      acknowledge_price_change: input.acknowledgePriceChange === true,
+    });
+
+    // Cart dikosongkan di backend oleh `CreateOrder`. Yang perlu kita lakukan
+    // hanya memaksa render ulang supaya badge keranjang di header ikut berubah.
+    revalidatePath("/keranjang");
+    revalidatePath("/");
+    revalidatePath("/lacak");
+
+    return { order };
+  } catch (error) {
+    // 409 (stok habis), 422 (voucher), 503 (kurir), dan 429 (rate limit)
+    // sampai ke sini apa adanya sebagai `ActionError` dengan `kind` yang
+    // sesuai, sehingga UI bisa menampilkan perbandingan yang tepat.
+    return toActionError(error);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Lacak pesanan                                                               */
+/* -------------------------------------------------------------------------- */
+
+export interface TrackOrderResult {
+  orderNumber: string;
+  /** `false` berarti 404, sesi habis, atau pesanan milik orang lain. */
+  found: boolean;
+  detail: OrderDetail | null;
+  requiresLogin: boolean;
+}
+
+/**
+ * Ambil detail pesanan untuk halaman lacak.
+ *
+ * PENTING: `GET /orders/{orderNumber}` hanya mengembalikan pesanan milik
+ * pengguna yang sedang login — `OrderController::show` memfilter `user_id` di
+ * dalam query. Artinya TIDAK ada lookup pesanan anonim yang aman, jadi
+ * "lacak tanpa login" di PRD §3.11 tidak dapat dipenuhi lewat API ini. Agar
+ * tidak membuka kebocoran data, halaman lacak untuk tamu hanya mengarahkan ke
+ * login, dan nomor pesanan tetap tidak pernah terkonfirmasi ada atau tidak.
+ */
+export async function trackOrderAction(
+  orderNumber: string,
+): Promise<TrackOrderResult> {
+  const normalized = orderNumber.trim().toUpperCase();
+
+  if (!normalized) {
+    return {
+      orderNumber: normalized,
+      found: false,
+      detail: null,
+      requiresLogin: false,
+    };
+  }
+
+  if (!(await getToken())) {
+    return {
+      orderNumber: normalized,
+      found: false,
+      detail: null,
+      requiresLogin: true,
+    };
+  }
+
+  const detail = await getOrder(normalized);
+  return {
+    orderNumber: normalized,
+    found: detail !== null,
+    detail,
+    requiresLogin: false,
+  };
+}

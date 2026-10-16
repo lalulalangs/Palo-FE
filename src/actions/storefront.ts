@@ -1,0 +1,378 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+import {
+  AUTH_TOKEN_COOKIE,
+  addCartItem,
+  apiRequest,
+  clearGuestToken,
+  createGuestWhatsAppCheckout,
+  getToken,
+  login,
+  register,
+  removeCartItem,
+  updateCartItem,
+} from "@/lib/api";
+import { toActionError } from "@/lib/action-result";
+import {
+  GUEST_RESULT_COOKIE,
+  GUEST_RESULT_TTL_SECONDS,
+  MAX_HANDOFF_BYTES,
+  type GuestResultHandoff,
+} from "@/lib/guest-handoff";
+import type { ActionError, ActionResult } from "@/lib/action-result";
+import type { GuestWhatsAppResult } from "@/lib/types";
+
+/**
+ * Server Actions untuk seluruh mutasi storefront.
+ *
+ * Kenapa Server Actions, bukan `fetch` dari komponen client:
+ * 1. Token Sanctum disimpan di cookie httpOnly. Kalau `POST /auth/login`
+ *    dipanggil dari browser, tokennya pernah masuk ke JavaScript yang bisa
+ *    dibaca skrip pihak ketiga.
+ * 2. Cookie sesi guest (penyimpanan cart Redis) juga httpOnly, jadi `GET
+ *    /cart` tidak bisa dilakukan dari client tanpa meneruskan cookie.
+ * 3. `api.ts` memakai `cookies()` dari `next/headers`, yang hanya boleh
+ *    dipanggil di server.
+ *
+ * Catatan keamanan (ARSITEKTUR §7): Server Action dapat dipanggil lewat POST
+ * langsung, bukan hanya dari UI. Karena itu tidak ada keputusan bisnis yang
+ * diambil di sini — harga, stok, ongkir, dan voucher tetap divalidasi penuh
+ * oleh backend (PRD §3.6). File ini hanya meneruskan, lalu menerjemahkan
+ * `ApiError` menjadi bentuk yang bisa ditampilkan.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Utilitas input                                                             */
+/* -------------------------------------------------------------------------- */
+
+function readText(formData: FormData, key: string): string {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function readOptionalText(formData: FormData, key: string): string | null {
+  const value = readText(formData, key);
+  return value.length > 0 ? value : null;
+}
+
+/**
+ * Cegah open redirect.
+ *
+ * `redirect_to` berasal dari form, jadi bisa diisi siapa saja. Hanya path
+ * internal yang diterima; `//evil.com` dan `https://evil.com` ditolak karena
+ * keduanya bisa dipakai mengarahkan pengguna ke situs palsu tepat setelah
+ * login berhasil.
+ */
+function safeRedirect(target: string | null, fallback: string): string {
+  if (!target) return fallback;
+  if (!target.startsWith("/")) return fallback;
+  if (target.startsWith("//")) return fallback;
+  return target;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Auth                                                                       */
+/* -------------------------------------------------------------------------- */
+
+async function persistToken(token: string): Promise<void> {
+  if (!token) return;
+  const store = await cookies();
+  store.set(AUTH_TOKEN_COOKIE, token, {
+    // 30 hari: cukup untuk belanja berulang tanpa sering login, dan cukup
+    // pendek supaya sesi lama tidak menggantung selamanya.
+    maxAge: 60 * 60 * 24 * 30,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
+}
+
+export async function loginAction(
+  _prev: ActionError | null,
+  formData: FormData,
+): Promise<ActionError | null> {
+  const email = readText(formData, "email");
+  const password = readText(formData, "password");
+  const remember = formData.get("remember") === "on";
+
+  try {
+    const response = await login({ email, password, remember });
+    await persistToken(response.token);
+    // Backend sudah menggabungkan keranjang tamu ke keranjang akun saat login
+    // (PRD §3.4). Token tamu tidak boleh dipakai lagi setelah ini.
+    await clearGuestToken();
+  } catch (error) {
+    return toActionError(error);
+  }
+
+  // Login juga merge cart guest ke cart akun (PRD §3.4). `revalidatePath`
+  // untuk `/` diperlukan karena badge keranjang di-render di root layout.
+  revalidatePath("/keranjang");
+  revalidatePath("/checkout");
+  revalidatePath("/");
+
+  // `redirect()` melempar exception, jadi HARUS di luar blok `try` — kalau
+  // tidak, exception-nya tertangkap `catch` dan dibaca sebagai login gagal.
+  redirect(safeRedirect(readOptionalText(formData, "redirect_to"), "/keranjang"));
+}
+
+export async function registerAction(
+  _prev: ActionError | null,
+  formData: FormData,
+): Promise<ActionError | null> {
+  const name = readText(formData, "name");
+  const email = readText(formData, "email");
+  const password = readText(formData, "password");
+  const passwordConfirmation = readText(formData, "password_confirmation");
+
+  // Konfirmasi password dicek di server juga, bukan hanya di client: validasi
+  // client bisa dilewati, dan pesan "konfirmasi tidak cocok" jauh lebih
+  // berguna daripada 422 generik dari backend.
+  if (password !== passwordConfirmation) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Periksa kembali isian form.",
+      fieldErrors: {
+        password_confirmation: ["Konfirmasi password tidak cocok."],
+      },
+    };
+  }
+
+  try {
+    const response = await register({
+      name,
+      email,
+      password,
+      password_confirmation: passwordConfirmation,
+    });
+    await persistToken(response.token);
+    await clearGuestToken();
+  } catch (error) {
+    return toActionError(error);
+  }
+
+  revalidatePath("/keranjang");
+  revalidatePath("/checkout");
+  revalidatePath("/");
+
+  redirect(safeRedirect(readOptionalText(formData, "redirect_to"), "/keranjang"));
+}
+
+export async function logoutAction(): Promise<void> {
+  const token = await getToken();
+  if (token) {
+    // Cabut token di server bila memungkinkan. Kegagalan tidak boleh
+    // menahan pengguna: cookie lokal tetap dihapus supaya sesi di browser
+    // benar-benar berakhir di sisi klien.
+    try {
+      await apiRequest<unknown>("/auth/logout", { method: "POST", token });
+    } catch {
+      // Sengaja diabaikan, lihat catatan di atas.
+    }
+  }
+  const store = await cookies();
+  store.delete(AUTH_TOKEN_COOKIE);
+
+  revalidatePath("/", "layout");
+  redirect("/");
+}
+
+/* -------------------------------------------------------------------------- */
+/* Keranjang (PRD §3.4)                                                       */
+/* -------------------------------------------------------------------------- */
+
+export async function addToCartAction(
+  skuId: number,
+  quantity: number,
+): Promise<ActionResult<null>> {
+  try {
+    await addCartItem(skuId, quantity);
+  } catch (error) {
+    return toActionError(error);
+  }
+  revalidatePath("/keranjang");
+  revalidatePath("/");
+  return { ok: true, data: null };
+}
+
+export async function updateCartItemAction(
+  skuId: number,
+  quantity: number,
+): Promise<ActionResult<null>> {
+  try {
+    await updateCartItem(skuId, quantity);
+  } catch (error) {
+    return toActionError(error);
+  }
+  revalidatePath("/keranjang");
+  revalidatePath("/");
+  return { ok: true, data: null };
+}
+
+export async function removeCartItemAction(
+  skuId: number,
+): Promise<ActionResult<null>> {
+  try {
+    await removeCartItem(skuId);
+  } catch (error) {
+    return toActionError(error);
+  }
+  revalidatePath("/keranjang");
+  revalidatePath("/");
+  return { ok: true, data: null };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Guest WhatsApp (PRD §3.11)                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Cookie serah-terima untuk halaman hasil guest WhatsApp.
+ *
+ * Ini bukan sesi: hanya carry-over singkat dari Server Action ke
+ * `/keranjang/sukses`, jadi umurnya pendek (10 menit) dan `httpOnly` supaya
+ * `wa_url` tidak bisa dibaca skrip pihak ketiga di halaman. Nama cookie
+ * sengaja berbeda dari `AUTH_TOKEN_COOKIE` agar tidak tertukar saat logout.
+ */
+/**
+ * Baca item keranjang dari satu field form `sku_id:quantity` yang dipisah koma.
+ *
+ * Bentuk ini dipilih supaya client tidak perlu mengirim array yang bisa
+ * dirusak. Perlu ditegaskan: ini BUKAN jaminan keamanan — backend tetap
+ * re-validasi SKU, harga, dan stok dari database (PRD §3.6).
+ */
+function readCartItems(
+  formData: FormData,
+): Array<{ sku_id: number; quantity: number }> {
+  const raw = readText(formData, "items");
+  if (!raw) return [];
+
+  const items: Array<{ sku_id: number; quantity: number }> = [];
+  for (const chunk of raw.split(",")) {
+    const [skuRaw, quantityRaw] = chunk.split(":");
+    const skuId = Number.parseInt(skuRaw ?? "", 10);
+    const quantity = Number.parseInt(quantityRaw ?? "", 10);
+    if (!Number.isFinite(skuId) || !Number.isFinite(quantity)) continue;
+    if (skuId <= 0 || quantity <= 0) continue;
+    items.push({ sku_id: skuId, quantity });
+  }
+  return items;
+}
+
+export async function createGuestCheckoutAction(
+  _prev: ActionError | null,
+  formData: FormData,
+): Promise<ActionError | null> {
+  const items = readCartItems(formData);
+  if (items.length === 0) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Keranjang kosong. Tambahkan produk sebelum melanjutkan.",
+      fieldErrors: {},
+    };
+  }
+
+  let result: GuestWhatsAppResult;
+  try {
+    result = await createGuestWhatsAppCheckout({
+      items,
+      guest_name: readOptionalText(formData, "guest_name"),
+      guest_phone: readOptionalText(formData, "guest_phone"),
+      note: readOptionalText(formData, "note"),
+    });
+  } catch (error) {
+    return toActionError(error);
+  }
+
+  const store = await cookies();
+  store.set(GUEST_RESULT_COOKIE, serializeHandoff(result), {
+    maxAge: GUEST_RESULT_TTL_SECONDS,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/keranjang/sukses",
+  });
+
+  // Cookie dibaca sekali di halaman tujuan lalu dihapus, jadi tidak ada jejak
+  // yang bertahan lama di browser.
+  revalidatePath("/keranjang/sukses");
+
+  // Di luar blok `try` — `redirect()` melempar exception yang kalau tertangkap
+  // akan terbaca sebagai kegagalan checkout. Karena jalur sukses selalu
+  // berakhir di sini, nilai balik aksi ini hanya bisa berupa `ActionError`.
+  redirect("/keranjang/sukses");
+}
+
+/**
+ * Susun payload cookie, dengan turun-tahan bila kelewat besar.
+ *
+ * `wa_url` adalah satu-satunya bagian yang bisa membengkak karena isi pesan
+ * WhatsApp di-URL-encode, jadi dia yang dipangkas. Dengan begitu
+ * `reference_code` dan `notice` tetap utuh, dan halaman hasil bisa
+ * menjelaskannya ketika tautannya ternyata terpotong.
+ */
+function serializeHandoff(result: GuestWhatsAppResult): string {
+  const base = {
+    reference_code: result.reference_code,
+    notice: result.notice,
+    estimated_total: result.estimated_total,
+    estimated_total_display: result.estimated_total_display,
+  };
+
+  const full = JSON.stringify({ ...base, wa_url: result.wa_url });
+  if (full.length <= MAX_HANDOFF_BYTES) return full;
+
+  // Pangkas dari belakang sampai muat. `wa_url` terpotong akan membuka
+  // WhatsApp dengan pesan terpotong, dan halaman hasil menyatakannya.
+  let waUrl = result.wa_url;
+  while (
+    waUrl.length > 0 &&
+    JSON.stringify({ ...base, wa_url: waUrl }).length > MAX_HANDOFF_BYTES
+  ) {
+    waUrl = waUrl.slice(0, Math.floor(waUrl.length * 0.9));
+  }
+  return JSON.stringify({ ...base, wa_url: waUrl, truncated: true });
+}
+
+/**
+ * Ambil cookie lalu hapus, supaya hanya dibaca sekali.
+ *
+ * `cookie.delete()` hanya bisa dipanggil dalam konteks Server Action/Server
+ * Component, jadi fungsi ini dipakai langsung dari halaman hasil.
+ */
+export async function takeGuestResultHandoff(): Promise<GuestResultHandoff | null> {
+  const store = await cookies();
+  const raw = store.get(GUEST_RESULT_COOKIE)?.value;
+  if (!raw) return null;
+  store.delete(GUEST_RESULT_COOKIE);
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== "object" || parsed === null) return null;
+    const value = parsed as Record<string, unknown>;
+    if (typeof value.reference_code !== "string") return null;
+    if (typeof value.wa_url !== "string") return null;
+    return {
+      reference_code: value.reference_code,
+      wa_url: value.wa_url,
+      notice: typeof value.notice === "string" ? value.notice : "",
+      estimated_total:
+        typeof value.estimated_total === "number" ? value.estimated_total : 0,
+      estimated_total_display:
+        typeof value.estimated_total_display === "string"
+          ? value.estimated_total_display
+          : null,
+    };
+  } catch {
+    // Cookie rusak (mis. versi aplikasi berbeda). Lebih baik tampilkan
+    // halaman tanpa hasil daripada halaman 500.
+    return null;
+  }
+}

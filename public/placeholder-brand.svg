@@ -1,0 +1,39 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 240 240"
+  width="240"
+  height="240"
+  role="img"
+  aria-label="Logo placeholder Palo Mountain Goods"
+>
+  <rect width="240" height="240" fill="#FFFFFF" />
+  <g transform="translate(120 112)" fill="none" stroke="#1F6048" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-72 60 L-24 -14 L4 18 L32 -14 L72 60 Z" />
+    <path d="M-24 -14 L4 18 L32 -14" />
+  </g>
+  <text
+    x="120"
+    y="168"
+    text-anchor="middle"
+    font-family="Source Serif 4, Georgia, serif"
+    font-size="20"
+    fill="#123F31"
+  >Palo</text>
+  <text
+    x="120"
+    y="192"
+    text-anchor="middle"
+    font-family="Manrope, Segoe UI, sans-serif"
+    font-size="10"
+    letter-spacing="3"
+    fill="#62766D"
+  >MOUNTAIN GOODS</text>
+  <text
+    x="120"
+    y="228"
+    text-anchor="middle"
+    font-family="Manrope, Segoe UI, sans-serif"
+    font-size="9"
+    fill="#B58957"
+  >LOGO RESMI MENUNGGU</text>
+</svg>
