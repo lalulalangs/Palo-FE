@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { headers } from "next/headers";
 
 import "./globals.css";
 
@@ -129,10 +130,19 @@ export const viewport: Viewport = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Data shell diambil di layout supaya header, footer, dan JSON-LD konsisten
-  // di semua halaman tanpa fetch berulang per route. Semua accessor aman:
-  // `getBrand`/`getCart` tidak pernah melempar exception.
-  const [brand, cart] = await Promise.all([getBrand(), getCart()]);
+  const headerList = await headers();
+  const isMaintenanceHeader = headerList.get("x-maintenance-mode") === "1";
+  const pathname = headerList.get("x-pathname") ?? "";
+  const isMaintenanceEnv = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+  const isMaintenance =
+    isMaintenanceEnv || isMaintenanceHeader || pathname === "/maintenance";
+
+  // Data shell diambil di layout supaya header, footer, dan JSON-LD konsisten.
+  // Jika sedang mode maintenance, cart tidak perlu diambil.
+  const [brand, cart] = await Promise.all([
+    getBrand(),
+    isMaintenance ? Promise.resolve(null) : getCart(),
+  ]);
 
   return (
     <html lang="id" className={blink.variable}>
@@ -155,40 +165,27 @@ export default async function RootLayout({
         />
 
         {/*
-         * Pita pengumuman ("Dua jalur pemesanan: …") DIHAPUS atas permintaan
-         * pemilik: teks itu menyebut checkout online, padahal payment gateway
-         * belum diputuskan (OD-01) dan belum ada vendor yang dipilih.
-         * Menampilkan klaim fitur yang belum ada lebih buruk daripada tidak
-         * menampilkan apa-apa.
-         *
-         * Info dua jalur pemesanan sendiri masih dijelaskan di beranda lewat
-         * section "Jalur 1 / Jalur 2" — jadi tidak ada informasi yang hilang.
+         * Header navigasi HANYA tampil jika BUKAN mode maintenance.
          */}
-        <SiteHeader cartCount={cart?.summary.item_count ?? 0} />
+        {!isMaintenance && (
+          <SiteHeader cartCount={cart?.summary.item_count ?? 0} />
+        )}
 
         {/*
          * `scroll-mt-20`: di beranda header memakai `position: fixed`, jadi
-         * `main` tidak lagi menyisakan ruang untuknya. Tanpa `scroll-mt`,
-         * tautan lompat (skip-link, bookmark) akan menempatkan target tepat
-         * di belakang header yang menutupi 80px teratas.
+         * `main` tidak lagi menyisakan ruang untuknya.
          */}
         <main
           id="konten-utama"
-          className="flex-1 scroll-mt-20"
+          className={isMaintenance ? "flex-1" : "flex-1 scroll-mt-20"}
         >
           {children}
         </main>
 
         {/*
-          `resolveBrand()` dipanggil di sini, bukan di dalam `SiteFooter`.
-
-          Footer butuh bentuk yang sudah digabung dengan placeholder jujur
-          (alamat, jam buka, nomor WA ternormalisasi). Kalau penggabungan
-          dilakukan di dalam komponen, setiap pemanggil harus ingat
-          memanggilnya — dan satu yang lupa akan menampilkan `undefined`
-          alih-alih catatan "menunggu konfirmasi".
-        */}
-        <SiteFooter brand={resolveBrand(brand)} />
+         * Footer navigasi HANYA tampil jika BUKAN mode maintenance.
+         */}
+        {!isMaintenance && <SiteFooter brand={resolveBrand(brand)} />}
 
         <noscript>
           <div className="mx-auto w-full max-w-3xl px-4 py-6 text-center text-caption text-text-secondary">
