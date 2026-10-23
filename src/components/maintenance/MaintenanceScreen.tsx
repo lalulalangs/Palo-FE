@@ -10,7 +10,7 @@ interface MaintenanceScreenProps {
 export function MaintenanceScreen({ brand }: MaintenanceScreenProps) {
   return (
     <div className="flex min-h-[calc(100vh-2rem)] flex-col justify-between py-12 tablet:py-24">
-      <Container width="reading" className="flex flex-col items-center text-center">
+      <Container width="wide" className="flex flex-col items-center text-center">
         {/* Brand Logo Container */}
         <div className="mb-8 inline-flex rounded-xl bg-surface-white p-3.5 shadow-editorial border border-border-soft">
           <BrandLogo size={64} />
@@ -23,13 +23,13 @@ export function MaintenanceScreen({ brand }: MaintenanceScreenProps) {
           </Badge>
         </div>
 
-        {/* Technical & Explicit Headline */}
-        <h1 className="font-headline text-display-mobile tablet:text-display-lg text-text-primary tracking-tight">
+        {/* Technical & Explicit Headline (Satu Baris Penuh) */}
+        <h1 className="w-full font-headline text-title-lg tablet:text-display-lg text-text-primary tracking-tight whitespace-nowrap">
           Sistem Sedang Dalam Pengembangan
         </h1>
 
         {/* Technical & To-the-point Copywriting */}
-        <div className="mt-6 max-w-xl text-left border border-border-soft bg-surface-white p-6 rounded-lg shadow-editorial">
+        <div className="mt-8 w-full max-w-2xl text-left border border-border-soft bg-surface-white p-6 rounded-lg shadow-editorial">
           <p className="text-body-md text-text-primary leading-relaxed">
             Platform e-commerce dan integrasi layanan transaksi publik Palo Mountain Goods saat ini sedang dalam fase finalisasi sistem, konfigurasi payment gateway, dan sinkronisasi basis data inventaris.
           </p>
