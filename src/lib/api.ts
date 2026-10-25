@@ -1367,8 +1367,22 @@ export async function applyVoucher(
 /* Pesanan                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Hasil `lookupOrder`: `"not_found"` = backend menjawab 404 (pesanan tidak ada
+ * atau bukan milik pengguna ini — `OrderController::show` memfilter `user_id`),
+ * `"unauthorized"` = token di cookie sudah tidak berlaku (401), `null` = backend
+ * mati atau gagal.
+ *
+ * Sentinels itu perlu, sama seperti `CollectionLookup`: 404 dan outage harus
+ * dirender berbeda. "Pesanan tidak ditemukan" saat server mati membuat pembeli
+ * mengira pesanannya hilang.
+ */
+export type OrderLookup = OrderDetail | "not_found" | "unauthorized" | null;
+
 /** `GET /orders/{orderNumber}` — dibaca dari snapshot, bukan katalog live. */
-export async function getOrder(orderNumber: string): Promise<OrderDetail | null> {
+export async function lookupOrder(
+  orderNumber: string,
+): Promise<OrderLookup> {
   try {
     const payload = await apiRequest<unknown>(
       `/orders/${encodeURIComponent(orderNumber)}`,
@@ -1377,9 +1391,22 @@ export async function getOrder(orderNumber: string): Promise<OrderDetail | null>
     const data = unwrap<Record<string, unknown>>(payload, "data");
     if (!data) return null;
     return normalizeOrder(data);
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) return "not_found";
+      if (error.status === 401) return "unauthorized";
+    }
     return null;
   }
+}
+
+/**
+ * Versi tanpa pembedaan sebab gagal — dipakai `trackOrderAction` dan halaman
+ * sukses checkout yang sudah punya pesannya sendiri.
+ */
+export async function getOrder(orderNumber: string): Promise<OrderDetail | null> {
+  const result = await lookupOrder(orderNumber);
+  return typeof result === "string" || result === null ? null : result;
 }
 
 export async function getOrderList(): Promise<OrderSummary[] | null> {

@@ -15,9 +15,12 @@ import { absoluteUrl } from "@/lib/site";
  * perlu diedit manual.
  *
  * Halaman yang tidak ada isinya TIDAK masuk sitemap: `/keranjang`,
- * `/checkout`, `/masuk`, `/daftar`, dan `/lacak` adalah halaman
- * utilitas/personal. Memasukkannya akan meminta crawler mengindeks
- * halaman kosong.
+ * `/checkout`, `/masuk`, `/daftar`, `/lacak`, `/me`, dan
+ * `/orders/[orderNumber]` adalah halaman utilitas/personal. Memasukkannya
+ * akan meminta crawler mengindeks halaman kosong. `/orders/[orderNumber]`
+ * apalagi — isinya hanya terbuka untuk akun yang memesan dan bertanda
+ * `noIndex`, jadi mendaftarkan satu nomor pesanan di sini salah di dua hal
+ * sekaligus. `/doku` juga tidak masuk: itu cuma pengalihan ke route tersebut.
  *
  * `lastModified` sengaja dibiarkan `new Date()` di halaman statis, karena
  * katalog bisa berubah kapan saja. Untuk URL produk tidak ada field
