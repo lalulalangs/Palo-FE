@@ -58,3 +58,31 @@ export function safeExternalUrl(raw: string | null | undefined): string | null {
 
   return url.toString();
 }
+
+/**
+ * Ambil URL halaman pembayaran dari respons pembuatan pesanan (`POST
+ * /checkout/orders`).
+ *
+ * Backend mengirim `payment_url` di dua tempat — level `payment` dan di dalam
+ * `payment.instructions` (salinan `payments.raw_response`) — jadi keduanya
+ * diterima. Nilainya datang dari gateway lewat backend kita, tapi ini tetap
+ * data dari luar yang akan dipakai sebagai tujuan navigasi: skema selain
+ * `http:`/`https:` ditolak dengan aturan yang sama seperti tautan admin.
+ */
+export interface PaymentUrlSource {
+  payment_url?: string | null;
+  payment?: {
+    payment_url?: string | null;
+    instructions?: { payment_url?: string | null } | null;
+  } | null;
+}
+
+export function paymentRedirectUrl(source: PaymentUrlSource): string | null {
+  const candidate =
+    source.payment_url ??
+    source.payment?.payment_url ??
+    source.payment?.instructions?.payment_url ??
+    null;
+
+  return safeExternalUrl(candidate);
+}

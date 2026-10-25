@@ -182,9 +182,26 @@ export function CheckoutFlow({
       }
 
       setIsRedirecting(true);
-      // Nomor pesanan diteruskan lewat query string supaya halaman hasil
-      // tidak bergantung pada state, dan bisa di-refresh tanpa kehilangan
-      // konteks.
+
+      /*
+       * Pesanan dibuat → pembeli langsung dibawa ke halaman pembayaran
+       * gateway. Sebelumnya mereka berhenti di halaman instruksi yang tidak
+       * berisi nomor VA/QR apa pun untuk DOKU Checkout (host-to-host), jadi
+       * pesanan "menunggu pembayaran" tanpa jalan untuk membayar.
+       *
+       * Navigasi dilakukan dengan `window.location.assign`, bukan `router.push`:
+       * tujuannya situs lain (staging.doku.com), dan router Next hanya untuk
+       * rute internal. `?order=` tetap diteruskan supaya pembeli mendarat
+       * kembali di halaman pesanan bila gateway mengembalikan mereka tanpa
+       * parameter.
+       */
+      if (result.paymentUrl) {
+        window.location.assign(result.paymentUrl);
+        return;
+      }
+
+      // Cadangan: tidak ada URL pembayaran (mis. gateway bermasalah). Halaman
+      // hasil tetap berguna karena menampilkan instruksi & status terbaru.
       router.push(
         `/checkout/berhasil?order=${encodeURIComponent(result.order.order_number)}`,
       );

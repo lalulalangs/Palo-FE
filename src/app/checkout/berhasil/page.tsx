@@ -7,6 +7,7 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { PaymentInstructions } from "@/components/checkout/PaymentInstructions";
 import { buttonClass } from "@/components/ui/Button";
 import { getOrder } from "@/lib/api";
+import { paymentRedirectUrl } from "@/lib/url";
 import {
   formatHarga,
   formatBarisPesanan,
@@ -127,6 +128,8 @@ export default async function CheckoutSuccessPage({
     );
   }
 
+  const paymentUrl = paymentRedirectUrl(detail);
+
   const instructions = detail.payment_expires_at
     ? `Selesaikan pembayaran sebelum ${formatWaktu(detail.payment_expires_at)} agar stok Anda tidak dilepas.`
     : "Instruksi pembayaran akan tampil di sini setelah dari payment gateway.";
@@ -183,6 +186,21 @@ export default async function CheckoutSuccessPage({
                 Metode: {detail.payment_method}
               </p>
             ) : null}
+            {/*
+              DOKU Checkout bersifat host-to-host: tidak ada nomor VA/QR yang
+              dibaca dari respons, pembeli harus membuka `payment_url`. Tanpa
+              tombol ini halaman hasil hanya berkata "selesaikan pembayaran"
+              tanpa memberi jalan.
+            */}
+            {paymentUrl ? (
+              <a
+                href={paymentUrl}
+                className={buttonClass({ size: "lg", fullWidth: true, className: "mt-4" })}
+              >
+                Lanjut ke halaman pembayaran DOKU
+              </a>
+            ) : null}
+
             {/*
               Instruksi dirender apa adanya dari `payment.instructions`
               (`payments.raw_response`). Kalau gateway belum mengirim apa pun,

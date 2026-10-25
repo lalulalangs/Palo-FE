@@ -16,6 +16,7 @@ import {
 import { toActionError } from "@/lib/action-result";
 import type { ActionError } from "@/lib/action-result";
 import { isPaymentMethod, type AddressInput } from "@/lib/checkout-form";
+import { paymentRedirectUrl } from "@/lib/url";
 import type {
   AppliedVoucher,
   CheckoutLineItem,
@@ -298,6 +299,14 @@ export async function applyVoucherAction(
 
 export interface PlaceOrderResult {
   order: CreatedOrder;
+  /**
+   * Halaman pembayaran gateway (DOKU Checkout) untuk pesanan yang baru dibuat.
+   *
+   * `null` bila gateway tidak mengirimnya — COD/WhatsApp tamu tidak memakai
+   * gateway, dan gateway yang sedang bermasalah juga bisa tidak mengirim apa
+   * pun. Pemanggil WAJIB punya jalur cadangan, bukan menganggap selalu ada.
+   */
+  paymentUrl: string | null;
 }
 
 export async function placeOrderAction(input: {
@@ -365,7 +374,9 @@ export async function placeOrderAction(input: {
     revalidatePath("/");
     revalidatePath("/lacak");
 
-    return { order };
+    // `payment_url` ada di dua tempat pada respons backend; `paymentRedirectUrl`
+    // memilih yang pertama tersedia dan menolak skema selain http(s).
+    return { order, paymentUrl: paymentRedirectUrl(order) };
   } catch (error) {
     // 409 (stok habis), 422 (voucher), 503 (kurir), dan 429 (rate limit)
     // sampai ke sini apa adanya sebagai `ActionError` dengan `kind` yang

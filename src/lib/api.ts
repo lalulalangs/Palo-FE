@@ -1493,11 +1493,17 @@ function normalizeOrder(source: Record<string, unknown>): OrderDetail | null {
  */
 function normalizePayment(value: unknown): PaymentInfo | null {
   if (!isRecord(value)) return null;
+  const instructions = normalizePaymentInstruction(value.instructions);
   return {
     method: readString(value, "method"),
     amount: readNumber(value.amount, 0),
     status: readString(value, "status") ?? "",
-    instructions: normalizePaymentInstruction(value.instructions),
+    instructions,
+    // `payment_url` dikirim di dua tempat (level `payment` dan di dalam
+    // `instructions`, yang merupakan salinan `payments.raw_response`). Ambil
+    // yang tersedia supaya tidak bergantung pada satu bentuk saja.
+    payment_url:
+      readString(value, "payment_url") ?? instructions?.payment_url ?? null,
   };
 }
 
@@ -1510,6 +1516,7 @@ function normalizePaymentInstruction(value: unknown): PaymentInstruction | null 
     instructions_text: readString(value, "instructions_text"),
     expires_at: readString(value, "expires_at"),
     method: readString(value, "method"),
+    payment_url: readString(value, "payment_url"),
   };
 }
 

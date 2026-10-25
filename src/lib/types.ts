@@ -408,6 +408,12 @@ export interface ShippingQuote {
 export interface PaymentInstruction {
   /** QRIS/VA/e-wallet — isi bergantung metode (KONTRAK-API §3). */
   qr_string: string | null;
+  /**
+   * Halaman pembayaran host-to-host (DOKU Checkout). Inilah tujuan yang harus
+   * dibuka pembeli setelah pesanan dibuat — tanpa ini, pembeli berhenti di
+   * halaman instruksi yang tidak punya nomor VA/QR apa pun.
+   */
+  payment_url?: string | null;
   va_number: string | null;
   bank_name: string | null;
   instructions_text: string | null;
@@ -431,6 +437,8 @@ export interface PaymentInfo {
   amount: number;
   status: string;
   instructions: PaymentInstruction | null;
+  /** Salinan `payment_url` di level `payment`, selain di `instructions`. */
+  payment_url?: string | null;
 }
 
 export type OrderStatus =
@@ -447,6 +455,11 @@ export type OrderStatus =
 
 export interface CreatedOrder {
   order_number: string;
+  /**
+   * URL halaman pembayaran gateway (DOKU Checkout), `null` untuk metode yang
+   * tidak memakai gateway (COD/WhatsApp tamu).
+   */
+  payment_url?: string | null;
   status: OrderStatus;
   subtotal: number;
   discount_total: number;
