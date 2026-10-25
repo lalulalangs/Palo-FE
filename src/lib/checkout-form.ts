@@ -1,4 +1,8 @@
-import { PAYMENT_METHODS, type PaymentMethod } from "./types";
+import {
+  PAYMENT_METHODS,
+  type PaymentMethod,
+  type ShippingDestination,
+} from "./types";
 
 /**
  * Pembantu formulir checkout.
@@ -12,8 +16,12 @@ export interface AddressInput {
   recipient_name: string;
   phone: string;
   street: string;
-  /** Wajib: layanan kurir menghitung ongkir dari kode kota, bukan teks. */
-  city_code: string;
+  /**
+   * Subdistrict RajaOngkir hasil pemilih wilayah. Inilah satu-satunya nilai
+   * yang dipakai kurir; `city`/`province` dst. hanya turunannya untuk kontrak
+   * order dan ringkasan. `0` = belum ada wilayah terpilih.
+   */
+  destination_id: number;
   city: string;
   province: string;
   postal_code: string | null;
@@ -59,7 +67,7 @@ export function readAddress(
     recipient_name: readText(formData, "recipient_name"),
     phone: readText(formData, "phone"),
     street: readText(formData, "street"),
-    city_code: readText(formData, "city_code"),
+    destination_id: Number(readText(formData, "destination_id")),
     city: readText(formData, "city"),
     province: readText(formData, "province"),
     postal_code: readOptionalText(formData, "postal_code"),
@@ -78,9 +86,9 @@ export function readAddress(
   if (!address.street) {
     errors.street = ["Alamat lengkap wajib diisi."];
   }
-  if (!address.city_code) {
-    errors.city_code = [
-      "Kode kota wajib diisi. Kode ini dipakai layanan kurir untuk menghitung ongkir.",
+  if (!Number.isFinite(address.destination_id) || address.destination_id <= 0) {
+    errors.destination_id = [
+      "Pilih wilayah pengiriman dari daftar hasil pencarian.",
     ];
   }
   if (!address.city) {
@@ -106,4 +114,46 @@ export function normalizePhone(raw: string): string {
   if (digits.startsWith("+")) return `0${digits.slice(1)}`;
   if (digits.startsWith("62")) return `0${digits.slice(2)}`;
   return digits;
+}
+
+/**
+ * Nama wilayah dari API kurir datang HURUF KAPITAL PENUH
+ * ("CEMPAKA PUTIH BARAT"), yang jelek dibaca dan tidak boleh ditampilkan apa
+ * adanya. `label` mentah juga tidak dipakai karena formatnya milik RajaOngkir.
+ */
+export function titleCase(value: string | null): string {
+  if (!value) return "";
+  return value
+    .toLowerCase()
+    .replace(/(^|[^a-z])([a-z])/g, (_match, before: string, letter: string) =>
+      `${before}${letter.toUpperCase()}`,
+    );
+}
+
+/**
+ * Kelima field wilayah diisi dari satu pilihan destinasi.
+ *
+ * `null` = pilihan dilepas ("Ganti wilayah"): `destination_id` kembali `0`
+ * sehingga `readAddress` menolak submit sampai pembeli memilih lagi — tidak
+ * ada fallback teks bebas, karena teks bebas adalah sumber ongkir salah.
+ */
+export function addressRegion(
+  destination: ShippingDestination | null,
+): Pick<
+  AddressInput,
+  | "destination_id"
+  | "city"
+  | "province"
+  | "postal_code"
+  | "district"
+  | "subdistrict"
+> {
+  return {
+    destination_id: destination?.id ?? 0,
+    city: titleCase(destination?.city_name ?? null),
+    province: titleCase(destination?.province_name ?? null),
+    postal_code: destination?.zip_code?.trim() || null,
+    district: titleCase(destination?.district_name ?? null) || null,
+    subdistrict: titleCase(destination?.subdistrict_name ?? null) || null,
+  };
 }

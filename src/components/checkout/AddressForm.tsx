@@ -1,52 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { DestinationPicker } from "@/components/checkout/DestinationPicker";
 import { Input, Textarea } from "@/components/ui/Input";
 import { buttonClass } from "@/components/ui/Button";
+import type { ActionError } from "@/lib/action-result";
 import {
+  addressRegion,
   readAddress,
   type AddressFieldErrors,
   type AddressInput,
 } from "@/lib/checkout-form";
+import type { ShippingDestination } from "@/lib/types";
 
 export type AddressSubmitResult =
   | { ok: true; address: AddressInput }
   | { ok: false; errors: AddressFieldErrors };
 
+/** `destination_id` tidak punya input sendiri; fokus diarahkan ke pencarian wilayah. */
+const FIELD_ELEMENT: Record<string, string> = {
+  destination_id: "destination_search",
+};
+
 /**
- * Formulir alamat pengiriman.
+ * Formulir alamat pengiriman (`docs/SPEC-ALAMAT-25102026.md` §1).
  *
  * Kenapa satu langkah penuh, bukan pemilih dari daftar alamat tersimpan:
  * `routes/api.php` belum punya endpoint CRUD alamat, jadi tidak ada daftar
  * alamat yang bisa diambil dari server. Menampilkannya sebagai pilihan
  * berarti mengarang data. Formulir ini mengirim objek `shipping_address`
- * lengkap, yang memang bentuk yang diminta `StoreOrderRequest`.
+ * lengkap, yang memang bentuk yang diminta `CheckoutOrderRequest`.
  *
- * Yang penting: `city_code`. Backend mewajibkannya karena layanan kurir
- * menghitung ongkir dari kode kota, bukan dari teks kota bebas. Mockup lama
- * hanya menanyakan "Kota Tujuan" sebagai teks, yang selalu ditolak validasi
- * atau, lebih buruk, menghasilkan ongkir yang keliru.
+ * Wilayah tujuan TIDAK diketik. Satu pencarian → satu hasil dipilih mengisi
+ * provinsi/kota/kecamatan/kelurahan/kode pos sekaligus dan menyimpan
+ * `destination_id` (subdistrict RajaOngkir). "Kode kota untuk kurir" hilang:
+ * itu satu-satunya pertanyaan yang tidak bisa dijawab pembeli tanpa CS, dan
+ * jawabannya adalah sumber ongkir salah yang tidak pernah terdeteksi.
  */
 export function AddressForm({
   defaults,
   errors,
+  quoteError = null,
   disabled = false,
   isPending = false,
   onSubmit,
 }: {
   defaults: AddressInput;
   errors: AddressFieldErrors;
+  /** Kegagalan quote ongkir (`kind: "courier"`/`"address"`/…) — tampil di langkah ini. */
+  quoteError?: ActionError | null;
   disabled?: boolean;
   isPending?: boolean;
   /** Dipanggil dengan hasil validasi. Tidak melempar exception. */
   onSubmit: (result: AddressSubmitResult) => void;
 }) {
   const [values, setValues] = useState<AddressInput>(defaults);
+  // Error dari submit sebelumnya tidak boleh menetap setelah isian diperbaiki.
+  // Menyesuaikan state saat prop berubah (pola resmi React, tanpa effect).
+  const [seenErrors, setSeenErrors] = useState(errors);
+  const [edited, setEdited] = useState(false);
+  if (seenErrors !== errors) {
+    setSeenErrors(errors);
+    setEdited(false);
+  }
 
   function update<K extends keyof AddressInput>(key: K, value: AddressInput[K]) {
+    setEdited(true);
     setValues((current) => ({ ...current, [key]: value }));
   }
+
+  function selectDestination(destination: ShippingDestination | null) {
+    setEdited(true);
+    setValues((current) => ({ ...current, ...addressRegion(destination) }));
+  }
+
+  // Fokus pindah ke field pertama yang salah: form ini hanya 6 isian, jadi
+  // ringkasan tidak perlu tautan lompat.
+  useEffect(() => {
+    const first = Object.keys(errors)[0];
+    if (!first) return;
+    const id = FIELD_ELEMENT[first] ?? first;
+    document.getElementById(id)?.focus();
+  }, [errors]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -69,6 +105,10 @@ export function AddressForm({
   }
 
   const isDisabled = disabled || isPending;
+  const shown: AddressFieldErrors = edited ? {} : errors;
+  const regionError =
+    shown.destination_id?.[0] ?? shown.city?.[0] ?? shown.province?.[0];
+  const errorCount = Object.keys(shown).length;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate={false}>
@@ -82,7 +122,7 @@ export function AddressForm({
         disabled={isDisabled}
         value={values.recipient_name}
         onChange={(event) => update("recipient_name", event.target.value)}
-        error={errors.recipient_name?.[0]}
+        error={shown.recipient_name?.[0]}
       />
 
       <Input
@@ -98,7 +138,7 @@ export function AddressForm({
         disabled={isDisabled}
         value={values.phone}
         onChange={(event) => update("phone", event.target.value)}
-        error={errors.phone?.[0]}
+        error={shown.phone?.[0]}
       />
 
       <Input
@@ -112,80 +152,29 @@ export function AddressForm({
         disabled={isDisabled}
         value={values.street}
         onChange={(event) => update("street", event.target.value)}
-        error={errors.street?.[0]}
+        error={shown.street?.[0]}
       />
 
-      <div className="grid gap-4 tablet:grid-cols-3">
-        <Input
-          id="district"
-          name="district"
-          label="Kecamatan"
-          autoComplete="address-level3"
-          maxLength={100}
-          disabled={isDisabled}
-          value={values.district ?? ""}
-          onChange={(event) => update("district", event.target.value)}
-          error={errors.district?.[0]}
-        />
-        <Input
-          id="city"
-          name="city"
-          label="Kota / Kabupaten"
-          autoComplete="address-level2"
-          required
-          maxLength={100}
-          disabled={isDisabled}
-          value={values.city}
-          onChange={(event) => update("city", event.target.value)}
-          error={errors.city?.[0]}
-        />
-        <Input
-          id="province"
-          name="province"
-          label="Provinsi"
-          autoComplete="address-level1"
-          required
-          maxLength={100}
-          disabled={isDisabled}
-          value={values.province}
-          onChange={(event) => update("province", event.target.value)}
-          error={errors.province?.[0]}
-        />
-      </div>
+      <DestinationPicker
+        picked={values}
+        error={regionError}
+        disabled={isDisabled}
+        onSelect={selectDestination}
+      />
 
-      <div className="grid gap-4 tablet:grid-cols-2">
-        {/*
-          `city_code` berupa input teks, bukan daftar dropdown, karena
-          `routes/api.php` tidak menyediakan endpoint daftar kota/kabupaten.
-          Menampilkan daftar karangan berisiko menghasilkan ongkos yang salah;
-          teks bebas membiarkan pengguna mengikuti kode dari dokumen resmi
-          kurir, dan backend tetap memvalidasinya.
-        */}
-        <Input
-          id="city_code"
-          name="city_code"
-          label="Kode kota untuk kurir"
-          hint="Kode wilayah yang dipakai layanan kurir. Hubungi Customer Service bila belum tahu kode kota Anda."
-          required
-          maxLength={20}
-          disabled={isDisabled}
-          value={values.city_code}
-          onChange={(event) => update("city_code", event.target.value)}
-          error={errors.city_code?.[0]}
-        />
-        <Input
-          id="postal_code"
-          name="postal_code"
-          label="Kode pos (opsional)"
-          autoComplete="postal-code"
-          inputMode="numeric"
-          maxLength={10}
-          disabled={isDisabled}
-          value={values.postal_code ?? ""}
-          onChange={(event) => update("postal_code", event.target.value)}
-          error={errors.postal_code?.[0]}
-        />
-      </div>
+      <Input
+        id="postal_code"
+        name="postal_code"
+        label="Kode pos"
+        hint="Terisi otomatis dari wilayah yang dipilih. Boleh diubah."
+        autoComplete="postal-code"
+        inputMode="numeric"
+        maxLength={10}
+        disabled={isDisabled}
+        value={values.postal_code ?? ""}
+        onChange={(event) => update("postal_code", event.target.value || null)}
+        error={shown.postal_code?.[0]}
+      />
 
       <Textarea
         id="notes"
@@ -196,8 +185,58 @@ export function AddressForm({
         disabled={isDisabled}
         value={values.notes ?? ""}
         onChange={(event) => update("notes", event.target.value)}
-        error={errors.notes?.[0]}
+        error={shown.notes?.[0]}
       />
+
+      {errorCount > 0 ? (
+        <p role="alert" className="text-caption text-feedback-error">
+          {errorCount} isian perlu diperbaiki sebelum ongkir dihitung.
+        </p>
+      ) : null}
+
+      {/*
+        Kegagalan quote ongkir tampil DI SINI — di langkah tempat pembeli
+        menekan tombol. Sebelumnya blok ini hanya dirender di langkah 2,
+        padahal `step` tidak pernah maju saat quote gagal: kegagalan hilang
+        tanpa pesan. Warna/judul mengikuti sebabnya: alamat tidak dikenali
+        kurir = merah, gangguan layanan = warn (bukan salah pembeli).
+      */}
+      {quoteError ? (
+        <div
+          role="alert"
+          aria-atomic="true"
+          className={
+            quoteError.kind === "address"
+              ? "rounded-md border border-feedback-error bg-feedback-error-soft/40 p-3"
+              : "rounded-md border border-feedback-warn bg-surface-paper p-3"
+          }
+        >
+          <p
+            className={
+              quoteError.kind === "address"
+                ? "text-label-md font-semibold text-feedback-error"
+                : "text-label-md font-semibold text-feedback-warn"
+            }
+          >
+            {quoteError.kind === "address"
+              ? "Alamat belum bisa diproses"
+              : quoteError.kind === "rate-limit"
+                ? "Terlalu banyak percobaan"
+                : quoteError.kind === "auth"
+                  ? "Sesi Anda berakhir"
+                  : "Ongkir belum dapat dihitung"}
+          </p>
+          <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+            {quoteError.message}
+            {quoteError.kind === "address"
+              ? " Pilih satu hasil dari pencarian agar ongkir dihitung ke kecamatan yang benar."
+              : ""}
+            {quoteError.kind === "courier"
+              ? " Ongkos tidak dikarang, jadi proses berhenti di sini sampai layanan kurir merespons."
+              : ""}
+          </p>
+        </div>
+      ) : null}
 
       {/*
         Tombol submit ada di dalam form, bukan di luar. Ini yang membuat
@@ -209,7 +248,11 @@ export function AddressForm({
         disabled={isDisabled}
         className={buttonClass({ size: "lg", fullWidth: true, className: "mt-2" })}
       >
-        {isPending ? "Menghitung ongkir…" : "Lanjut ke ongkir"}
+        {isPending
+          ? "Menghitung ongkir…"
+          : quoteError
+            ? "Coba hitung ongkir lagi"
+            : "Lanjut ke ongkir"}
       </button>
 
       {/*

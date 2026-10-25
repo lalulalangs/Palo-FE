@@ -29,6 +29,8 @@ export interface ActionError {
     | "courier"
     | "price-changed"
     | "voucher"
+    /** Tujuan ongkir tidak dikenali kurir (`shipping_destination_not_found`). */
+    | "address"
     | "network"
     | "unknown";
   /**
@@ -61,14 +63,35 @@ const NETWORK_MESSAGE =
   "Layanan sedang tidak dapat dihubungi. Silakan coba lagi sebentar.";
 
 /**
+ * Kunci `fieldErrors` yang menandakan kegagalan voucher.
+ *
+ * Dulu SEMUA 422 dipetakan ke `kind: "voucher"`, sehingga alamat/berat/kurir
+ * tampil sebagai "Voucher tidak dapat dipakai" dan chip voucher yang sah ikut
+ * dilepas. Urutan pemeriksaan: penanda mesin dulu, baru kunci field.
+ */
+const VOUCHER_FIELD_KEYS = ["code", "voucher_code"];
+
+function classificationFor422(error: ApiError): ActionError["kind"] {
+  if (error.errorCode === "shipping_destination_not_found") return "address";
+
+  const touchesVoucher = VOUCHER_FIELD_KEYS.some(
+    (key) => (error.fieldErrors[key]?.length ?? 0) > 0,
+  );
+  if (touchesVoucher) return "voucher";
+
+  return "validation";
+}
+
+/**
  * Petakan `ApiError` ke bentuk yang bisa ditampilkan.
  *
  * Pemetaan `status` → `kind` mengikuti tabel error di `KONTRAK-API.md` §3 dan
  * §6 supaya frontend bisa membedakan secara eksplisit:
  * - 503 → kurir bermasalah → WAJIB memblokir lanjut ke pembayaran (PRD §3.8 AC)
  * - 409 → stok habis / harga berubah → tawarkan muat ulang keranjang
- * - 422 → voucher tidak berlaku → biarkan buyer melanjutkan tanpa diskon
- * - 429 → rate limit → tampilkanjedanya, jangan auto-retry
+ * - 422 → lihat `classificationFor422`: penanda mesin dulu (`error_code`),
+ *   baru kunci `fieldErrors`. 422 TIDAK otomatis berarti voucher.
+ * - 429 → rate limit → tampilkan jedanya, jangan auto-retry
  */
 export function toActionError(error: unknown): ActionError {
   if (error instanceof ApiError) {
@@ -109,7 +132,7 @@ export function toActionError(error: unknown): ActionError {
     if (error.status === 422) {
       return {
         ok: false,
-        kind: "voucher",
+        kind: classificationFor422(error),
         message: error.message,
         fieldErrors: error.fieldErrors,
       };

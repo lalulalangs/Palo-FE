@@ -11,6 +11,7 @@ import {
   getShippingQuote,
   getToken,
   removeCartItem,
+  searchDestinations,
 } from "@/lib/api";
 import { toActionError } from "@/lib/action-result";
 import type { ActionError } from "@/lib/action-result";
@@ -20,6 +21,7 @@ import type {
   CheckoutLineItem,
   CreatedOrder,
   OrderDetail,
+  ShippingDestination,
   ShippingQuote,
   ShippingService,
 } from "@/lib/types";
@@ -95,9 +97,13 @@ export async function removeSkuFromCartAction(
 export interface ShippingQuoteResult {
   services: ShippingService[];
   destinationCity: string;
-  destinationCityCode: string;
   /** `true` hanya bila ongkir terverifikasi dan boleh lanjut. */
   canProceed: boolean;
+}
+
+/** Hasil pencarian wilayah; `destinations` kosong = tidak ada yang cocok. */
+export interface DestinationSearchResult {
+  destinations: ShippingDestination[];
 }
 
 /**
@@ -129,6 +135,35 @@ async function cartLineItems(
   }));
 }
 
+/**
+ * Cari wilayah tujuan (`GET /shipping/destinations`).
+ *
+ * Penjaga terakhir kuota: backend menolak `search` < 3 karakter, dan klien
+ * sudah membatasi di komponen. Guard di sini memastikan tidak ada satu pun
+ * request jaringan yang lolos karena bug UI.
+ */
+export async function searchDestinationsAction(
+  query: string,
+): Promise<DestinationSearchResult | ActionError> {
+  const keyword = query.trim();
+  if (keyword.length < 3) return { destinations: [] };
+
+  if (!(await getToken())) {
+    return {
+      ok: false,
+      kind: "auth",
+      message: "Sesi Anda berakhir. Masuk kembali untuk mencari wilayah.",
+      fieldErrors: {},
+    };
+  }
+
+  try {
+    return { destinations: await searchDestinations(keyword) };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
 export async function quoteShippingAction(
   address: AddressInput,
 ): Promise<ShippingQuoteResult | ActionError> {
@@ -157,7 +192,10 @@ export async function quoteShippingAction(
 
   try {
     const quote: ShippingQuote = await getShippingQuote({
-      destination_city: address.city_code,
+      // Subdistrict RajaOngkir hasil pemilih wilayah. Jalur `destination_city`
+      // (nama teks) di server me-resolve ke `rows[0]` pencarian — sumber ongkir
+      // yang salah tanpa galat, jadi tidak dipakai lagi.
+      destination_id: address.destination_id,
       items,
     });
 
@@ -176,7 +214,6 @@ export async function quoteShippingAction(
     return {
       services: quote.services,
       destinationCity: address.city,
-      destinationCityCode: address.city_code,
       canProceed: true,
     };
   } catch (error) {

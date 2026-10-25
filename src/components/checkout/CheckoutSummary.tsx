@@ -115,6 +115,9 @@ export function CheckoutSummary({
           <address className="mt-1 text-caption not-italic leading-relaxed text-text-secondary">
             {address.recipient_name} · {address.phone}
             <span className="block">{address.street}</span>
+            {address.subdistrict ? (
+              <span className="block">{address.subdistrict}</span>
+            ) : null}
             {address.district ? <span className="block">{address.district}</span> : null}
             <span className="block">
               {[address.city, address.province, address.postal_code]

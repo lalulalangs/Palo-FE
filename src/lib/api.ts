@@ -35,6 +35,7 @@ import type {
   ProductSku,
   RegisterRequest,
   ShippingAddressSnapshot,
+  ShippingDestination,
   ShippingQuote,
   ShippingQuoteRequest,
   SortKey,
@@ -981,6 +982,47 @@ export async function removeCartItem(skuId: number): Promise<Cart> {
 /* -------------------------------------------------------------------------- */
 /* Checkout                                                                   */
 /* -------------------------------------------------------------------------- */
+
+/**
+ * Batas hasil pencarian wilayah — SATU nilai tetap.
+ *
+ * `limit` ikut masuk kunci cache server (`ShippingRateService::searchDestinations`),
+ * jadi mengganti-ganti limit berarti satu HIT kuota baru untuk kata kunci yang
+ * sudah pernah dicari. Delapan baris cukup untuk dipilih tanpa memanjangkan form.
+ */
+const DESTINATION_SEARCH_LIMIT = 8;
+
+/**
+ * `GET /shipping/destinations?search=&limit=` — pencarian subdistrict RajaOngkir.
+ *
+ * MELEMPAR `ApiError` (beda dengan `getCategories` yang menelan kegagalan jadi
+ * `null`): 429 dan status 0 harus sampai ke pemanggil supaya pembeli melihat
+ * sebabnya, bukan daftar kosong yang menyamar sebagai "tidak ada hasil".
+ */
+export async function searchDestinations(
+  query: string,
+): Promise<ShippingDestination[]> {
+  const payload = await apiRequest<unknown>("/shipping/destinations", {
+    query: { search: query, limit: DESTINATION_SEARCH_LIMIT },
+    token: await getToken(),
+  });
+  // Balasan `ShippingController::destinations`: `{ data: { destinations: [...] } }`.
+  const data = unwrap<Record<string, unknown>>(payload, "data");
+  if (!Array.isArray(data?.destinations)) return [];
+
+  return data.destinations
+    .filter(isRecord)
+    .map((row) => ({
+      id: readNumber(row.id, 0),
+      label: readString(row, "label") ?? "",
+      province_name: readString(row, "province_name"),
+      city_name: readString(row, "city_name"),
+      district_name: readString(row, "district_name"),
+      subdistrict_name: readString(row, "subdistrict_name"),
+      zip_code: readString(row, "zip_code"),
+    }))
+    .filter((destination) => destination.id > 0);
+}
 
 export async function getShippingQuote(
   request: ShippingQuoteRequest,

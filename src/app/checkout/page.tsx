@@ -37,7 +37,7 @@ const EMPTY_ADDRESS: AddressInput = {
   recipient_name: "",
   phone: "",
   street: "",
-  city_code: "",
+  destination_id: 0,
   city: "",
   province: "",
   postal_code: null,

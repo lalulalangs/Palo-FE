@@ -367,8 +367,12 @@ export interface ShippingAddress {
   recipient_name: string;
   phone: string;
   street: string;
-  /** Wajib: API kurir butuh kode kota, bukan teks bebas. */
-  city_code: string;
+  /**
+   * Subdistrict RajaOngkir dari pemilih wilayah (`GET /shipping/destinations`).
+   * Satu-satunya nilai yang dipakai kurir untuk menghitung ongkir;
+   * `city_code` (teks bebas) tidak lagi dikirim.
+   */
+  destination_id: number;
   city: string;
   province: string;
   postal_code: string | null;
@@ -423,8 +427,25 @@ export const PAYMENT_METHODS = [
 
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number]["value"];
 
+/**
+ * Satu baris `GET /shipping/destinations` — satu subdistrict RajaOngkir.
+ *
+ * `label` milik RajaOngkir (huruf kapital penuh, format bisa berubah), jadi
+ * untuk tampilan susun sendiri dari field di bawah — lihat `titleCase`.
+ */
+export interface ShippingDestination {
+  id: number;
+  label: string;
+  province_name: string | null;
+  city_name: string | null;
+  district_name: string | null;
+  subdistrict_name: string | null;
+  zip_code: string | null;
+}
+
 export interface ShippingQuoteRequest {
-  destination_city: string;
+  /** Subdistrict RajaOngkir; jalur yang benar untuk `POST /shipping/quote`. */
+  destination_id: number;
   items: Array<{ sku_id: number; quantity: number }>;
 }
 

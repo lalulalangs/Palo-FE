@@ -14,7 +14,11 @@ import { ShippingRatePicker } from "@/components/checkout/ShippingRatePicker";
 import { VoucherField } from "@/components/checkout/VoucherField";
 import { buttonClass } from "@/components/ui/Button";
 import type { ActionError } from "@/lib/action-result";
-import type { AddressFieldErrors, AddressInput } from "@/lib/checkout-form";
+import {
+  addressRegion,
+  type AddressFieldErrors,
+  type AddressInput,
+} from "@/lib/checkout-form";
 import { formatHarga } from "@/lib/format";
 import type {
   AppliedVoucher,
@@ -67,6 +71,13 @@ export function CheckoutFlow({
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState<AddressInput>(defaultAddress);
   const [addressErrors, setAddressErrors] = useState<AddressFieldErrors>({});
+  /**
+   * Dinaikkan hanya saat pilihan wilayah harus dikosongkan (422
+   * `shipping_destination_not_found`). `AddressForm` memakai `defaults` sebagai
+   * state awal, jadi remount adalah cara paling sederhana mengisi ulang form
+   * tanpa sinkronisasi dua arah antara induk dan form.
+   */
+  const [addressFormKey, setAddressFormKey] = useState(0);
 
   const [services, setServices] = useState<ShippingService[]>([]);
   const [selectedService, setSelectedService] = useState<ShippingService | null>(
@@ -105,6 +116,13 @@ export function CheckoutFlow({
     startQuoting(async () => {
       const quote = await quoteShippingAction(result.address);
       if (isActionErrorLike(quote)) {
+        // 422 `shipping_destination_not_found`: wilayah tujuan belum pasti bagi
+        // kurir, jadi pilihan wilayah dikosongkan dan pembeli memilih ulang dari
+        // hasil pencarian. Isian lain tetap; voucher tidak disentuh.
+        if (quote.kind === "address") {
+          setAddress({ ...result.address, ...addressRegion(null) });
+          setAddressFormKey((key) => key + 1);
+        }
         setShippingError(quote);
         return;
       }
@@ -197,8 +215,10 @@ export function CheckoutFlow({
 
               <div className="mt-5">
                 <AddressForm
+                  key={addressFormKey}
                   defaults={address}
                   errors={addressErrors}
+                  quoteError={shippingError}
                   disabled={busy}
                   isPending={isQuoting}
                   onSubmit={handleAddressSubmit}
@@ -273,31 +293,12 @@ export function CheckoutFlow({
                 </div>
               ) : null}
 
-              {shippingError ? (
-                <div role="alert" className="mt-4">
-                  <PlaceholderNotice
-                    title={
-                      shippingError.kind === "courier"
-                        ? "Checkout diblokir"
-                        : "Ongkir belum tersedia"
-                    }
-                    body={`${shippingError.message}${
-                      shippingError.kind === "courier"
-                        ? " Ongkos tidak boleh dikarang, jadi proses berhenti di sini sampai layanan kurir merespons."
-                        : ""
-                    }`}
-                    variant="paper"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleAddressSubmit({ ok: true, address })}
-                    disabled={busy}
-                    className={buttonClass({ variant: "outline", className: "mt-3" })}
-                  >
-                    Hitung ulang
-                  </button>
-                </div>
-              ) : null}
+              {/*
+                Galat quote TIDAK dirender di sini: `handleAddressSubmit` tidak
+                pernah memindahkan `step` saat quote gagal, jadi pembeli tetap
+                di langkah 1. Blok yang dulu ada di sini mati dan sudah pindah
+                ke `AddressForm` (`quoteError`), di tempat pembeli menekan tombol.
+              */}
 
               <button
                 type="button"
