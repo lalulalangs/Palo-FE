@@ -343,16 +343,16 @@ function serializeHandoff(result: GuestWhatsAppResult): string {
 }
 
 /**
- * Ambil cookie lalu hapus, supaya hanya dibaca sekali.
+ * Ambil cookie handoff untuk halaman hasil WhatsApp checkout tamu.
  *
- * `cookie.delete()` hanya bisa dipanggil dalam konteks Server Action/Server
- * Component, jadi fungsi ini dipakai langsung dari halaman hasil.
+ * Di Server Component (page render), `cookies()` berstatus read-only
+ * sehingga cookie tidak bisa dihapus di sini (`ReadonlyRequestCookiesError`).
+ * Cookie akan kedaluwarsa otomatis sesuai `maxAge` (GUEST_RESULT_TTL_SECONDS).
  */
 export async function takeGuestResultHandoff(): Promise<GuestResultHandoff | null> {
   const store = await cookies();
   const raw = store.get(GUEST_RESULT_COOKIE)?.value;
   if (!raw) return null;
-  store.delete(GUEST_RESULT_COOKIE);
 
   try {
     const parsed: unknown = JSON.parse(raw);
