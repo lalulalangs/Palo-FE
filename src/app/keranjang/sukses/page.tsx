@@ -51,7 +51,7 @@ export default async function GuestCheckoutSuccessPage() {
           <div className="mx-auto max-w-2xl">
             <PlaceholderNotice
               title="Halaman ini hanya bisa dibuka setelah formulir dikirim"
-              body="Kode referensi dan tautan WhatsApp dibuat sesaat setelah Anda menekan tombol di halaman keranjang, lalu langsung dihapus dari browser. Buka halaman keranjang untuk mencoba lagi."
+              body="Kode referensi dan tautan WhatsApp dibuat sesaat setelah Anda menekan tombol di halaman keranjang, dan hanya tersimpan sepuluh menit di browser ini. Buka halaman keranjang untuk mencoba lagi."
             />
             <div className="mt-6 flex flex-col gap-3 tablet:flex-row">
               <Link href="/keranjang" className={buttonClass({ size: "lg" })}>

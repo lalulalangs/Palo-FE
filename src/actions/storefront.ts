@@ -350,8 +350,21 @@ function serializeHandoff(result: GuestWhatsAppResult): string {
  * Cookie akan kedaluwarsa otomatis sesuai `maxAge` (GUEST_RESULT_TTL_SECONDS).
  */
 export async function takeGuestResultHandoff(): Promise<GuestResultHandoff | null> {
-  const store = await cookies();
-  const raw = store.get(GUEST_RESULT_COOKIE)?.value;
+  /*
+   * SEMUA akses cookie dibungkus: halaman ini adalah langkah terakhir satu-
+   * satunya jalur pemesanan tamu, dan dulu pernah 500 total gara-gara satu
+   * operasi cookie di sini. Konteks yang tidak bisa membaca cookie (request
+   * non-browser, cookie rusak, konteks render yang berubah antar versi Next)
+   * harus berakhir di halaman "belum ada pesan", bukan di error boundary.
+   */
+  let raw: string | undefined;
+  try {
+    const store = await cookies();
+    raw = store.get(GUEST_RESULT_COOKIE)?.value;
+  } catch {
+    return null;
+  }
+
   if (!raw) return null;
 
   try {
