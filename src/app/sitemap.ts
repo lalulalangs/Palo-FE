@@ -15,8 +15,8 @@ import { absoluteUrl } from "@/lib/site";
  * perlu diedit manual.
  *
  * Halaman yang tidak ada isinya TIDAK masuk sitemap: `/keranjang`,
- * `/checkout`, `/masuk`, `/daftar`, `/lacak`, dan `/keranjang/sukses` adalah
- * halaman utilitas/personal. Memasukkannya akan meminta crawler mengindeks
+ * `/checkout`, `/masuk`, `/daftar`, dan `/lacak` adalah halaman
+ * utilitas/personal. Memasukkannya akan meminta crawler mengindeks
  * halaman kosong.
  *
  * `lastModified` sengaja dibiarkan `new Date()` di halaman statis, karena

@@ -1,12 +1,17 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 
 import { createGuestCheckoutAction } from "@/actions/storefront";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { buttonClass } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { fieldError, isActionError } from "@/lib/action-result";
+import { formatHarga } from "@/lib/format";
+import type {
+  GuestCheckoutActionState,
+  GuestResultHandoff,
+} from "@/lib/guest-handoff";
 import { stockStateOf } from "@/lib/cart-stock";
 import type { CartItem } from "@/lib/types";
 
@@ -35,14 +40,19 @@ export function GuestCheckoutForm({
   /** Hanya satu CTA primer per tampilan; diisi oleh halaman induk. */
   variant?: "primary" | "outline";
 }) {
-  const [state, formAction, isPending] = useActionState(
-    createGuestCheckoutAction,
-    null,
-  );
+  const [state, formAction, isPending] = useActionState<
+    GuestCheckoutActionState | null,
+    FormData
+  >(createGuestCheckoutAction, null);
   const error = isActionError(state) ? state : null;
+  // Sukses = hasil dikembalikan action dan panel ditampilkan DI SINI.
+  // Tidak ada cookie, tidak ada redirect, tidak ada halaman perantara.
+  const handoff = state?.ok ? state.handoff : null;
   // Gerbang yang sama dipakai baris keranjang dan ringkasan: stok basi
   // (jumlah > sisa stok) juga memblokir jalur tamu, bukan hanya stok habis.
   const hasBlockingItem = items.some((item) => stockStateOf(item) !== "cukup");
+
+  if (handoff) return <GuestResultPanel handoff={handoff} />;
 
   return (
     <form action={formAction} className="space-y-4">
@@ -128,6 +138,91 @@ export function GuestCheckoutForm({
         pesanan sudah tercatat dan bukan pembayaran yang selesai.
       </p>
     </form>
+  );
+}
+
+/**
+ * Hasil setelah pesan WhatsApp disiapkan.
+ *
+ * Dulu ini halaman `/keranjang/sukses` yang dibuka lewat redirect + cookie
+ * serah-terima. Cookie itu yang berulang kali gagal (mutasi saat render, lalu
+ * tidak pernah sampai ke browser), jadi hasilnya sekarang dirender di tempat
+ * pengguna menekan tombol — tidak ada perpindahan halaman yang bisa gagal.
+ *
+ * Fokus dipindah ke judul supaya pembaca layar langsung tahu isi formulir
+ * sudah berganti menjadi hasil.
+ */
+function GuestResultPanel({ handoff }: { handoff: GuestResultHandoff }) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="text-headline-sm text-text-primary"
+      >
+        Pesan WhatsApp sudah disiapkan
+      </h2>
+
+      <div className="rounded-lg border-2 border-accent-earth/50 bg-surface-paper p-4">
+        <p className="text-title-md text-brand-deep">Ini belum menjadi pesanan</p>
+        <p className="mt-2 text-body-md text-text-secondary">{handoff.notice}</p>
+        <p className="mt-2 text-caption leading-relaxed text-text-secondary">
+          Yang tercatat hanya niat menghubungi Customer Service. Tidak ada nomor
+          pesanan, tidak ada stok yang dikunci, dan tidak ada pembayaran yang
+          diproses. Harga serta stok final dikonfirmasi langsung oleh Customer
+          Service.
+        </p>
+      </div>
+
+      <div className="rounded-lg border border-border-soft bg-surface-white p-4">
+        <p className="text-caption uppercase tracking-widest text-text-secondary">
+          Kode referensi
+        </p>
+        <p className="mt-1 font-mono text-title-lg font-bold tracking-wider text-brand-deep">
+          {handoff.reference_code}
+        </p>
+        <p className="mt-1 text-caption text-text-secondary">
+          Sebutkan kode ini di awal percakapan supaya Customer Service bisa
+          menemukan catatan Anda.
+        </p>
+      </div>
+
+      {handoff.estimated_total > 0 || handoff.estimated_total_display ? (
+        <p className="text-body-md text-text-primary">
+          Estimasi total{" "}
+          <strong className="font-semibold text-brand-forest">
+            {formatHarga(
+              handoff.estimated_total,
+              handoff.estimated_total_display,
+            )}
+          </strong>{" "}
+          <span className="text-caption text-text-secondary">
+            (belum termasuk ongkos kirim)
+          </span>
+        </p>
+      ) : null}
+
+      <a
+        href={handoff.wa_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={buttonClass({ size: "lg", fullWidth: true })}
+      >
+        Buka WhatsApp dan kirim pesan
+      </a>
+
+      <p className="text-caption leading-relaxed text-text-secondary">
+        Tautan ini membuka percakapan dengan pesan yang sudah terisi. Membuka
+        tautan tidak mengirim apa pun — Anda tetap menekan tombol kirim di
+        WhatsApp.
+      </p>
+    </div>
   );
 }
 

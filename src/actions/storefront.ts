@@ -18,11 +18,9 @@ import {
   updateCartItem,
 } from "@/lib/api";
 import { toActionError } from "@/lib/action-result";
-import {
-  GUEST_RESULT_COOKIE,
-  GUEST_RESULT_TTL_SECONDS,
-  MAX_HANDOFF_BYTES,
-  type GuestResultHandoff,
+import type {
+  GuestCheckoutActionState,
+  GuestResultHandoff,
 } from "@/lib/guest-handoff";
 import type { ActionError, ActionResult } from "@/lib/action-result";
 import type { GuestWhatsAppResult } from "@/lib/types";
@@ -234,14 +232,6 @@ export async function removeCartItemAction(
 /* -------------------------------------------------------------------------- */
 
 /**
- * Cookie serah-terima untuk halaman hasil guest WhatsApp.
- *
- * Ini bukan sesi: hanya carry-over singkat dari Server Action ke
- * `/keranjang/sukses`, jadi umurnya pendek (10 menit) dan `httpOnly` supaya
- * `wa_url` tidak bisa dibaca skrip pihak ketiga di halaman. Nama cookie
- * sengaja berbeda dari `AUTH_TOKEN_COOKIE` agar tidak tertukar saat logout.
- */
-/**
  * Baca item keranjang dari satu field form `sku_id:quantity` yang dipisah koma.
  *
  * Bentuk ini dipilih supaya client tidak perlu mengirim array yang bisa
@@ -266,10 +256,19 @@ function readCartItems(
   return items;
 }
 
+/**
+ * Kirim keranjang tamu ke Customer Service via WhatsApp.
+ *
+ * Hasil DIKEMBALIKAN ke form, bukan dioper lewat cookie + redirect. Riwayat
+ * lengkapnya ada di `src/lib/guest-handoff.ts`: cookie serah-terima membuat
+ * halaman hasil 500 (mutasi cookie saat render), lalu setelah itu diperbaiki
+ * cookienya tetap tidak sampai ke browser sehingga pembeli selalu melihat
+ * "belum ada pesan" padahal endpoint sukses.
+ */
 export async function createGuestCheckoutAction(
-  _prev: ActionError | null,
+  _prev: GuestCheckoutActionState | null,
   formData: FormData,
-): Promise<ActionError | null> {
+): Promise<GuestCheckoutActionState> {
   const items = readCartItems(formData);
   if (items.length === 0) {
     return {
@@ -292,103 +291,17 @@ export async function createGuestCheckoutAction(
     return toActionError(error);
   }
 
-  const store = await cookies();
-  store.set(GUEST_RESULT_COOKIE, serializeHandoff(result), {
-    maxAge: GUEST_RESULT_TTL_SECONDS,
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/keranjang/sukses",
-  });
-
-  // Cookie dibaca sekali di halaman tujuan lalu dihapus, jadi tidak ada jejak
-  // yang bertahan lama di browser.
-  revalidatePath("/keranjang/sukses");
-
-  // Di luar blok `try` — `redirect()` melempar exception yang kalau tertangkap
-  // akan terbaca sebagai kegagalan checkout. Karena jalur sukses selalu
-  // berakhir di sini, nilai balik aksi ini hanya bisa berupa `ActionError`.
-  redirect("/keranjang/sukses");
-}
-
-/**
- * Susun payload cookie, dengan turun-tahan bila kelewat besar.
- *
- * `wa_url` adalah satu-satunya bagian yang bisa membengkak karena isi pesan
- * WhatsApp di-URL-encode, jadi dia yang dipangkas. Dengan begitu
- * `reference_code` dan `notice` tetap utuh, dan halaman hasil bisa
- * menjelaskannya ketika tautannya ternyata terpotong.
- */
-function serializeHandoff(result: GuestWhatsAppResult): string {
-  const base = {
+  const handoff: GuestResultHandoff = {
     reference_code: result.reference_code,
+    wa_url: result.wa_url,
     notice: result.notice,
     estimated_total: result.estimated_total,
     estimated_total_display: result.estimated_total_display,
   };
 
-  const full = JSON.stringify({ ...base, wa_url: result.wa_url });
-  if (full.length <= MAX_HANDOFF_BYTES) return full;
+  revalidatePath("/keranjang");
 
-  // Pangkas dari belakang sampai muat. `wa_url` terpotong akan membuka
-  // WhatsApp dengan pesan terpotong, dan halaman hasil menyatakannya.
-  let waUrl = result.wa_url;
-  while (
-    waUrl.length > 0 &&
-    JSON.stringify({ ...base, wa_url: waUrl }).length > MAX_HANDOFF_BYTES
-  ) {
-    waUrl = waUrl.slice(0, Math.floor(waUrl.length * 0.9));
-  }
-  return JSON.stringify({ ...base, wa_url: waUrl, truncated: true });
-}
-
-/**
- * Ambil cookie handoff untuk halaman hasil WhatsApp checkout tamu.
- *
- * Di Server Component (page render), `cookies()` berstatus read-only
- * sehingga cookie tidak bisa dihapus di sini (`ReadonlyRequestCookiesError`).
- * Cookie akan kedaluwarsa otomatis sesuai `maxAge` (GUEST_RESULT_TTL_SECONDS).
- */
-export async function takeGuestResultHandoff(): Promise<GuestResultHandoff | null> {
-  /*
-   * SEMUA akses cookie dibungkus: halaman ini adalah langkah terakhir satu-
-   * satunya jalur pemesanan tamu, dan dulu pernah 500 total gara-gara satu
-   * operasi cookie di sini. Konteks yang tidak bisa membaca cookie (request
-   * non-browser, cookie rusak, konteks render yang berubah antar versi Next)
-   * harus berakhir di halaman "belum ada pesan", bukan di error boundary.
-   */
-  let raw: string | undefined;
-  try {
-    const store = await cookies();
-    raw = store.get(GUEST_RESULT_COOKIE)?.value;
-  } catch {
-    return null;
-  }
-
-  if (!raw) return null;
-
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== "object" || parsed === null) return null;
-    const value = parsed as Record<string, unknown>;
-    if (typeof value.reference_code !== "string") return null;
-    if (typeof value.wa_url !== "string") return null;
-    return {
-      reference_code: value.reference_code,
-      wa_url: value.wa_url,
-      notice: typeof value.notice === "string" ? value.notice : "",
-      estimated_total:
-        typeof value.estimated_total === "number" ? value.estimated_total : 0,
-      estimated_total_display:
-        typeof value.estimated_total_display === "string"
-          ? value.estimated_total_display
-          : null,
-    };
-  } catch {
-    // Cookie rusak (mis. versi aplikasi berbeda). Lebih baik tampilkan
-    // halaman tanpa hasil daripada halaman 500.
-    return null;
-  }
+  return { ok: true, handoff };
 }
 
 /* -------------------------------------------------------------------------- */

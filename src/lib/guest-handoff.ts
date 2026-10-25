@@ -1,5 +1,7 @@
+import type { ActionError } from "@/lib/action-result";
+
 /**
- * Konstanta & tipe bersama untuk Server Action storefront.
+ * Bentuk & hasil checkout tamu via WhatsApp.
  *
  * ===================================================================
  *  KENAPA FILE INI DIPISAH DARI `actions/storefront.ts`
@@ -10,54 +12,44 @@
  *
  *   "Only async functions are allowed to be exported in a 'use server' file"
  *
- * Error itu nyata terjadi di sini: `GUEST_RESULT_COOKIE` dan
- * `GuestResultHandoff` tadinya diekspor dari file `"use server"`, sehingga
- * SELURUH halaman ikut 500 — termasuk beranda yang sebenarnya tidak
- * bergantung pada kode tersebut.
+ * Jadi tipe bersama tinggal di sini (file biasa, tanpa direktif), lalu
+ * diimpor dari sisi action maupun komponen.
  *
- * Solusinya: pindahkan konstanta & tipe ke file biasa (tanpa direktif), lalu
- * import dari `actions/storefront.ts`. Nilai dan tipenya tetap satu sumber
- * kebenaran; yang berubah hanya tempat jejarnya.
+ * ===================================================================
+ *  KENAPA HASILNYA DIKEMBALIKAN, BUKAN DIOPER LEWAT COOKIE
+ * ===================================================================
+ * Versi sebelumnya menyimpan hasil di cookie `pmg_guest_wa_result` bertaut
+ * `path=/keranjang/sukses`, lalu `redirect()`. Dua kegagalan produksi lahir
+ * dari rangkaian itu:
+ *
+ * 1. Cookie dihapus di dalam render halaman hasil → Next melempar
+ *    "Cookies can only be modified in a Server Action or Route Handler",
+ *    dan seluruh halaman menjadi error boundary.
+ * 2. Setelah penghapusan itu dibereskan, browser tetap tidak pernah menerima
+ *    cookienya — bukan soal ukuran (payload terukur hanya ~766 byte setelah
+ *    `encodeURIComponent`), sehingga halaman hasil selalu berkata "belum ada
+ *    pesan" padahal API sukses.
+ *
+ * Hasil sekarang dikembalikan langsung oleh Server Action ke form yang
+ * mengirimnya. Tidak ada cookie, tidak ada redirect, tidak ada halaman
+ * perantara — satu kelas kegagalan hilang seluruhnya.
  */
 
-/**
- * Cookie serah-terima untuk halaman hasil guest WhatsApp.
- *
- * Ini bukan sesi: hanya carry-over singkat dari Server Action ke
- * `/keranjang/sukses`, jadi umurnya pendek (10 menit) dan `httpOnly` supaya
- * `wa_url` tidak bisa dibaca skrip pihak ketiga di halaman. Nama cookie
- * sengaja berbeda dari `AUTH_TOKEN_COOKIE` agar tidak tertukar saat logout.
- */
-export const GUEST_RESULT_COOKIE = "pmg_guest_wa_result";
-
-/**
- * Umur cookie serah-terima dalam detik (10 menit).
- *
- * Cukup untuk user menyelesaikan satu langkah, cukup pendek supaya `wa_url`
- * tidak menggantung lama di browser.
- */
-export const GUEST_RESULT_TTL_SECONDS = 600;
-
-/**
- * Batas aman sebelum cookie melewati 4 KB per browser.
- *
- * Kalau payload ternyata melebihi batas ini, `wa_url` dipangkas dari
- * belakang. Kode referensi dan notice tetap dijaga utuh karena keduanya yang
- * wajib tampil apa adanya.
- */
-export const MAX_HANDOFF_BYTES = 3000;
-
-/**
- * Bentuk yang disimpan di cookie serah-terima.
- *
- * `message` sengaja TIDAK ikut: isinya sudah tertanam di `wa_url` (pesan
- * WhatsApp), dan mengikutinya akan membuat cookie cepat melewati batas 4 KB
- * untuk keranjang yang panjang.
- */
+/** Data yang perlu ditampilkan setelah pesan WhatsApp siap dibuka. */
 export interface GuestResultHandoff {
   reference_code: string;
   wa_url: string;
+  /** Kalimat dari backend; wajib ditampilkan apa adanya. */
   notice: string;
   estimated_total: number;
   estimated_total_display: string | null;
 }
+
+/** Aksi berhasil: pesan WhatsApp siap dibuka. */
+export interface GuestCheckoutSuccess {
+  ok: true;
+  handoff: GuestResultHandoff;
+}
+
+/** Keadaan form: belum submit, sukses, atau galat. */
+export type GuestCheckoutActionState = GuestCheckoutSuccess | ActionError;

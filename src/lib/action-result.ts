@@ -139,12 +139,14 @@ export function toActionError(error: unknown): ActionError {
     }
 
     if (error.status === 429) {
+      // Pesan 429 dari Laravel berbahasa Inggris ("Too Many Attempts."), dan
+      // itu yang dulu tampil apa adanya ke pembeli. Copy Indonesia dipakai
+      // selalu; jendela throttle bergeser, jadi hitungan mundur diklaim.
       return {
         ok: false,
         kind: "rate-limit",
         message:
-          error.message ||
-          "Terlalu banyak percobaan. Tunggu sebentar sebelum mencoba lagi.",
+          "Terlalu banyak percobaan dalam waktu singkat. Tunggu sekitar satu menit, lalu coba lagi.",
         fieldErrors: {},
       };
     }
