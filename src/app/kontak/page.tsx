@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { JsonLd } from "@/components/JsonLd";
+import { InquiryForm } from "@/components/checkout/InquiryForm";
 import { Container } from "@/components/layout/Container";
 import { PageHeader, SectionHeading } from "@/components/layout/PageHeader";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { buttonClass } from "@/components/ui/Button";
-import { getBrand } from "@/lib/api";
+import { getBrand, getCurrentUser } from "@/lib/api";
 import { resolveBrand, whatsappLink } from "@/lib/brand";
 import { breadcrumbJsonLd, contactPageJsonLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/metadata";
@@ -45,10 +46,20 @@ export const metadata: Metadata = buildMetadata({
 
 const CS_DEFAULT_MESSAGE = "Halo, saya ingin bertanya tentang merchandise Senaru.";
 
+/**
+ * Nomor cadangan milik backend (`getCleanCsWhatsAppNumber()`), dipakai saat
+ * `app_settings` kosong. Form inquiry TIDAK boleh dirender selama nomor CS
+ * hanya nomor contoh ini — pertanyaannya akan dikirim ke nomor yang salah.
+ */
+const PLACEHOLDER_CS_NUMBER = "6281234567890";
+
 export default async function ContactPage() {
-  const brand = await getBrand();
+  const [brand, user] = await Promise.all([getBrand(), getCurrentUser()]);
   const resolved = resolveBrand(brand);
   const csLink = whatsappLink(resolved, CS_DEFAULT_MESSAGE);
+  const hasRealCsNumber =
+    resolved.whatsappLink !== null &&
+    resolved.whatsappLink !== PLACEHOLDER_CS_NUMBER;
 
   const crumbs = [
     { name: "Beranda", href: "/" },
@@ -247,6 +258,35 @@ export default async function ContactPage() {
             ) : null}
           </section>
         </div>
+
+        {/* ---- Inquiry grosir / ekspedisi (PRD §6A, audit baris 27) ---- */}
+        <section id="inquiry" className="mt-10 scroll-mt-24">
+          <div className="grid gap-8 desktop:grid-cols-12">
+            <div className="desktop:col-span-5">
+              <SectionHeading
+                eyebrow="Pesanan partai"
+                title="Ajukan pertanyaan grosir atau ekspedisi"
+                description="Untuk pembelian dalam jumlah besar, kebutuhan ekspedisi, atau kerja sama reseller. Isi form ini, lalu lanjutkan ke WhatsApp Customer Service dengan pesan yang sudah tersusun."
+              />
+              <p className="mt-4 text-caption leading-relaxed text-text-secondary">
+                Halaman ini tidak menjanjikan harga, ketersediaan, maupun
+                tenggat. Semuanya dibicarakan langsung dengan Customer Service.
+              </p>
+            </div>
+
+            <div className="desktop:col-span-7">
+              {hasRealCsNumber ? (
+                <InquiryForm defaultName={user?.name ?? ""} />
+              ) : (
+                <PlaceholderNotice
+                  title="Nomor WhatsApp CS belum diisi"
+                  body="Formulir pertanyaan hanya ditampilkan setelah admin mengisi nomor Customer Service, karena seluruh pertanyaan diarahkan ke nomor itu."
+                  variant="paper"
+                />
+              )}
+            </div>
+          </div>
+        </section>
 
         <div className="mt-10 flex flex-col gap-3 tablet:flex-row">
           <Link href="/produk" className={buttonClass({ size: "lg" })}>

@@ -9,6 +9,7 @@ import {
   addCartItem,
   apiRequest,
   clearGuestToken,
+  createCustomInquiry,
   createGuestWhatsAppCheckout,
   getToken,
   login,
@@ -374,5 +375,61 @@ export async function takeGuestResultHandoff(): Promise<GuestResultHandoff | nul
     // Cookie rusak (mis. versi aplikasi berbeda). Lebih baik tampilkan
     // halaman tanpa hasil daripada halaman 500.
     return null;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Inquiry grosir / B2B (PRD §6A)                                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * `POST /guest/custom-inquiry` — pertanyaan grosir/ekspedisi yang berakhir di
+ * WhatsApp CS. Bukan pesanan, bukan reservasi stok.
+ *
+ * Dua hal yang disengaja:
+ * 1. **`items: null`.** Keranjang tidak dilampirkan — `items` tidak pernah
+ *    masuk pesan WhatsApp (`GuestCheckoutService::customInquiry()`) dan hanya
+ *    tersimpan di `cart_snapshot` tanpa UI admin. Mengirimnya berarti menyimpan
+ *    daftar SKU tanpa manfaat.
+ * 2. **Tanpa `cookies()`, `redirect()`, `revalidatePath()`.** Tidak ada yang
+ *    di-cache yang berubah; hasilnya ditampilkan di komponen, bukan di halaman
+ *    hasil terpisah.
+ */
+export async function createCustomInquiryAction(
+  _prev: ActionResult<GuestWhatsAppResult> | null,
+  formData: FormData,
+): Promise<ActionResult<GuestWhatsAppResult>> {
+  const quantityRaw = readText(formData, "quantity");
+  let quantity: number | null = null;
+
+  if (quantityRaw.length > 0) {
+    const parsed = Number.parseInt(quantityRaw, 10);
+    // `quantity.integer` dan `quantity.max` belum punya pesan Indonesia di
+    // `CustomInquiryRequest::messages()`, jadi nilai di luar kontrak ditolak di
+    // sini supaya pembeli tidak menerima teks Inggris dari backend.
+    if (!Number.isFinite(parsed) || parsed < 1 || parsed > 10000) {
+      return {
+        ok: false,
+        kind: "validation",
+        message: "Periksa kembali isian di bawah ini.",
+        fieldErrors: {
+          quantity: ["Jumlah harus angka bulat antara 1 dan 10.000."],
+        },
+      };
+    }
+    quantity = parsed;
+  }
+
+  try {
+    const data = await createCustomInquiry({
+      name: readText(formData, "name"),
+      phone: readText(formData, "phone"),
+      quantity,
+      note: readOptionalText(formData, "note"),
+      items: null,
+    });
+    return { ok: true, data };
+  } catch (error) {
+    return toActionError(error);
   }
 }
