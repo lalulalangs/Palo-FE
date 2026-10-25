@@ -7,9 +7,11 @@ import {
   removeCartItemAction,
   updateCartItemAction,
 } from "@/actions/storefront";
+import { buttonClass } from "@/components/ui/Button";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
-import { formatHarga } from "@/lib/format";
+import { stockStateOf } from "@/lib/cart-stock";
+import { formatAngka, formatHarga } from "@/lib/format";
 import type { CartItem } from "@/lib/types";
 
 /**
@@ -29,20 +31,27 @@ import type { CartItem } from "@/lib/types";
 export function CartLineItem({ item }: { item: CartItem }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [adjusted, setAdjusted] = useState<string | null>(null);
 
   const maxQuantity = Math.max(item.available_stock, 1);
-  const isBlocked = item.is_out_of_stock || item.available_stock <= 0;
+  const state = stockStateOf(item);
 
-  function changeQuantity(next: number) {
+  function changeQuantity(next: number, announce = false) {
     setError(null);
+    setAdjusted(null);
     startTransition(async () => {
       const result = await updateCartItemAction(item.sku_id, next);
-      if (!result.ok) setError(result.message);
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
+      if (announce) setAdjusted(`Jumlah disesuaikan menjadi ${next}.`);
     });
   }
 
   function remove() {
     setError(null);
+    setAdjusted(null);
     startTransition(async () => {
       const result = await removeCartItemAction(item.sku_id);
       if (!result.ok) setError(result.message);
@@ -125,11 +134,38 @@ export function CartLineItem({ item }: { item: CartItem }) {
           </button>
         </div>
 
-        {isBlocked ? (
-          <p className="mt-2 rounded-md bg-surface-paper px-3 py-2 text-caption font-semibold text-feedback-warn">
+        {state === "habis" ? (
+          <p className="mt-2 rounded-md bg-surface-paper px-3 py-2 text-label-sm font-semibold text-feedback-warn">
             Produk ini sedang tidak tersedia. Hapus dari keranjang agar tidak
             menghambat pemesanan.
           </p>
+        ) : null}
+
+        {/*
+          Stok turun setelah barang masuk keranjang: server tidak meng-clamp
+          `quantity` saat membaca, jadi jumlah di keranjang bisa lebih besar
+          dari sisa stok. Pengguna harus diberi tahu angka keduanya, bukan
+          hanya "Maksimal N per pesanan".
+        */}
+        {state === "kurang" ? (
+          <div className="mt-2 rounded-md bg-surface-paper px-3 py-2">
+            <p className="text-label-sm font-semibold text-feedback-warn">
+              Jumlah di keranjang melebihi sisa stok. Kurangi dulu sebelum
+              melanjutkan.
+            </p>
+            <button
+              type="button"
+              onClick={() => changeQuantity(item.available_stock, true)}
+              disabled={isPending}
+              className={buttonClass({
+                variant: "outline",
+                size: "sm",
+                className: "mt-2",
+              })}
+            >
+              Sesuaikan ke {formatAngka(item.available_stock)}
+            </button>
+          </div>
         ) : null}
 
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
@@ -146,10 +182,27 @@ export function CartLineItem({ item }: { item: CartItem }) {
             <QuantityStepper
               value={item.quantity}
               onChange={changeQuantity}
-              max={isBlocked ? 1 : maxQuantity}
+              max={maxQuantity}
               label={`jumlah ${item.product_name}`}
-              disabled={isPending || isBlocked}
+              disabled={isPending || state === "habis"}
               itemName={item.variant_name ?? item.product_name}
+              note={
+                state === "kurang"
+                  ? // Angka lengkapnya ada di chip di atas; mengulang kalimat
+                    // yang sama dua kali di satu baris hanya menambah bising.
+                    {
+                      text: `Sisa stok ${formatAngka(item.available_stock)}.`,
+                      tone: "warn",
+                    }
+                  : state === "cukup"
+                    ? {
+                        text: `Sisa stok ${formatAngka(item.available_stock)}.`,
+                        tone: "muted",
+                      }
+                    : // `habis`: tanpa ini stepper menampilkan "Maksimal 1 per
+                      // pesanan", angka karangan untuk barang yang stoknya 0.
+                      { text: "Stok habis.", tone: "warn" }
+              }
             />
           </div>
 
@@ -165,10 +218,14 @@ export function CartLineItem({ item }: { item: CartItem }) {
 
           {/*
             `aria-live` supaya pesan dari server (mis. "Stok [SKU] tidak
-            mencukupi") langsung diumumkan begitu muncul.
+            mencukupi") dan hasil `Sesuaikan ke N` langsung diumumkan begitu
+            muncul, tanpa memindahkan fokus.
           */}
         <p role="status" aria-live="polite" className="mt-2 text-caption">
           {error ? <span className="text-feedback-error">{error}</span> : null}
+          {adjusted ? (
+            <span className="text-text-primary">{adjusted}</span>
+          ) : null}
         </p>
       </div>
     </article>

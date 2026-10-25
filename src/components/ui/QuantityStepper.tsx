@@ -27,6 +27,12 @@ export interface QuantityStepperProps {
   disabled?: boolean;
   /** Nama butir untuk pesan batas maksimum, mis. "Varian Ukuran L". */
   itemName?: string;
+  /**
+   * Catatan pengganti teks bawaan ("Maksimal N per pesanan"). Dipakai
+   * keranjang, yang butuh menyebut sisa stok dan jumlah di keranjang —
+   * pemakai lain (PDP) tidak mengirim apa pun, jadi teks bawaannya tetap.
+   */
+  note?: { text: string; tone: "muted" | "warn" };
   className?: string;
 }
 
@@ -38,6 +44,7 @@ export function QuantityStepper({
   label,
   disabled = false,
   itemName,
+  note,
   className,
 }: QuantityStepperProps) {
   const inputId = useId();
@@ -45,13 +52,23 @@ export function QuantityStepper({
 
   const atMax = value >= max;
   const atMin = value <= min;
+  const upper = Math.max(max, min);
 
   function commit(next: number) {
-    const clamped = Math.min(Math.max(next, min), Math.max(max, min));
+    /*
+     * `value` bisa SUDAH di atas `max` — stok turun setelah barang masuk
+     * keranjang, dan `GET /cart` tidak meng-clamp quantity. Backend menolak
+     * setiap tulis dengan `quantity > available_stock`
+     * (`CartService::updateItem`: "Jumlah melebihi stok tersedia (N)"), jadi
+     * menurunkan satu langkah (5→4→3→2) hanya menghasilkan tiga penolakan
+     * tanpa mengubah apa pun. Satu klik harus langsung mendarat di `max`;
+     * angkanya sendiri sudah dijelaskan catatan di bawah stepper.
+     */
+    const clamped = Math.min(Math.max(next, min), upper);
     onChange(clamped);
-    if (next > max) {
+    if (next > upper) {
       setNotice(
-        `Stok tersedia hanya ${max}${itemName ? ` untuk ${itemName}` : ""}.`,
+        `Stok tersedia hanya ${upper}${itemName ? ` untuk ${itemName}` : ""}.`,
       );
       return;
     }
@@ -85,7 +102,7 @@ export function QuantityStepper({
           max={Math.max(max, min)}
           disabled={disabled}
           readOnly
-          aria-describedby={notice ? `${inputId}-notice` : undefined}
+          aria-describedby={`${inputId}-notice`}
         />
         <button
           type="button"
@@ -105,9 +122,12 @@ export function QuantityStepper({
         id={`${inputId}-notice`}
         role="status"
         aria-live="polite"
-        className="mt-1.5 text-caption text-text-secondary"
+        className={[
+          "mt-1.5 text-caption",
+          note?.tone === "warn" ? "text-feedback-warn" : "text-text-secondary",
+        ].join(" ")}
       >
-        {notice ?? `Maksimal ${max} per pesanan.`}
+        {notice ?? note?.text ?? `Maksimal ${max} per pesanan.`}
       </p>
     </div>
   );

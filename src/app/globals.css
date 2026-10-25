@@ -56,7 +56,12 @@
 
   /* --- Text ----------------------------------------------------------------- */
   --color-text-primary: #1e2c25;
-  --color-text-secondary: #62766d;
+  /*
+   * `#51625a` (dari `#62766d`): varian lama gagal WCAG AA 4,5:1 di atas
+   * `surface-paper` (4,45:1) dan `surface-sage` (4,09:1). Varian ini ≥5,46:1
+   * di semua permukaan terang; hue 153° dipertahankan.
+   */
+  --color-text-secondary: #51625a;
 
   /* --- Border --------------------------------------------------------------- */
   --color-border-soft: #d8e1d9;

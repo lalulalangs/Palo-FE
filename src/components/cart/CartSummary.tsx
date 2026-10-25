@@ -27,11 +27,18 @@ export function CartSummary({
   summary,
   shippingNote,
   action,
+  blockedReason,
 }: {
   summary: CartSummaryData;
   /** Slot untuk tombol/tautan aksi (disusun oleh Server Component induk). */
   shippingNote?: string;
   action?: React.ReactNode;
+  /**
+   * Alasan checkout belum bisa dilanjutkan (ada baris `kurang`/`habis`).
+   * Dirender sebagai teks terlihat tepat di atas CTA, karena tombol
+   * `disabled` tidak bisa difokus dan tidak boleh mengandalkan tooltip.
+   */
+  blockedReason?: string | null;
 }) {
   const totalLabel = formatHarga(summary.subtotal, summary.subtotal_display);
 
@@ -78,9 +85,19 @@ export function CartSummary({
         </p>
       </div>
 
+      {blockedReason ? (
+        <p
+          id="checkout-blocked"
+          className="mb-3 flex gap-2 rounded-md bg-surface-paper p-3 text-label-sm font-semibold leading-relaxed text-feedback-warn"
+        >
+          <span aria-hidden="true">!</span>
+          <span>{blockedReason}</span>
+        </p>
+      ) : null}
+
       {action ? <div className="space-y-3">{action}</div> : null}
 
-      <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-caption leading-relaxed text-text-secondary">
+      <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-label-sm leading-relaxed text-text-secondary">
         Keranjang tidak memblokir stok. Stok dan harga divalidasi ulang oleh
         server saat pesanan dibuat, sehingga nilai di atas bisa berubah.
       </p>

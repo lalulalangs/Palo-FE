@@ -7,6 +7,7 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { buttonClass } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { fieldError, isActionError } from "@/lib/action-result";
+import { stockStateOf } from "@/lib/cart-stock";
 import type { CartItem } from "@/lib/types";
 
 /**
@@ -26,18 +27,27 @@ import type { CartItem } from "@/lib/types";
  *    adalah permintaan lewat CS, bukan SKU berbayar. Jalur itu punya endpoint
  *    sendiri (`/guest/custom-inquiry`) dan tidak dicampur ke form pemesanan.
  */
-export function GuestCheckoutForm({ items }: { items: CartItem[] }) {
+export function GuestCheckoutForm({
+  items,
+  variant = "primary",
+}: {
+  items: CartItem[];
+  /** Hanya satu CTA primer per tampilan; diisi oleh halaman induk. */
+  variant?: "primary" | "outline";
+}) {
   const [state, formAction, isPending] = useActionState(
     createGuestCheckoutAction,
     null,
   );
   const error = isActionError(state) ? state : null;
-  const hasBlockingItem = items.some((item) => item.is_out_of_stock);
+  // Gerbang yang sama dipakai baris keranjang dan ringkasan: stok basi
+  // (jumlah > sisa stok) juga memblokir jalur tamu, bukan hanya stok habis.
+  const hasBlockingItem = items.some((item) => stockStateOf(item) !== "cukup");
 
   return (
     <form action={formAction} className="space-y-4">
       <h2 className="text-headline-sm text-text-primary">
-        Jalur 1 — Checkout lewat WhatsApp
+        Checkout lewat WhatsApp
       </h2>
       <p className="text-caption leading-relaxed text-text-secondary">
         Tanpa akun. Daftar belanja disusun otomatis ke percakapan WhatsApp
@@ -89,8 +99,9 @@ export function GuestCheckoutForm({ items }: { items: CartItem[] }) {
 
       {hasBlockingItem ? (
         <PlaceholderNotice
-          title="Ada item yang sedang tidak tersedia"
-          body="Satu atau lebih item di keranjang kehabisan stok. Hapus item tersebut sebelum melanjutkan supaya pesan ke Customer Service tidak memuat barang yang tidak bisa dipenuhi."
+          title="Ada barang yang perlu disesuaikan dulu"
+          body="Satu atau lebih barang habis atau jumlahnya melebihi sisa stok. Sesuaikan jumlahnya sebelum melanjutkan."
+          variant="paper"
         />
       ) : null}
 
@@ -107,7 +118,7 @@ export function GuestCheckoutForm({ items }: { items: CartItem[] }) {
       <button
         type="submit"
         disabled={isPending || hasBlockingItem}
-        className={buttonClass({ fullWidth: true, size: "lg" })}
+        className={buttonClass({ variant, fullWidth: true, size: "lg" })}
       >
         {isPending ? "Menyiapkan pesan…" : "Lanjut ke WhatsApp CS"}
       </button>
@@ -120,10 +131,19 @@ export function GuestCheckoutForm({ items }: { items: CartItem[] }) {
   );
 }
 
-/** `sku_id:quantity` dipisah koma — format yang dibaca Server Action. */
+/**
+ * `sku_id:quantity` dipisah koma — format yang dibaca Server Action.
+ *
+ * Baris `habis` dibuang, dan baris `kurang` dikirim dengan jumlah yang sudah
+ * diturunkan ke sisa stok. Ini lapisan UX, bukan keamanan: backend tetap
+ * memvalidasi SKU, harga, dan stok.
+ */
 function serializeItems(items: CartItem[]): string {
   return items
-    .filter((item) => !item.is_out_of_stock && item.quantity > 0)
-    .map((item) => `${item.sku_id}:${item.quantity}`)
+    .filter((item) => stockStateOf(item) !== "habis" && item.quantity > 0)
+    .map(
+      (item) =>
+        `${item.sku_id}:${Math.min(item.quantity, item.available_stock)}`,
+    )
     .join(",");
 }

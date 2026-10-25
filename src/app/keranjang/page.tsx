@@ -8,8 +8,9 @@ import { CartSummary } from "@/components/cart/CartSummary";
 import { GuestCheckoutForm } from "@/components/cart/GuestCheckoutForm";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { buttonClass } from "@/components/ui/Button";
+import { Button, buttonClass } from "@/components/ui/Button";
 import { getCart, getToken } from "@/lib/api";
+import { stockStateOf } from "@/lib/cart-stock";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/metadata";
 import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
@@ -58,6 +59,28 @@ export default async function CartPage() {
     subtotal: 0,
     subtotal_display: "",
   };
+
+  /*
+   * Gerbang checkout. Server tidak meng-clamp `quantity` terhadap stok
+   * terbaru saat membaca keranjang, dan `/checkout` tidak memeriksa stok
+   * sama sekali — jadi satu-satunya tempat menghentikan pengguna sebelum
+   * form panjang adalah di sini. Nama barangnya disebut supaya pengguna
+   * tidak perlu menebak baris mana yang bermasalah.
+   */
+  const blocked = items.filter((item) => stockStateOf(item) !== "cukup");
+  const hasKurang = blocked.some((item) => stockStateOf(item) === "kurang");
+  const hasHabis = blocked.some((item) => stockStateOf(item) === "habis");
+  const blockedNames = blocked
+    .map((item) => item.product_name)
+    .join(", ");
+  const blockedReason =
+    blocked.length === 0
+      ? null
+      : hasKurang && hasHabis
+        ? `Checkout belum bisa dilanjutkan. Ada barang yang habis dan ada jumlah yang melebihi sisa stok: ${blockedNames}.`
+        : hasKurang
+          ? `Checkout belum bisa dilanjutkan. Sesuaikan jumlah barang yang melebihi sisa stok: ${blockedNames}.`
+          : `Checkout belum bisa dilanjutkan. Hapus barang yang sudah habis: ${blockedNames}.`;
 
   return (
     <>
@@ -115,7 +138,7 @@ export default async function CartPage() {
                 ))}
               </div>
 
-              <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-caption leading-relaxed text-text-secondary">
+              <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-label-sm leading-relaxed text-text-secondary">
                 Menambah atau mengubah jumlah di keranjang tidak mengunci stok.
                 Pemeriksaan stok baru terjadi saat pesanan dibuat di server.
               </p>
@@ -125,8 +148,26 @@ export default async function CartPage() {
             <div className="desktop:col-span-5">
               <CartSummary
                 summary={summary}
+                blockedReason={blockedReason}
                 action={
-                  isLoggedIn ? (
+                  blocked.length > 0 ? (
+                    /*
+                     * Tombol nonaktif, bukan `Link`: halaman /checkout tidak
+                     * memeriksa stok, jadi tautan aktif hanya memindahkan
+                     * penolakan ke langkah terakhir.
+                     */
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      fullWidth
+                      disabled
+                      aria-describedby="checkout-blocked"
+                    >
+                      {isLoggedIn
+                        ? "Lanjut ke checkout online"
+                        : "Masuk untuk checkout online"}
+                    </Button>
+                  ) : isLoggedIn ? (
                     <Link
                       href="/checkout"
                       className={buttonClass({ fullWidth: true, size: "lg" })}
@@ -136,7 +177,11 @@ export default async function CartPage() {
                   ) : (
                     <Link
                       href="/masuk?redirect_to=/checkout"
-                      className={buttonClass({ fullWidth: true, size: "lg" })}
+                      className={buttonClass({
+                        variant: "outline",
+                        fullWidth: true,
+                        size: "lg",
+                      })}
                     >
                       Masuk untuk checkout online
                     </Link>
@@ -149,11 +194,14 @@ export default async function CartPage() {
                 supaya tidak menutupi daftar item di mobile.
               */}
               <div className="mt-6 rounded-lg border-2 border-brand-forest bg-surface-paper p-5 tablet:p-6 desktop:sticky desktop:top-28">
-                <GuestCheckoutForm items={items} />
+                <GuestCheckoutForm
+                  items={items}
+                  variant={isLoggedIn ? "outline" : "primary"}
+                />
               </div>
 
               {!isLoggedIn ? (
-                <p className="mt-4 text-caption leading-relaxed text-text-secondary">
+                <p className="mt-4 text-label-sm leading-relaxed text-text-secondary">
                   Ingin memakai pembayaran online?{" "}
                   <Link
                     href="/daftar?redirect_to=/checkout"

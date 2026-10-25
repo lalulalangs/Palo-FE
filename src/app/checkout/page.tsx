@@ -7,6 +7,7 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { CheckoutFlow } from "@/components/checkout/CheckoutFlow";
 import { buttonClass } from "@/components/ui/Button";
 import { getCart, getCurrentUser, getToken } from "@/lib/api";
+import { stockStateOf } from "@/lib/cart-stock";
 import type { AddressInput } from "@/lib/checkout-form";
 import { buildMetadata } from "@/lib/metadata";
 import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
@@ -164,6 +165,50 @@ export default async function CheckoutPage({
           <div className="mx-auto max-w-xl text-center">
             <Link href="/produk" className={buttonClass({ size: "lg" })}>
               Lihat katalog
+            </Link>
+          </div>
+        </Container>
+      </>
+    );
+  }
+
+  /*
+   * Gerbang stok, dipasang di sini juga — bukan hanya di `/keranjang`.
+   *
+   * `/keranjang` sudah menonaktifkan CTA-nya, tapi halaman ini bisa dibuka
+   * langsung lewat URL atau bookmark. Tanpa pemeriksaan ini, `POST
+   * /checkout/orders` baru menolak di langkah terakhir setelah pengguna
+   * mengisi alamat, memilih kurir, dan memilih metode bayar.
+   */
+  const blocked = items.filter((item) => stockStateOf(item) !== "cukup");
+
+  if (blocked.length > 0) {
+    return (
+      <>
+        <PageHeader
+          eyebrow="Checkout"
+          title="Pesanan belum bisa dilanjutkan"
+          description="Sebagian barang di keranjang perlu disesuaikan dulu sebelum checkout."
+          breadcrumbs={[
+            { name: "Beranda", href: "/" },
+            { name: "Keranjang", href: "/keranjang" },
+            { name: "Checkout", href: "/checkout" },
+          ]}
+        />
+        <Container className="py-10 tablet:py-14">
+          <div className="mx-auto max-w-2xl">
+            <PlaceholderNotice
+              title="Ada barang yang perlu disesuaikan"
+              body={`Barang berikut habis atau jumlahnya melebihi sisa stok: ${blocked
+                .map((item) => item.product_name)
+                .join(", ")}. Sesuaikan di keranjang sebelum melanjutkan.`}
+              variant="paper"
+            />
+            <Link
+              href="/keranjang"
+              className={buttonClass({ variant: "outline", className: "mt-6" })}
+            >
+              Kembali ke keranjang
             </Link>
           </div>
         </Container>
