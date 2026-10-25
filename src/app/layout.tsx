@@ -7,7 +7,7 @@ import "./globals.css";
 import { JsonLd } from "@/components/JsonLd";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { getBrand, getCart } from "@/lib/api";
+import { getBrand, getCart, getToken } from "@/lib/api";
 import { resolveBrand } from "@/lib/brand";
 import { organizationJsonLd } from "@/lib/jsonld";
 import { PLACEHOLDER_BRAND } from "@/lib/placeholders";
@@ -139,9 +139,13 @@ export default async function RootLayout({
 
   // Data shell diambil di layout supaya header, footer, dan JSON-LD konsisten.
   // Jika sedang mode maintenance, cart tidak perlu diambil.
-  const [brand, cart] = await Promise.all([
+  // `getToken()` hanya membaca cookie, tidak memanggil backend. Dipakai
+  // semata-mata untuk memilih tujuan ikon Akun (`/me` vs `/masuk`); validitas
+  // token tetap diperiksa di halaman /me itu sendiri.
+  const [brand, cart, isLoggedIn] = await Promise.all([
     getBrand(),
     isMaintenance ? Promise.resolve(null) : getCart(),
+    getToken().then(Boolean),
   ]);
 
   return (
@@ -168,7 +172,10 @@ export default async function RootLayout({
          * Header navigasi HANYA tampil jika BUKAN mode maintenance.
          */}
         {!isMaintenance && (
-          <SiteHeader cartCount={cart?.summary.item_count ?? 0} />
+          <SiteHeader
+            cartCount={cart?.summary.item_count ?? 0}
+            isLoggedIn={isLoggedIn}
+          />
         )}
 
         {/*

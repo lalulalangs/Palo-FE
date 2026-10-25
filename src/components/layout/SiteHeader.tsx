@@ -104,7 +104,18 @@ function scrollServerSnapshot(): boolean {
   return false;
 }
 
-export function SiteHeader({ cartCount }: { cartCount: number }) {
+export function SiteHeader({
+  cartCount,
+  isLoggedIn,
+}: {
+  cartCount: number;
+  /**
+   * Hanya keberadaan cookie, bukan validitas token: kalau token sudah mati,
+   * tautan `/me` akan mengarahkan ulang ke halaman masuk. Mengambil
+   * `GET /auth/me` di setiap render layout terlalu mahal untuk sebuah ikon.
+   */
+  isLoggedIn: boolean;
+}) {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
@@ -203,7 +214,7 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
               <span className="sr-only">Cari produk</span>
             </Link>
             <Link
-              href="/masuk"
+              href={isLoggedIn ? "/me" : "/masuk"}
               className={[
                 "flex h-11 w-11 items-center justify-center rounded-md transition-colors",
                 transparan
@@ -212,7 +223,9 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
               ].join(" ")}
             >
               <AccountIcon />
-              <span className="sr-only">Akun pelanggan</span>
+              <span className="sr-only">
+                {isLoggedIn ? "Akun saya" : "Akun pelanggan"}
+              </span>
             </Link>
             <Link
               href="/keranjang"
@@ -268,10 +281,10 @@ export function SiteHeader({ cartCount }: { cartCount: number }) {
                   ))}
                   <li>
                     <Link
-                      href="/daftar"
+                      href={isLoggedIn ? "/me" : "/daftar"}
                       className="flex min-h-11 items-center rounded-md px-3 text-label-md text-text-primary transition-colors hover:bg-surface-sage"
                     >
-                      Buat Akun
+                      {isLoggedIn ? "Akun Saya" : "Buat Akun"}
                     </Link>
                   </li>
                 </ul>
