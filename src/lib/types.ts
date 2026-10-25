@@ -435,6 +435,8 @@ export interface PaymentInfo {
 
 export type OrderStatus =
   | "menunggu_pembayaran"
+  /** Pool WhatsApp tamu: pesanan ada, pembayaran menunggu verifikasi CS. */
+  | "menunggu_konfirmasi_cs"
   | "dibayar"
   | "diproses"
   | "dikirim"
@@ -714,6 +716,13 @@ export interface GuestWhatsAppRequest {
 
 export interface GuestWhatsAppResult {
   reference_code: string;
+  /**
+   * Nomor pesanan `PLR-...` untuk alur WhatsApp tamu.
+   *
+   * `null` pada `POST /guest/custom-inquiry`, karena inquiry partai memang
+   * BUKAN pesanan (tidak membuat order).
+   */
+  order_number?: string | null;
   wa_url: string;
   message: string;
   estimated_total: number;

@@ -293,6 +293,7 @@ export async function createGuestCheckoutAction(
 
   const handoff: GuestResultHandoff = {
     reference_code: result.reference_code,
+    order_number: result.order_number ?? null,
     wa_url: result.wa_url,
     notice: result.notice,
     estimated_total: result.estimated_total,

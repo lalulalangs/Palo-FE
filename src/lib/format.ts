@@ -130,6 +130,7 @@ export function formatEstimasi(etd: string | null | undefined): string {
 
 const ORDER_STATUS_LABEL: Record<string, string> = {
   menunggu_pembayaran: "Menunggu Pembayaran",
+  menunggu_konfirmasi_cs: "Menunggu Konfirmasi CS",
   dibayar: "Dibayar",
   diproses: "Diproses",
   dikirim: "Dikirim",

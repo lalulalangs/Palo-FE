@@ -134,8 +134,9 @@ export function GuestCheckoutForm({
       </button>
 
       <p className="text-caption leading-relaxed text-text-secondary">
-        Membuka WhatsApp adalah menghubungi Customer Service, bukan bukti
-        pesanan sudah tercatat dan bukan pembayaran yang selesai.
+        Pesanan langsung tercatat di sistem setelah tombol ini ditekan.
+        Pembayaran (VA/QRIS) disepakati lewat WhatsApp dan baru diproses
+        setelah admin memverifikasinya.
       </p>
     </form>
   );
@@ -166,22 +167,33 @@ function GuestResultPanel({ handoff }: { handoff: GuestResultHandoff }) {
         tabIndex={-1}
         className="text-headline-sm text-text-primary"
       >
-        Pesan WhatsApp sudah disiapkan
+        Pesanan tercatat, menunggu konfirmasi
       </h2>
 
       <div className="rounded-lg border-2 border-accent-earth/50 bg-surface-paper p-4">
-        <p className="text-title-md text-brand-deep">Ini belum menjadi pesanan</p>
+        <p className="text-title-md text-brand-deep">Pesanan sudah masuk</p>
         <p className="mt-2 text-body-md text-text-secondary">{handoff.notice}</p>
         <p className="mt-2 text-caption leading-relaxed text-text-secondary">
-          Yang tercatat hanya niat menghubungi Customer Service. Tidak ada nomor
-          pesanan, tidak ada stok yang dikunci, dan tidak ada pembayaran yang
-          diproses. Harga serta stok final dikonfirmasi langsung oleh Customer
-          Service.
+          Customer Service akan menghubungi Anda lewat WhatsApp untuk memilih
+          pembayaran (VA atau QRIS). Pesanan baru diproses setelah pembayaran
+          diverifikasi admin. Bila tidak dibayar dalam 1×24 jam, pesanan
+          kedaluwarsa otomatis. Ongkos kirim dikonfirmasi CS dan belum termasuk
+          angka di bawah.
         </p>
       </div>
 
       <div className="rounded-lg border border-border-soft bg-surface-white p-4">
-        <p className="text-caption uppercase tracking-widest text-text-secondary">
+        {handoff.order_number ? (
+          <>
+            <p className="text-caption uppercase tracking-widest text-text-secondary">
+              Nomor pesanan
+            </p>
+            <p className="mt-1 font-mono text-title-lg font-bold tracking-wider text-text-primary">
+              {handoff.order_number}
+            </p>
+          </>
+        ) : null}
+        <p className="mt-3 text-caption uppercase tracking-widest text-text-secondary">
           Kode referensi
         </p>
         <p className="mt-1 font-mono text-title-lg font-bold tracking-wider text-brand-deep">

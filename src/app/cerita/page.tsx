@@ -51,7 +51,7 @@ const PRINSIP = [
   {
     number: "03",
     title: "Dua jalur pemesanan, tanpa memaksa",
-    body: "Pembeli yang sudah punya akun bisa membayar lewat payment gateway resmi. Pembeli yang belum punya bisa menyelesaikan pesanan lewat WhatsApp Customer Service, dengan catatan jelas bahwa kontak itu bukan bukti pesanan sudah tercatat (PRD §3.11).",
+    body: "Pembeli yang sudah punya akun bisa membayar lewat payment gateway resmi. Pembeli yang belum punya akun tetap bisa memesan: pesanannya tercatat di sistem dan pembayaran (VA/QRIS) disepakati lewat WhatsApp Customer Service, lalu diverifikasi admin sebelum dikirim.",
   },
 ] as const;
 

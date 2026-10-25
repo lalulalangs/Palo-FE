@@ -38,6 +38,8 @@ import type { ActionError } from "@/lib/action-result";
 /** Data yang perlu ditampilkan setelah pesan WhatsApp siap dibuka. */
 export interface GuestResultHandoff {
   reference_code: string;
+  /** Nomor pesanan `PLR-...`; `null` bila backend tidak mengirimnya. */
+  order_number: string | null;
   wa_url: string;
   /** Kalimat dari backend; wajib ditampilkan apa adanya. */
   notice: string;
