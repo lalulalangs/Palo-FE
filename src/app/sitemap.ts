@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { getCategories, getProducts } from "@/lib/api";
+import { getCategories, getCollectionList, getProducts } from "@/lib/api";
 import type { ProductListItem } from "@/lib/types";
 import { PER_PAGE } from "@/lib/catalog-query";
 import { absoluteUrl } from "@/lib/site";
@@ -29,14 +29,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticEntries: MetadataRoute.Sitemap = [
     { url: absoluteUrl("/"), lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: absoluteUrl("/produk"), lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: absoluteUrl("/koleksi"), lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: absoluteUrl("/cerita"), lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: absoluteUrl("/kontak"), lastModified: now, changeFrequency: "monthly", priority: 0.6 },
   ];
 
-  const [categories, allProducts] = await Promise.all([
+  const [categories, allProducts, collections] = await Promise.all([
     getCategories(),
     fetchAllProducts(),
+    /*
+     * Satu request mengembalikan SEMUA koleksi aktif (maks 100, tanpa
+     * paginasi), dan `Collection::active()` sudah menyaring `is_active`,
+     * `published_at <= now`, `ended_at >= now`. Jadi daftar sitemap menyusut
+     * sendiri saat koleksi berakhir — tanpa cron, tanpa edit manual.
+     * `null` (backend mati saat build) = tidak ada entri ditambahkan.
+     */
+    getCollectionList(),
   ]);
+
+  const collectionEntries: MetadataRoute.Sitemap = (collections ?? []).map(
+    (collection) => ({
+      url: absoluteUrl(`/koleksi/${collection.slug}`),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+      ...(collection.banner_desktop
+        ? { images: [absoluteUrl(collection.banner_desktop)] }
+        : {}),
+    }),
+  );
 
   const categoryEntries: MetadataRoute.Sitemap = (categories ?? []).map(
     (category) => ({
@@ -59,7 +80,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  return [...staticEntries, ...categoryEntries, ...productEntries];
+  return [
+    ...staticEntries,
+    ...collectionEntries,
+    ...categoryEntries,
+    ...productEntries,
+  ];
 }
 
 /**

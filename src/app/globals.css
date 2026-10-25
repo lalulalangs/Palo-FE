@@ -266,23 +266,21 @@
    * berbeda di tiap perangkat -- dari 0,59 di iPhone 14 sampai 2,67 di
    * 1920x1080. `object-cover` hanya bisa memotong, tidak pernah
    * menambah, jadi satu berkas foto selalu kehilangan sebagian besar di
-   * salah satu ujung rentang itu. Di HP, foto landscape kehilangan
-   * dua pertiga lebarnya; di desktop, foto potret kehilangan 61%
-   * tingginya. Tidak ada satu aset pun yang cocok untuk semua ukuran.
+   * salah satu ujung rentang itu.
    *
-   * Kalau rasio kotak dikunci per kelompok perangkat, crop dibuat pada
-   * rasio yang sama, dan hasilnya potong nol. Nilai di bawah ini harus
-   * SAMA PERSIS dengan rasio crop di `scripts/prepare_banner_crops.py`:
+   * Sejak hero beranda dibaca dari `GET /hero-sliders`, rasionya ditentukan
+   * oleh aset yang diunggah admin: `images.mobile_url` 4:5 dan
+   * `images.desktop_url` 16:9 (lihat `docs/SPEC-HERO-25102026.md`).
    *
-   *     HP        4:5 = 0,800   crop 1080x1350
-   *     tablet    6:5 = 1,200   crop 1200x1000
-   *     desktop   2:1 = 2,000   crop 1600x800
+   *      < 768px  4:5  = 0,800   crop 1080x1350
+   *     >= 768px  16:9 = 1,778   crop 2560x1440
    *
-   * Kalau salah satu sisi diubah, sisi lain ikut harus diubah -- kalau
-   * tidak, gambar diam-diam mulai terpotong lagi tanpa error apa pun.
+   * Rasio 6:5 (tablet) dan 2:1 (desktop) DIHAPUS: keduanya lahir dari
+   * `scripts/prepare_banner_crops.py` milik jalur `/banners` yang tidak lagi
+   * mengisi hero. Kontrak `/hero-sliders` tidak punya aset 6:5, jadi
+   * membiarkan aturan itu berarti tablet memakai crop yang salah.
    *
-   * Breakpoint juga harus sama dengan `--breakpoint-tablet` (48rem) dan
-   * `--breakpoint-desktop` (80rem) di `@theme` atas.
+   * Breakpoint harus sama dengan `--breakpoint-tablet` (48rem) di `@theme`.
    */
   .hero-frame {
     aspect-ratio: 4 / 5;
@@ -290,33 +288,30 @@
 
   @media (min-width: 48rem) {
     .hero-frame {
-      aspect-ratio: 6 / 5;
+      aspect-ratio: 16 / 9;
     }
   }
 
-  @media (min-width: 80rem) {
-    .hero-frame {
-      aspect-ratio: 2 / 1;
-    }
-  }
-
-  /* -----------------------------------------------------------------------
-   *  LAYAR PENDEK (HP yang dirotasi)
-   * -----------------------------------------------------------------------
-   * `aspect-ratio` dihitung dari lebar, jadi di HP landscape (mis. 844x390)
-   * hero akan setinggi 1055px -- lebih besar dari viewportnya sendiri.
-   * Layar hanya terisi sebagian, dan pengguna tidak pernah sampai ke
-   * katalog.
-   *
-   * Di sini rasio dibuang dan tinggi dikembalikan ke viewport, karena
-   * fokus utamanya "jangan menutupi seluruh layar", bukan "jangan potong
-   * gambar". Frontend sudah menyiapkan crop 2:1 untuk kasus ini.
-   */
   @media (max-height: 30rem) {
     .hero-frame {
       aspect-ratio: auto;
       min-height: 60svh;
     }
+  }
+
+  /* -----------------------------------------------------------------------
+   *  PIRING TEKS (HERO TANPA SLIDE)
+   * -----------------------------------------------------------------------
+   * `data: []` dari `/hero-sliders` adalah keadaan NORMAL hari ini: admin
+   * belum mengaktifkan slide. Kotak 4:5 tanpa foto hanya mengosongkan layar
+   * pertama, jadi tingginya dipatok 320-416px -- cukup untuk eyebrow, judul,
+   * dan tagline, tidak lebih.
+   *
+   * Ditulis SETELAH aturan layar pendek supaya `min-height`-nya menang.
+   */
+  .hero-frame--quiet {
+    aspect-ratio: auto;
+    min-height: clamp(20rem, 44svh, 26rem);
   }
 }
 

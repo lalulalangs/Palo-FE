@@ -11,7 +11,7 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { Container } from "@/components/layout/Container";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { LineIcon } from "@/components/ui/LineIcon";
-import { getBanners, getBrand, getCategories, getProducts } from "@/lib/api";
+import { getBrand, getCategories, getHeroSliders, getProducts } from "@/lib/api";
 import { PER_PAGE } from "@/lib/catalog-query";
 import { resolveBrand, whatsappLink } from "@/lib/brand";
 import { HOMEPAGE } from "@/lib/homepage-static";
@@ -30,7 +30,7 @@ import { SITE_NAME } from "@/lib/site";
  * ===================================================================
  *  SUSUNAN SECTION
  * ===================================================================
- *   1. Hero carousel     -> `GET /banners`
+ *   1. Hero carousel     -> `GET /hero-sliders`
  *   2. Katalog produk    -> `GET /products`
  *   3. Lookbook split    -> statik (foto, `lib/homepage-static.ts`)
  *   4. Brand manifesto   -> statik (foto + teks)
@@ -93,8 +93,8 @@ const CATALOG_QUERY = {
 const GRID_HOME = 8;
 
 export default async function HomePage() {
-  const [banners, brand, categories, catalog] = await Promise.all([
-    getBanners(),
+  const [sliders, brand, categories, catalog] = await Promise.all([
+    getHeroSliders(),
     getBrand(),
     getCategories(),
     getProducts({ ...CATALOG_QUERY }),
@@ -102,24 +102,43 @@ export default async function HomePage() {
 
   const resolved = resolveBrand(brand);
 
-  const heroSlides: HeroSlide[] = (banners ?? []).map((item) => ({
+  /*
+   * Pemetaan kontrak `/hero-sliders` -> bentuk tampilan `HeroSlide`.
+   *
+   * Dua jebakan yang wajib dipertahankan di sini:
+   *
+   * 1. `theme: "light"` = TEKS PUTIH + scrim gelap. `HeroFrame` menghitung
+   *    `isDark = slide.theme !== "dark"`; mengirim `"dark"` justru menghasilkan
+   *    teks gelap di atas scrim paper — hero jadi tidak terbaca tanpa error.
+   *    `/hero-sliders` tidak punya field tema, jadi nilainya dipatok di sini.
+   * 2. `overlayOpacity: 100`. Default komponen adalah 45, dan 45 itulah yang
+   *    membuat teks hero gagal kontras AA (1,53:1 di atas foto terang).
+   *
+   * `order` sengaja tidak dipakai: server sudah mengurutkan (`sort_order asc`).
+   */
+  const heroSlides: HeroSlide[] = (sliders ?? []).map((item) => ({
     id: item.id,
     title: item.title ?? "",
-    subtitle: item.subtitle,
-    eyebrow: item.eyebrow,
-    stampLeft: item.stamp_left,
-    stampRight: item.stamp_right,
-    ctaLabel: item.link_label,
-    ctaUrl: item.link_url,
-    cta2Label: item.cta2_label,
-    cta2Url: item.cta2_url,
-    imageUrl: item.image_url,
-    imageAlt: item.image_alt,
-    imageLandscapeUrl: item.image_landscape_url,
-    imagePortraitUrl: item.image_portrait_url,
-    imageTabletUrl: item.image_tablet_url,
-    theme: item.theme,
-    overlayOpacity: item.overlay_opacity,
+    subtitle: item.description,
+    eyebrow: item.badge,
+    stampLeft: item.series_tag,
+    stampRight: item.location_tag,
+    ctaLabel: item.actions.primary.label,
+    ctaUrl: item.actions.primary.url,
+    cta2Label: item.actions.secondary.label,
+    cta2Url: item.actions.secondary.url,
+    // Satu aset 16:9 disebar ke tiga slot supaya tipe `HeroSlide` yang ada
+    // tidak perlu diubah; komponen tidak lagi punya aturan crop 6:5 tablet.
+    imageUrl: item.images.desktop_url,
+    imageLandscapeUrl: item.images.desktop_url,
+    imageTabletUrl: item.images.desktop_url,
+    // `null` = tidak ada crop 4:5 -> komponen memakai `desktop_url` di <768.
+    imagePortraitUrl: item.images.mobile_url,
+    // `null` -> `alt=""` (dekoratif), BUKAN diisi judul: `h1` sudah
+    // menyuarakan kalimat yang sama.
+    imageAlt: item.images.alt_text,
+    theme: "light",
+    overlayOpacity: 100,
   }));
 
   const products = catalog?.products ?? [];

@@ -250,6 +250,113 @@ export interface BannerItem {
   overlay_opacity: number;
 }
 
+/** Satu tombol aksi hero slider. `label` NOT NULL di DB, `url` boleh kosong. */
+export interface HeroSliderAction {
+  label: string | null;
+  url: string | null;
+}
+
+/**
+ * Satu slide hero dari `GET /hero-sliders`.
+ *
+ * Bentuk ini SAMA PERSIS dengan `HeroSliderResource` backend (termasuk objek
+ * `images` / `actions` bersarang), bukan bentuk tampilan. Pemetaan ke
+ * `HeroSlide` terjadi di `app/page.tsx`.
+ *
+ * CATATAN KONTRAK:
+ * - `order` = kolom `sort_order`. Server sudah mengurutkan (`sort_order asc,
+ *   id asc`) dan membatasi 100 baris, jadi frontend TIDAK mengurutkan ulang.
+ * - `images.desktop_url` wajib, `images.mobile_url` opsional. Tidak ada
+ *   `image_tablet`: aset hero adalah unggahan admin apa adanya.
+ * - `secondary.url` biasanya `null` (label ber-default, URL nullable). Tombol
+ *   tanpa URL tidak boleh dirender.
+ */
+export interface HeroSliderItem {
+  id: number | null;
+  /** Stempel kiri-atas. */
+  series_tag: string | null;
+  /** Stempel kanan-atas. */
+  location_tag: string | null;
+  /** Pill eyebrow di atas judul. */
+  badge: string | null;
+  title: string | null;
+  description: string | null;
+  images: {
+    /** 16:9, wajib. URL absolut dari `Storage::disk('public')->url()`. */
+    desktop_url: string | null;
+    /** 4:5, opsional. `null` = pakai `desktop_url` (crop tengah). */
+    mobile_url: string | null;
+    /** `null` = gambar dekoratif (`alt=""`), bukan diisi judul. */
+    alt_text: string | null;
+  };
+  actions: {
+    primary: HeroSliderAction;
+    secondary: HeroSliderAction;
+  };
+  order: number;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Koleksi                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Satu koleksi kurasi dari `GET /collections`.
+ *
+ * CATATAN KONTRAK: `CollectionListResource` mengirim `banner_desktop` /
+ * `banner_mobile` sebagai string URL (bukan objek media), dan `products_count`
+ * HANYA ada di endpoint daftar. Detail memakai `whenLoaded('products')`, jadi
+ * jumlah produk di sana dibaca dari `products.pagination.total` — bukan dari
+ * field ini.
+ */
+export interface CollectionListItem {
+  id: number | null;
+  name: string;
+  slug: string;
+  /** Kalimat kurasi dari admin. `null` = tidak dirender sama sekali. */
+  tagline: string | null;
+  badge_label: string | null;
+  /** Banner 16:9 / 21:9. `null` = admin belum mengunggah. */
+  banner_desktop: string | null;
+  /** Banner vertikal untuk <768px. `null` = pakai banner desktop. */
+  banner_mobile: string | null;
+  is_featured: boolean;
+  /** `null` = tidak dihitung backend (detail); `0` = memang belum berisi. */
+  products_count: number | null;
+  published_at: string | null;
+  ended_at: string | null;
+}
+
+/**
+ * `seo_meta` koleksi.
+ *
+ * Textarea Filament boleh tersimpan sebagai string kosong, jadi kedua field
+ * bisa `null` maupun kosong — `api.ts` memperlakukan keduanya sama.
+ */
+export interface CollectionSeoMeta {
+  meta_title: string | null;
+  meta_description: string | null;
+}
+
+export interface CollectionDetail extends CollectionListItem {
+  description: string | null;
+  seo_meta: CollectionSeoMeta | null;
+}
+
+/**
+ * Paginasi detail koleksi.
+ *
+ * Bentuknya BERBEDA dari `/products`: berada di `products.pagination`
+ * (bukan `meta`) dan membawa `has_more`, bukan hanya `last_page`.
+ */
+export type CollectionPagination = PaginationMeta & { has_more: boolean };
+
+export interface CollectionDetailResult {
+  collection: CollectionDetail;
+  products: ProductListItem[];
+  pagination: CollectionPagination;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Keranjang                                                                  */
 /* -------------------------------------------------------------------------- */

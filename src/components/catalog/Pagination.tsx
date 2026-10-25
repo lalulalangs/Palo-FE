@@ -21,12 +21,18 @@ export function Pagination({
   lastPage,
   buildHref,
   className = "",
+  label = "Navigasi halaman katalog",
 }: {
   currentPage: number;
   lastPage: number;
   /** Membangun URL untuk satu nomor halaman. */
   buildHref: (page: number) => string;
   className?: string;
+  /**
+   * Nama landmark. Default-nya label katalog supaya pemanggil lama tidak
+   * berubah; halaman koleksi mengoper `"Navigasi halaman koleksi"`.
+   */
+  label?: string;
 }) {
   if (lastPage <= 1) return null;
 
@@ -34,7 +40,7 @@ export function Pagination({
 
   return (
     <nav
-      aria-label="Navigasi halaman katalog"
+      aria-label={label}
       className={["flex items-center justify-center gap-1", className]
         .filter(Boolean)
         .join(" ")}

@@ -52,8 +52,16 @@ export interface NavLink {
   label: string;
 }
 
+/**
+ * Navigasi utama.
+ *
+ * Item pertama adalah `Koleksi` (bukan `Katalog`): `design.md` §3 menetapkan
+ * menu global `Koleksi`, `Cerita Palo`, `Toko Senaru`. Diganti, BUKAN
+ * ditambah — lima item tidak muat di 768px. `/produk` tetap terjangkau lewat
+ * ikon pencarian di header, footer, breadcrumb produk, dan CTA di `/koleksi`.
+ */
 export const PRIMARY_NAV: NavLink[] = [
-  { href: "/produk", label: "Katalog" },
+  { href: "/koleksi", label: "Koleksi" },
   { href: "/cerita", label: "Cerita Palo" },
   { href: "/kontak", label: "Toko Senaru" },
   { href: "/lacak", label: "Lacak Pesanan" },
@@ -279,6 +287,21 @@ export function SiteHeader({
                       </ActiveLink>
                     </li>
                   ))}
+                  {/*
+                    "Katalog" hanya ada di drawer seluler. Tanpa ini pengguna
+                    ponsel kehilangan satu-satunya tautan TEKS ke `/produk`
+                    (ikon pencarian hanya terbaca "Cari produk" oleh pembaca
+                    layar). Drawer bertumpuk vertikal, jadi tidak ada batas
+                    lebar seperti nav tablet.
+                  */}
+                  <li>
+                    <Link
+                      href="/produk"
+                      className="flex min-h-11 items-center rounded-md px-3 text-label-md text-text-primary transition-colors hover:bg-surface-sage"
+                    >
+                      Katalog
+                    </Link>
+                  </li>
                   <li>
                     <Link
                       href={isLoggedIn ? "/me" : "/daftar"}

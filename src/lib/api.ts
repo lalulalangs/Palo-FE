@@ -16,10 +16,15 @@ import type {
   Cart,
   CategoryItem,
   CheckoutRequest,
+  CollectionDetailResult,
+  CollectionListItem,
+  CollectionPagination,
+  CollectionSeoMeta,
   CreatedOrder,
   CustomInquiryRequest,
   GuestWhatsAppRequest,
   GuestWhatsAppResult,
+  HeroSliderItem,
   LoginRequest,
   OrderDetail,
   OrderItemSnapshot,
@@ -543,6 +548,75 @@ function normalizeBanner(value: unknown): BannerItem | null {
   };
 }
 
+/**
+ * `GET /hero-sliders` — sumber hero beranda.
+ *
+ * `null` = backend tidak terjangkau. `[]` = tidak ada slide aktif, dan itu
+ * respons SAH (admin belum mengaktifkan slide apa pun) — beranda lalu
+ * menampilkan piring teks dari nilai fallback, bukan hero kosong.
+ *
+ * Urutan TIDAK diubah di sini: `PublicHeroSliderController` sudah memakai
+ * `active()->ordered()->limit(100)` (`sort_order asc, id asc`).
+ */
+export async function getHeroSliders(): Promise<HeroSliderItem[] | null> {
+  try {
+    const payload = await apiRequest<unknown>("/hero-sliders");
+    const list = unwrap<unknown[]>(payload, "data");
+    if (!Array.isArray(list)) return null;
+    return list
+      .map(normalizeHeroSlider)
+      .filter((item): item is HeroSliderItem => item !== null);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Normalisasi satu slide `/hero-sliders` — satu pintu, seperti
+ * `normalizeBanner()`. Bentuknya bersarang (`images`, `actions`), jadi
+ * pembacaan field dilakukan lewat `isRecord` dulu.
+ */
+function normalizeHeroSlider(value: unknown): HeroSliderItem | null {
+  if (!isRecord(value)) return null;
+
+  const images = isRecord(value.images) ? value.images : {};
+  const actions = isRecord(value.actions) ? value.actions : {};
+  const primary = isRecord(actions.primary) ? actions.primary : {};
+  const secondary = isRecord(actions.secondary) ? actions.secondary : {};
+
+  // `image_desktop` NOT NULL di DB: slide tanpa foto desktop bukan slide yang
+  // bisa ditampilkan, jadi dibuang di sini alih-alih menjadi kotak kosong.
+  const desktopUrl = mediaUrl(readString(images, "desktop_url"));
+  if (!desktopUrl) return null;
+
+  return {
+    id: typeof value.id === "number" ? value.id : null,
+    series_tag: readString(value, "series_tag"),
+    location_tag: readString(value, "location_tag"),
+    badge: readString(value, "badge"),
+    title: readString(value, "title"),
+    description: readString(value, "description"),
+    images: {
+      desktop_url: desktopUrl,
+      // `mediaUrl` meneruskan URL absolut apa adanya, jadi tetap benar kalau
+      // media pindah ke CDN.
+      mobile_url: mediaUrl(readString(images, "mobile_url")),
+      alt_text: readString(images, "alt_text"),
+    },
+    actions: {
+      primary: {
+        label: readString(primary, "label"),
+        url: readString(primary, "url"),
+      },
+      secondary: {
+        label: readString(secondary, "label"),
+        url: readString(secondary, "url"),
+      },
+    },
+    order: readNumber(value.order, 0),
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 /* Katalog                                                                    */
 /* -------------------------------------------------------------------------- */
@@ -878,6 +952,168 @@ function normalizeSku(
     stock: typeof value.stock === "number" ? value.stock : null,
     is_out_of_stock: value.is_out_of_stock === true || value.is_available === false,
     attributes: attributesOverride ?? readAttributes(value.attributes),
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Koleksi                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Nilai `per_page` untuk detail koleksi.
+ *
+ * Sama dengan `PER_PAGE` di `lib/catalog-query.ts`, tapi TIDAK diimpor dari
+ * sana: modul itu dipakai Client Component, sedangkan file ini memakai
+ * `next/headers`. Satu impor saja akan menyeret `next/headers` ke bundel client.
+ */
+const COLLECTION_PER_PAGE = 24;
+
+/**
+ * `GET /collections` — seluruh koleksi aktif (maks 100, tanpa paginasi).
+ *
+ * `null` = backend tidak bisa dihubungi. `[]` = backend hidup, memang belum ada
+ * koleksi yang tayang. Dua keadaan itu dirender berbeda.
+ */
+export async function getCollectionList(): Promise<CollectionListItem[] | null> {
+  try {
+    const payload = await apiRequest<unknown>("/collections");
+    /*
+     * `CollectionController::index()` menyerahkan
+     * `CollectionListResource::collection(...)` langsung ke `respond()` TANPA
+     * `->resolve()` — berbeda dari `CategoryController`. Bentuk kabelnya jadi
+     * bergantung serializer: `data: [...]` ATAU `data: { data: [...] }`.
+     *
+     * Salah tebak bentuk berarti `/koleksi` tampil kosong padahal status 200 —
+     * tanpa satu pun error. Karena itu keduanya diterima di sini.
+     */
+    const raw = unwrap<unknown>(payload, "data");
+    const list = Array.isArray(raw) ? raw : unwrap<unknown[]>(raw, "data");
+    if (!Array.isArray(list)) return null;
+    return list
+      .map(normalizeCollection)
+      .filter((item): item is CollectionListItem => item !== null);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Hasil `getCollectionDetail`: `"not_found"` = backend menjawab 404 (koleksi
+ * tidak ada / sudah berakhir), `null` = backend mati atau gagal.
+ *
+ * Sentinel itu perlu: `ApiError.status === 404` harus dibedakan dari
+ * `status === 0` (jaringan mati). Outage yang dipetakan ke 404 akan mencabut
+ * seluruh halaman koleksi dari indeks mesin pencari.
+ */
+export type CollectionLookup = CollectionDetailResult | "not_found" | null;
+
+/** `GET /collections/{slug}?page=N&per_page=24` */
+export async function getCollectionDetail(
+  slug: string,
+  page = 1,
+): Promise<CollectionLookup> {
+  try {
+    const payload = await apiRequest<unknown>(
+      `/collections/${encodeURIComponent(slug)}`,
+      { query: { page, per_page: COLLECTION_PER_PAGE } },
+    );
+    const data = unwrap<Record<string, unknown>>(payload, "data");
+    if (!data) return null;
+
+    const collection = normalizeCollection(data);
+    if (!collection) return null;
+
+    // `CollectionDetailResource` menaruh produk di `products.data` +
+    // `products.pagination`. Produknya bentuk `ProductListResource`, jadi
+    // normalizer katalog yang sudah ada dipakai ulang.
+    const productsBlock = isRecord(data.products) ? data.products : null;
+    const products = (Array.isArray(productsBlock?.data) ? productsBlock.data : [])
+      .filter(isRecord)
+      .filter((item) => typeof item.slug === "string")
+      .map((item) => normalizeListItem(item));
+
+    return {
+      collection: {
+        ...collection,
+        description: readString(data, "description"),
+        seo_meta: normalizeCollectionSeo(data.seo_meta),
+      },
+      products,
+      pagination: normalizeCollectionPagination(
+        productsBlock?.pagination,
+        page,
+        products.length,
+      ),
+    };
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return "not_found";
+    return null;
+  }
+}
+
+function normalizeCollection(value: unknown): CollectionListItem | null {
+  if (!isRecord(value)) return null;
+
+  // Slug wajib karena itu satu-satunya jalan ke detail. Nama sengaja TIDAK
+  // wajib: kartu punya placeholder yang sudah ada, sedangkan koleksi yang
+  // dibuang karena namanya kosong akan hilang dari daftar tanpa jejak.
+  const slug = readString(value, "slug");
+  if (!slug) return null;
+
+  const count = value.products_count;
+
+  return {
+    id: typeof value.id === "number" ? value.id : null,
+    name: readString(value, "name") ?? "",
+    slug,
+    tagline: readString(value, "tagline"),
+    badge_label: readString(value, "badge_label"),
+    // Backend mengirim URL absolut, tapi path relatif tetap dirangkai di satu
+    // pintu (`mediaUrl`) supaya aman kalau penyimpanan berpindah.
+    banner_desktop: mediaUrl(readString(value, "banner_desktop")),
+    banner_mobile: mediaUrl(readString(value, "banner_mobile")),
+    is_featured: value.is_featured === true,
+    products_count:
+      typeof count === "number" && Number.isFinite(count) ? count : null,
+    published_at: readString(value, "published_at"),
+    ended_at: readString(value, "ended_at"),
+  };
+}
+
+/** Baca `seo_meta` secara defensif; objek yang seluruhnya kosong jadi `null`. */
+function normalizeCollectionSeo(value: unknown): CollectionSeoMeta | null {
+  if (!isRecord(value)) return null;
+
+  const meta_title = readString(value, "meta_title");
+  const meta_description = readString(value, "meta_description");
+  if (!meta_title && !meta_description) return null;
+
+  return { meta_title, meta_description };
+}
+
+function normalizeCollectionPagination(
+  value: unknown,
+  page: number,
+  loaded: number,
+): CollectionPagination {
+  if (!isRecord(value)) {
+    // Detail tanpa blok paginasi: anggap satu halaman berisi semua yang dimuat.
+    // Lebih jujur daripada mengarang `last_page: 0`.
+    return {
+      current_page: page,
+      last_page: 1,
+      per_page: COLLECTION_PER_PAGE,
+      total: loaded,
+      has_more: false,
+    };
+  }
+
+  return {
+    current_page: readNumber(value.current_page, page),
+    last_page: readNumber(value.last_page, 1),
+    per_page: readNumber(value.per_page, COLLECTION_PER_PAGE),
+    total: readNumber(value.total, loaded),
+    has_more: value.has_more === true,
   };
 }
 

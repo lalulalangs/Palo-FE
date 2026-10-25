@@ -123,6 +123,7 @@ export function SiteFooter({ brand }: { brand: ResolvedBrand | null }) {
               headingId="footer-jelajahi"
               heading="Jelajahi"
               links={[
+                { href: "/koleksi", label: "Koleksi" },
                 { href: "/produk", label: "Katalog" },
                 { href: "/cerita", label: "Cerita Palo" },
                 { href: "/kontak", label: "Toko Senaru" },
