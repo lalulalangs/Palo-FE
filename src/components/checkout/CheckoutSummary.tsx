@@ -1,11 +1,9 @@
 import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 import { formatEstimasi, formatHarga, formatRupiah, pluralItem } from "@/lib/format";
-import {
-  PAYMENT_METHODS,
-  type AppliedVoucher,
-  type CartItem,
-  type PaymentMethod,
-  type ShippingService,
+import type {
+  AppliedVoucher,
+  CartItem,
+  ShippingService,
 } from "@/lib/types";
 import type { AddressInput } from "@/lib/checkout-form";
 
@@ -30,7 +28,6 @@ export function CheckoutSummary({
   accountEmail,
   address,
   service,
-  paymentMethod,
   voucher,
 }: {
   cart: CartItem[];
@@ -38,7 +35,6 @@ export function CheckoutSummary({
   accountEmail: string;
   address: AddressInput | null;
   service: ShippingService | null;
-  paymentMethod: PaymentMethod | null;
   voucher: AppliedVoucher | null;
 }) {
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -182,14 +178,18 @@ export function CheckoutSummary({
         dibuat, termasuk total ini.
       </p>
 
+      {/*
+        Sejak checkout tidak lagi menanyakan kanal, ringkasan cukup menyebut
+        jalurnya: pembayaran online lewat DOKU dan kanal dipilih di sana.
+        `paymentMethod` tetap diterima (kontrak backend) tapi tidak lagi
+        ditampilkan sebagai pilihan pembeli.
+      */}
       <p className="mt-4 border-t border-border-soft pt-4 text-caption text-text-secondary">
-        Metode pembayaran:{" "}
+        Pembayaran:{" "}
         <span className="font-medium text-text-primary">
-          {paymentMethod
-            ? (PAYMENT_METHODS.find((item) => item.value === paymentMethod)
-                ?.label ?? paymentMethod)
-            : "Belum dipilih"}
-        </span>
+          Online lewat DOKU
+        </span>{" "}
+        — kanal dipilih di halaman pembayaran.
       </p>
 
       <p className="mt-1 text-caption text-text-secondary">

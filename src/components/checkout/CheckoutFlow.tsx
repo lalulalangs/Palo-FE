@@ -9,7 +9,6 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { AddressForm, type AddressSubmitResult } from "@/components/checkout/AddressForm";
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
 import { CheckoutSummary } from "@/components/checkout/CheckoutSummary";
-import { PaymentMethodPicker } from "@/components/checkout/PaymentMethodPicker";
 import { ShippingRatePicker } from "@/components/checkout/ShippingRatePicker";
 import { VoucherField } from "@/components/checkout/VoucherField";
 import { buttonClass } from "@/components/ui/Button";
@@ -20,6 +19,7 @@ import {
   type AddressInput,
 } from "@/lib/checkout-form";
 import { formatHarga } from "@/lib/format";
+import { DEFAULT_PAYMENT_METHOD } from "@/lib/types";
 import type {
   AppliedVoucher,
   CartItem,
@@ -85,7 +85,12 @@ export function CheckoutFlow({
   );
   const [destinationCity, setDestinationCity] = useState("");
 
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  /*
+   * Tidak ada lagi pemilihan kanal pembayaran di sini: DOKU Checkout
+   * menampilkannya di halamannya sendiri (QRIS/VA/e-wallet/kartu). Yang
+   * dikirim ke backend satu nilai tetap supaya kontraknya tidak berubah.
+   */
+  const paymentMethod: PaymentMethod = DEFAULT_PAYMENT_METHOD;
   // Satu sumber kebenaran: yang tampil di ringkasan = yang diterapkan server.
   const [voucher, setVoucher] = useState<AppliedVoucher | null>(null);
 
@@ -139,15 +144,6 @@ export function CheckoutFlow({
         ok: false,
         kind: "validation",
         message: "Pilih metode pengiriman terlebih dahulu.",
-        fieldErrors: {},
-      });
-      return;
-    }
-    if (!paymentMethod) {
-      setOrderError({
-        ok: false,
-        kind: "validation",
-        message: "Pilih metode pembayaran terlebih dahulu.",
         fieldErrors: {},
       });
       return;
@@ -346,7 +342,7 @@ export function CheckoutFlow({
                   id="langkah-bayar"
                   className="text-headline-sm text-brand-deep"
                 >
-                  Metode pembayaran
+                  Pembayaran dan voucher
                 </h2>
                 <button
                   type="button"
@@ -360,13 +356,18 @@ export function CheckoutFlow({
                 </button>
               </div>
 
-              <div className="mt-4">
-                <PaymentMethodPicker
-                  selected={paymentMethod}
-                  onSelect={setPaymentMethod}
-                  disabled={busy}
-                />
-              </div>
+              {/*
+                Metode pembayaran tidak ditanyakan di sini. Pembeli memilih
+                kanal (QRIS, Virtual Account, e-wallet, kartu) di halaman DOKU
+                yang dibuka tepat setelah pesanan dibuat, jadi daftar kanal di
+                checkout hanya menduplikasi keputusan yang tetap bisa diubah
+                di sana.
+              */}
+              <p className="mt-4 rounded-md border border-border-soft bg-surface-paper p-4 text-label-sm leading-relaxed text-text-secondary">
+                Pembayaran diproses lewat halaman DOKU yang aman. Kanal
+                pembayaran (QRIS, Virtual Account, e-wallet, atau kartu kredit)
+                dipilih di sana setelah pesanan dibuat.
+              </p>
 
               <div className="mt-6">
                 <VoucherField
@@ -474,7 +475,7 @@ export function CheckoutFlow({
                 <button
                   type="button"
                   onClick={() => submitOrder()}
-                  disabled={busy || !paymentMethod || !selectedService}
+                  disabled={busy || !selectedService}
                   className={buttonClass({ size: "lg", fullWidth: true })}
                 >
                   {isPlacing
@@ -508,7 +509,6 @@ export function CheckoutFlow({
             accountEmail={userEmail}
             address={step >= 1 ? address : null}
             service={selectedService}
-            paymentMethod={paymentMethod}
             voucher={voucher}
           />
         </div>

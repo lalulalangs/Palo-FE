@@ -539,7 +539,18 @@ export interface CheckoutRequest {
   shipping_address_id?: number;
 }
 
-/** Metode pembayaran yang diterima `StoreOrderRequest::rules()`. */
+/**
+ * Metode pembayaran yang diterima `StoreOrderRequest::rules()`.
+ *
+ * Sejak 25-10-2026 checkout TIDAK lagi menanyakan kanal pembayaran: semua
+ * pembayaran online lewat DOKU Checkout (host-to-host), dan pembeli memilih
+ * QRIS / Virtual Account / E-Wallet / Kartu Kredit DI HALAMAN DOKU, bukan di
+ * sini. `PaymentMethod` tetap berisi seluruh nilai yang sah karena itu bentuk
+ * kontrak backend (`payment_method` juga dibaca di riwayat & detail pesanan).
+ *
+ * `DEFAULT_PAYMENT_METHOD` adalah nilai yang dikirim form checkout: satu
+ * metode per transaksi, sisanya ditentukan kanal di sisi DOKU.
+ */
 export const PAYMENT_METHODS = [
   { value: "qris", label: "QRIS" },
   { value: "virtual_account", label: "Virtual Account Bank" },
@@ -548,6 +559,17 @@ export const PAYMENT_METHODS = [
 ] as const;
 
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number]["value"];
+
+/**
+ * Metode yang dikirim `placeOrderAction` untuk pembayaran online.
+ *
+ * `qris` dipilih karena kanal ini tidak butuh rekening bank atau penerbit
+ * kartu tertentu; DOKU menampilkan seluruh kanal yang aktif pada akun merchant
+ * di halaman pembayarannya, jadi pembeli tetap bisa memilih VA/e-wallet di
+ * sana. Yang disimpan backend hanyalah "pembayaran online"; kanal sebenarnya
+ * tercatat di DOKU.
+ */
+export const DEFAULT_PAYMENT_METHOD: PaymentMethod = "qris";
 
 /**
  * Satu baris `GET /shipping/destinations` — satu subdistrict RajaOngkir.
