@@ -429,6 +429,53 @@ export interface ShippingQuoteRequest {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Voucher                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Satu voucher dari `GET /vouchers`.
+ *
+ * Hanya voucher yang sedang berlaku yang dikirim backend (`available()`),
+ * dan kontraknya **tidak** menyebut cakupan kategori/produk — jadi daftar ini
+ * tidak boleh dipresentasikan sebagai "berlaku untuk pesanan ini".
+ */
+export interface Voucher {
+  id: number;
+  code: string;
+  /** Enum backend. Tidak dipakai untuk menyusun kalimat apa pun. */
+  type: string | null;
+  value: number;
+  formatted_value: string | null;
+  /** `0` berarti tanpa minimal belanja. */
+  min_purchase: number;
+  formatted_min_purchase: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  description: string | null;
+}
+
+/**
+ * Hasil `POST /vouchers/apply`.
+ *
+ * `final_subtotal` adalah subtotal **produk** setelah diskon — TIDAK termasuk
+ * ongkir (`VoucherService::performValidation`). Karena itu ongkir terpilih
+ * masih boleh ditambahkan untuk "Total tagihan", dan label yang dipakai di UI
+ * adalah "Subtotal setelah diskon", bukan "Total".
+ */
+export interface VoucherApplyResult {
+  discount_amount: number;
+  formatted_discount_amount: string | null;
+  formatted_subtotal: string | null;
+  final_subtotal: number;
+  formatted_final_subtotal: string | null;
+}
+
+/** Voucher yang sedang dipakai di halaman checkout. */
+export interface AppliedVoucher extends VoucherApplyResult {
+  code: string;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Pesanan                                                                    */
 /* -------------------------------------------------------------------------- */
 

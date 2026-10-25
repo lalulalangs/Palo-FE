@@ -11,12 +11,18 @@ import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
 import { CheckoutSummary } from "@/components/checkout/CheckoutSummary";
 import { PaymentMethodPicker } from "@/components/checkout/PaymentMethodPicker";
 import { ShippingRatePicker } from "@/components/checkout/ShippingRatePicker";
+import { VoucherField } from "@/components/checkout/VoucherField";
 import { buttonClass } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import type { ActionError } from "@/lib/action-result";
 import type { AddressFieldErrors, AddressInput } from "@/lib/checkout-form";
 import { formatHarga } from "@/lib/format";
-import type { CartItem, PaymentMethod, ShippingService } from "@/lib/types";
+import type {
+  AppliedVoucher,
+  CartItem,
+  PaymentMethod,
+  ShippingService,
+  Voucher,
+} from "@/lib/types";
 
 /**
  * Alur checkout tiga langkah (PRD §3.6).
@@ -47,11 +53,14 @@ export function CheckoutFlow({
   defaultAddress,
   userName,
   userEmail,
+  vouchers,
 }: {
   cart: CartItem[];
   defaultAddress: AddressInput;
   userName: string;
   userEmail: string;
+  /** Kode yang sedang berlaku (`GET /vouchers`); `[]` bila gagal dimuat. */
+  vouchers: Voucher[];
 }) {
   const router = useRouter();
 
@@ -66,7 +75,8 @@ export function CheckoutFlow({
   const [destinationCity, setDestinationCity] = useState("");
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
-  const [voucherCode, setVoucherCode] = useState("");
+  // Satu sumber kebenaran: yang tampil di ringkasan = yang diterapkan server.
+  const [voucher, setVoucher] = useState<AppliedVoucher | null>(null);
 
   const [isQuoting, startQuoting] = useTransition();
   const [isPlacing, startPlacing] = useTransition();
@@ -140,12 +150,15 @@ export function CheckoutFlow({
         address,
         service: selectedService,
         paymentMethod,
-        voucherCode: voucherCode.trim().length > 0 ? voucherCode.trim() : null,
+        voucherCode: voucher?.code ?? null,
         acknowledgePriceChange,
         priceSeen,
       });
 
       if (isActionErrorLike(result)) {
+        // S10: server menolak voucher-nya, jadi diskon lama tidak boleh
+        // menetap di layar setelah pesanan gagal dibuat.
+        if (result.kind === "voucher") setVoucher(null);
         setOrderError(result);
         return;
       }
@@ -338,16 +351,12 @@ export function CheckoutFlow({
               </div>
 
               <div className="mt-6">
-                <Input
-                  id="voucher_code"
-                  name="voucher_code"
-                  label="Kode voucher (opsional)"
-                  hint="Voucher dicek ulang di server saat pesanan dibuat. Kalau sudah tidak berlaku, pesanan tetap dapat dilanjutkan tanpa diskon."
-                  autoCapitalize="characters"
-                  maxLength={50}
+                <VoucherField
+                  vouchers={vouchers}
+                  subtotal={cart.reduce((total, item) => total + item.subtotal, 0)}
+                  applied={voucher}
+                  onAppliedChange={setVoucher}
                   disabled={busy}
-                  value={voucherCode}
-                  onChange={(event) => setVoucherCode(event.target.value)}
                 />
               </div>
 
@@ -482,6 +491,7 @@ export function CheckoutFlow({
             address={step >= 1 ? address : null}
             service={selectedService}
             paymentMethod={paymentMethod}
+            voucher={voucher}
           />
         </div>
       </div>

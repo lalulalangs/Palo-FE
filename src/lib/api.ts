@@ -38,6 +38,8 @@ import type {
   ShippingQuote,
   ShippingQuoteRequest,
   SortKey,
+  Voucher,
+  VoucherApplyResult,
 } from "./types";
 
 /**
@@ -1010,6 +1012,77 @@ export async function createOrder(
     throw new ApiError("Server tidak mengembalikan data pesanan.", 502);
   }
   return data as unknown as CreatedOrder;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Voucher                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * `GET /vouchers` — kode yang sedang berlaku, publik (tanpa token).
+ *
+ * Pola sama dengan `getCategories()`: satu pintu normalisasi, gagal → `null`.
+ * Daftar yang gagal dimuat tidak boleh menghalangi checkout; input kode tetap
+ * bisa dipakai manual.
+ */
+export async function getVoucherList(): Promise<Voucher[] | null> {
+  try {
+    const payload = await apiRequest<unknown>("/vouchers");
+    const list = unwrap<unknown[]>(payload, "data");
+    if (!Array.isArray(list)) return null;
+    return list
+      .map(normalizeVoucher)
+      .filter((item): item is Voucher => item !== null);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeVoucher(value: unknown): Voucher | null {
+  if (!isRecord(value)) return null;
+  const code = readString(value, "code");
+  if (!code) return null;
+
+  return {
+    id: readNumber(value.id, 0),
+    code,
+    type: readString(value, "type"),
+    value: readNumber(value.value, 0),
+    formatted_value: readString(value, "formatted_value"),
+    min_purchase: readNumber(value.min_purchase, 0),
+    formatted_min_purchase: readString(value, "formatted_min_purchase"),
+    start_date: readString(value, "start_date"),
+    end_date: readString(value, "end_date"),
+    description: readString(value, "description"),
+  };
+}
+
+/**
+ * `POST /vouchers/apply` — simulasi diskon, publik, throttle 10/menit.
+ *
+ * `items` HANYA `{ sku_id, quantity }`: subtotal dihitung server dari harga
+ * live. Melempar `ApiError` supaya 422/429/0 dipetakan `toActionError` yang
+ * sudah ada.
+ */
+export async function applyVoucher(
+  code: string,
+  items: Array<{ sku_id: number; quantity: number }>,
+): Promise<VoucherApplyResult> {
+  const payload = await apiRequest<unknown>("/vouchers/apply", {
+    method: "POST",
+    body: { code, items },
+  });
+  const data = unwrap<Record<string, unknown>>(payload, "data");
+  if (!data) {
+    throw new ApiError("Server tidak mengembalikan hasil perhitungan voucher.", 502);
+  }
+  return {
+    discount_amount: readNumber(data.discount_amount, 0),
+    formatted_discount_amount: readString(data, "formatted_discount_amount"),
+    formatted_subtotal: readString(data, "formatted_subtotal"),
+    final_subtotal: readNumber(data.final_subtotal, 0),
+    formatted_final_subtotal: readString(data, "formatted_final_subtotal"),
+  };
 }
 
 /* -------------------------------------------------------------------------- */

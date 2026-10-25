@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { CheckoutFlow } from "@/components/checkout/CheckoutFlow";
 import { buttonClass } from "@/components/ui/Button";
-import { getCart, getCurrentUser, getToken } from "@/lib/api";
+import { getCart, getCurrentUser, getToken, getVoucherList } from "@/lib/api";
 import { stockStateOf } from "@/lib/cart-stock";
 import type { AddressInput } from "@/lib/checkout-form";
 import { buildMetadata } from "@/lib/metadata";
@@ -114,7 +114,11 @@ export default async function CheckoutPage({
     );
   }
 
-  const [cart, user] = await Promise.all([getCart(), getCurrentUser()]);
+  const [cart, user, vouchers] = await Promise.all([
+    getCart(),
+    getCurrentUser(),
+    getVoucherList(),
+  ]);
   const items = cart?.items ?? [];
 
   if (!cart) {
@@ -235,6 +239,7 @@ export default async function CheckoutPage({
           defaultAddress={EMPTY_ADDRESS}
           userName={user?.name ?? "Akun Anda"}
           userEmail={user?.email ?? "Sesi akun aktif"}
+          vouchers={vouchers ?? []}
         />
       </Container>
     </>

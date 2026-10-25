@@ -1,6 +1,12 @@
 import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
 import { formatEstimasi, formatHarga, formatRupiah, pluralItem } from "@/lib/format";
-import { PAYMENT_METHODS, type CartItem, type PaymentMethod, type ShippingService } from "@/lib/types";
+import {
+  PAYMENT_METHODS,
+  type AppliedVoucher,
+  type CartItem,
+  type PaymentMethod,
+  type ShippingService,
+} from "@/lib/types";
 import type { AddressInput } from "@/lib/checkout-form";
 
 /**
@@ -25,6 +31,7 @@ export function CheckoutSummary({
   address,
   service,
   paymentMethod,
+  voucher,
 }: {
   cart: CartItem[];
   accountName: string;
@@ -32,9 +39,24 @@ export function CheckoutSummary({
   address: AddressInput | null;
   service: ShippingService | null;
   paymentMethod: PaymentMethod | null;
+  voucher: AppliedVoucher | null;
 }) {
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
-  const subtotal = cart.reduce((total, item) => total + item.subtotal, 0);
+  const cartSubtotal = cart.reduce((total, item) => total + item.subtotal, 0);
+
+  /*
+   * Saat voucher aktif, subtotal mengikuti hasil `POST /vouchers/apply`
+   * (`formatted_subtotal`, atau `final_subtotal + discount_amount`), bukan
+   * hitungan peramban — server baru saja menghitungnya dari harga live.
+   *
+   * `final_subtotal` adalah subtotal PRODUK setelah diskon, TANPA ongkir
+   * (`VoucherService::performValidation`), jadi menambahkan `service.cost`
+   * masih sah. Kalau backend suatu saat memasukkannya, baris ini dobel.
+   */
+  const subtotal = voucher
+    ? voucher.final_subtotal + voucher.discount_amount
+    : cartSubtotal;
+  const total = (voucher ? voucher.final_subtotal : cartSubtotal) + (service?.cost ?? 0);
 
   return (
     <aside
@@ -107,9 +129,23 @@ export function CheckoutSummary({
         <div className="flex items-start justify-between gap-3">
           <dt className="text-text-secondary">Subtotal produk</dt>
           <dd className="text-right font-medium text-text-primary">
-            {formatRupiah(subtotal)}
+            {formatHarga(subtotal, voucher?.formatted_subtotal)}
           </dd>
         </div>
+        {voucher ? (
+          <div className="flex items-start justify-between gap-3">
+            <dt className="text-text-secondary">
+              Diskon voucher ({voucher.code})
+            </dt>
+            <dd className="text-right font-medium text-brand-forest">
+              −
+              {formatHarga(
+                voucher.discount_amount,
+                voucher.formatted_discount_amount,
+              )}
+            </dd>
+          </div>
+        ) : null}
         <div className="flex items-start justify-between gap-3">
           <dt className="text-text-secondary">Ongkos kirim</dt>
           <dd className="text-right font-medium text-text-primary">
@@ -134,19 +170,13 @@ export function CheckoutSummary({
           Total tagihan
         </p>
         <p className="text-headline-sm font-semibold text-brand-forest">
-          {service ? formatRupiah(subtotal + service.cost) : "—"}
+          {service ? formatRupiah(total) : "—"}
         </p>
       </div>
 
-      {/*
-        Diskon voucher sengaja tidak ikut dihitung di sini. Nilainya baru
-        diketahui setelah server memvalidasinya saat pesanan dibuat, jadi
-        menampilkan total yang sudah memperhitungkan diskon di sini akan
-        menampilkan angka yang belum pernah dikonfirmasi.
-      */}
       <p className="mt-2 text-caption leading-relaxed text-text-secondary">
-        Total final dihitung ulang oleh server, termasuk voucher bila berlaku.
-        Harga dan stok divalidasi ulang saat pesanan dibuat (PRD §3.6).
+        Harga, stok, dan voucher divalidasi ulang oleh server saat pesanan
+        dibuat, termasuk total ini.
       </p>
 
       <p className="mt-4 border-t border-border-soft pt-4 text-caption text-text-secondary">

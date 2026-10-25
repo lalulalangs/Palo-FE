@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import {
   addCartItem,
+  applyVoucher,
   createOrder,
   getCart,
   getOrder,
@@ -15,6 +16,7 @@ import { toActionError } from "@/lib/action-result";
 import type { ActionError } from "@/lib/action-result";
 import { isPaymentMethod, type AddressInput } from "@/lib/checkout-form";
 import type {
+  AppliedVoucher,
   CheckoutLineItem,
   CreatedOrder,
   OrderDetail,
@@ -182,6 +184,74 @@ export async function quoteShippingAction(
     // `toActionError` memetakannya ke `kind: "courier"` sehingga UI memblokir
     // langkah berikutnya alih-alih menampilkan ongkir default.
     return toActionError(error);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Langkah 3 — periksa kode voucher (baris 14–15 audit)                       */
+/* -------------------------------------------------------------------------- */
+
+const RATE_LIMIT_MESSAGE =
+  "Terlalu banyak percobaan. Tunggu sekitar satu menit, lalu coba lagi.";
+
+/**
+ * `POST /vouchers/apply` untuk langkah pembayaran.
+ *
+ * Item diambil dari cart server dengan bentuk `{ sku_id, quantity }` saja —
+ * tanpa `price_seen` dan tanpa `subtotal` (harga dihitung server). Endpoint ini
+ * publik, jadi tidak ada pemeriksaan token; halaman checkout sendiri sudah
+ * bergerbang token.
+ *
+ * Voucher opsional: kegagalan di sini tidak boleh memblokir "Buat Pesanan".
+ * `voucher_code` tetap dikirim ulang ke `POST /checkout/orders` sebagai
+ * revalidasi terakhir.
+ */
+export async function applyVoucherAction(
+  code: string,
+): Promise<AppliedVoucher | ActionError> {
+  const normalized = code.trim().toUpperCase();
+  if (!normalized) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Masukkan kode voucher terlebih dahulu.",
+      fieldErrors: {},
+    };
+  }
+
+  const cart = await getCart();
+  const items = (cart?.items ?? []).map((item) => ({
+    sku_id: item.sku_id,
+    quantity: item.quantity,
+  }));
+
+  if (items.length === 0) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Keranjang kosong. Kode voucher tidak dapat diperiksa.",
+      fieldErrors: {},
+    };
+  }
+
+  try {
+    const result = await applyVoucher(normalized, items);
+    return { ...result, code: normalized };
+  } catch (error) {
+    const mapped = toActionError(error);
+
+    // 422 membawa pesan spesifik per field (`errors.code`), dan itu yang paling
+    // berguna bagi pembeli — pesan umum backend hanya mengulang hal yang sama.
+    const codeMessage =
+      mapped.kind === "voucher" ? mapped.fieldErrors.code?.[0] : undefined;
+    if (codeMessage) return { ...mapped, message: codeMessage };
+
+    // Jendela throttle bergeser, jadi hitungan mundur di klien akan berbohong.
+    if (mapped.kind === "rate-limit") {
+      return { ...mapped, message: RATE_LIMIT_MESSAGE };
+    }
+
+    return mapped;
   }
 }
 
