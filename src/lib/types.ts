@@ -552,6 +552,7 @@ export interface CheckoutRequest {
  * metode per transaksi, sisanya ditentukan kanal di sisi DOKU.
  */
 export const PAYMENT_METHODS = [
+  { value: "online", label: "Online (kanal dipilih di DOKU)" },
   { value: "qris", label: "QRIS" },
   { value: "virtual_account", label: "Virtual Account Bank" },
   { value: "ewallet", label: "E-Wallet" },
@@ -561,15 +562,16 @@ export const PAYMENT_METHODS = [
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number]["value"];
 
 /**
- * Metode yang dikirim `placeOrderAction` untuk pembayaran online.
+ * Metode yang dikirim `placeOrderAction`.
  *
- * `qris` dipilih karena kanal ini tidak butuh rekening bank atau penerbit
- * kartu tertentu; DOKU menampilkan seluruh kanal yang aktif pada akun merchant
- * di halaman pembayarannya, jadi pembeli tetap bisa memilih VA/e-wallet di
- * sana. Yang disimpan backend hanyalah "pembayaran online"; kanal sebenarnya
- * tercatat di DOKU.
+ * HARUS `online`, bukan salah satu kanal (`qris`/`virtual_account`/…).
+ * Backend memetakan metode ke `payment.payment_method_types` milik DOKU, dan
+ * nilai kanal MENGUNCI halaman pembayaran ke kanal itu — `qris` menghasilkan
+ * `/payment/page/qris?status=single-payment`, sehingga pembeli tidak pernah
+ * ditawari VA, e-wallet, atau kartu. `online` tidak punya pemetaan, jadi DOKU
+ * menampilkan seluruh kanal yang aktif di akun merchant.
  */
-export const DEFAULT_PAYMENT_METHOD: PaymentMethod = "qris";
+export const DEFAULT_PAYMENT_METHOD: PaymentMethod = "online";
 
 /**
  * Satu baris `GET /shipping/destinations` — satu subdistrict RajaOngkir.

@@ -42,7 +42,11 @@ export function PaymentInstructions({ payment }: { payment: PaymentInfo }) {
     <div className="space-y-4">
       {method ? (
         <p className="text-caption text-text-secondary">
-          Metode: <span className="font-semibold text-text-primary">{method}</span>
+          Metode:{" "}
+          <span className="font-semibold text-text-primary">
+            {/* `online` = kanal belum dipilih; jangan tampilkan sebagai jargon. */}
+            {method === "online" ? "dipilih di halaman DOKU" : method}
+          </span>
           {" · "}
           Jumlah:{" "}
           <span className="font-semibold text-text-primary">
