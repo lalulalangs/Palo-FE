@@ -143,14 +143,20 @@ export function productJsonLd(options: ProductJsonLdOptions): JsonLdObject | nul
   }
 
   if (!product.is_placeholder) {
-    const sku = product.default_sku ?? product.variants[0] ?? null;
+    // Varian bersarang: SKU pertama dari varian pertama. `default_sku` tidak
+    // ada di kontrak, jadi tidak boleh disintesis di sini.
+    const skuCount = product.variants.reduce(
+      (total, variant) => total + variant.skus.length,
+      0,
+    );
+    const sku = product.variants[0]?.skus[0] ?? null;
     if (sku) {
       node.sku = sku.code;
     }
     node.offers = {
       "@type": "AggregateOffer",
       priceCurrency: "IDR",
-      offerCount: Math.max(product.variants.length, 1),
+      offerCount: Math.max(skuCount, 1),
       availability:
         product.is_out_of_stock
           ? "https://schema.org/OutOfStock"

@@ -38,6 +38,7 @@ import type {
   ProductListItem,
   ProductListMeta,
   ProductSku,
+  ProductVariant,
   RegisterRequest,
   ShippingAddressSnapshot,
   ShippingDestination,
@@ -838,15 +839,6 @@ function normalizeProductDetail(
   const images = normalizeDetailImages(source);
   const variants = normalizeDetailVariants(source);
 
-  // `default_sku` diutamakan kalau backend mengirimnya; kalau tidak, SKU
-  // pertama dari `variants[]` hasil ratakan dipakai (PRD §3.2 AC: produk
-  // tanpa varian tetap punya satu SKU yang bisa ditambahkan ke keranjang).
-  const defaultSku =
-    (isRecord(source.default_sku) ? normalizeSku(source.default_sku) : null) ??
-    firstSkuFromList(source.skus) ??
-    variants[0] ??
-    null;
-
   return {
     id: readNumber(source.id, 0),
     name: readString(source, "name") ?? "",
@@ -866,7 +858,6 @@ function normalizeProductDetail(
     badge: readString(source, "badge"),
     images,
     variants,
-    default_sku: defaultSku,
     category: isRecord(source.category) ? normalizeCategoryRef(source.category) : null,
   };
 }
@@ -891,67 +882,63 @@ function normalizeDetailImages(source: Record<string, unknown>): ProductImageIte
 }
 
 /**
- * Ratakan varian detail menjadi satu daftar SKU.
+ * Normalisasi `variants[]` endpoint detail menjadi bentuk bersarang.
  *
- * Backend (`ProductDetailResource`) mengelompokkan SKU di dalam varian:
- * `variants[] = [{ id, name, attributes, skus: [...] }]`. Frontend memakai
- * satu daftar SKU rata, jadi atribut varian induk disalin ke setiap SKU-nya
- * supaya label varian ("M · Black") tetap punya sumber. Bentuk kontrak lama
- * (`variants[]` berisi SKU langsung) juga tetap didukung.
+ * `ProductDetailResource` mengelompokkan SKU di dalam varian:
+ * `variants[] = [{ id, name, attributes, skus: [...] }]`. Bentuk itu
+ * dipertahankan apa adanya — atribut menempel di varian, SKU di dalamnya.
+ * Meratakan SKU (perilaku lama) lalu menyintesis `default_sku` dari
+ * `variants[0]` adalah akar bug "pemilih varian tidak pernah tampil": panel
+ * selalu menerima satu SKU. Varian tanpa `skus[]` tetap dikembalikan dengan
+ * daftar kosong, karena "varian ada tapi belum punya SKU" adalah fakta data.
  */
-function normalizeDetailVariants(source: Record<string, unknown>): ProductSku[] {
+function normalizeDetailVariants(
+  source: Record<string, unknown>,
+): ProductVariant[] {
   const raw = source.variants;
   if (!Array.isArray(raw)) return [];
 
-  const out: ProductSku[] = [];
+  const out: ProductVariant[] = [];
   for (const item of raw) {
     if (!isRecord(item)) continue;
-
-    if (Array.isArray(item.skus)) {
-      const attributes = readAttributes(item.attributes);
-      for (const skuRaw of item.skus) {
-        const sku = normalizeSku(skuRaw, attributes);
-        if (sku) out.push(sku);
-      }
-      continue;
-    }
-
-    const sku = normalizeSku(item);
-    if (sku) out.push(sku);
+    const skus = Array.isArray(item.skus)
+      ? item.skus
+          .map((sku) => normalizeSku(sku))
+          .filter((sku): sku is ProductSku => sku !== null)
+      : [];
+    out.push({
+      id: readNumber(item.id, 0),
+      name: readString(item, "name") ?? "",
+      attributes: readAttributes(item.attributes),
+      skus,
+    });
   }
 
   return out;
 }
 
-/** SKU pertama dari array `skus[]`, atau `null` bila tidak ada. */
-function firstSkuFromList(value: unknown): ProductSku | null {
-  if (!Array.isArray(value)) return null;
-  for (const item of value) {
-    const sku = normalizeSku(item);
-    if (sku) return sku;
-  }
-  return null;
-}
-
-function normalizeSku(
-  value: unknown,
-  attributesOverride?: Record<string, string> | null,
-): ProductSku | null {
+function normalizeSku(value: unknown): ProductSku | null {
   if (!isRecord(value)) return null;
   const id = value.id;
   if (typeof id !== "number") return null;
+  // `ProductDetailResource` memakai `sku_code`/`formatted_price`/
+  // `is_available`; dokumen kontrak memakai `code`/`price_display`/
+  // `is_out_of_stock`. Keduanya diterima supaya SKU tidak pernah hilang.
+  const stock = typeof value.stock === "number" ? value.stock : null;
   return {
     id,
-    // `ProductDetailResource` memakai `sku_code`/`formatted_price`/
-    // `is_available`; dokumen kontrak memakai `code`/`price_display`/
-    // `is_out_of_stock`. Keduanya diterima supaya varian tidak pernah hilang.
     code: readString(value, "code") ?? readString(value, "sku_code") ?? "",
     price: readNumber(value.price, 0),
     price_display:
       readString(value, "price_display") ?? readString(value, "formatted_price"),
-    stock: typeof value.stock === "number" ? value.stock : null,
-    is_out_of_stock: value.is_out_of_stock === true || value.is_available === false,
-    attributes: attributesOverride ?? readAttributes(value.attributes),
+    stock,
+    // Satu definisi "bisa dibeli" (ARSITEKTUR D5): `is_active && stock > 0`.
+    // Angka stok yang tidak dikirim (`null`) bukan alasan mematikan SKU.
+    is_out_of_stock:
+      value.is_out_of_stock === true ||
+      value.is_available === false ||
+      (stock !== null && stock <= 0),
+    is_active: value.is_active !== false,
   };
 }
 

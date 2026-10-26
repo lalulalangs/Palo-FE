@@ -82,9 +82,26 @@ export interface ProductSku {
   code: string;
   price: number;
   price_display: string | null;
+  /** `null` = server tidak mengirim angka stok (S7), bukan "stok 0". */
   stock: number | null;
   is_out_of_stock: boolean;
+  is_active: boolean;
+}
+
+/**
+ * Varian: kelompok SKU dengan atribut yang sama (`{ size: "M", color: "Black" }`).
+ *
+ * SKU **tidak** punya atribut sendiri. Meratakan varian menjadi daftar SKU
+ * (bentuk lama) membuat "varian" dan "SKU" tidak bisa dibedakan saat satu
+ * varian berisi lebih dari satu SKU, dan sintesis `default_sku` dari
+ * `variants[0]` membuat pemilih varian tidak pernah muncul.
+ */
+export interface ProductVariant {
+  id: number;
+  /** Label cadangan dari server, mis. `"Black / Size M"`. */
+  name: string;
   attributes: Record<string, string> | null;
+  skus: ProductSku[];
 }
 
 export interface ProductImageItem {
@@ -111,8 +128,8 @@ export interface ProductDetail {
   is_out_of_stock: boolean;
   badge: string | null;
   images: ProductImageItem[];
-  variants: ProductSku[];
-  default_sku: ProductSku | null;
+  /** Varian bersarang: atribut menempel di varian, SKU di dalamnya. */
+  variants: ProductVariant[];
   category: CategoryRef | null;
 }
 
