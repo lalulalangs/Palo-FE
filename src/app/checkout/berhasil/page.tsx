@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { PaymentInstructions } from "@/components/checkout/PaymentInstructions";
+import { PaymentRedirectCard } from "@/components/checkout/PaymentRedirectCard";
 import { buttonClass } from "@/components/ui/Button";
 import { getOrder } from "@/lib/api";
 import { paymentRedirectUrl } from "@/lib/url";
@@ -154,6 +155,13 @@ export default async function CheckoutSuccessPage({
 
       <Container className="py-8 tablet:py-12">
         <div className="mx-auto max-w-3xl space-y-6">
+          {paymentUrl ? (
+            <PaymentRedirectCard
+              paymentUrl={paymentUrl}
+              orderNumber={detail.order_number}
+            />
+          ) : null}
+
           <section className="rounded-lg border-2 border-brand-forest bg-surface-paper p-5 tablet:p-6">
             <p className="text-caption uppercase tracking-widest text-text-secondary">
               Nomor pesanan

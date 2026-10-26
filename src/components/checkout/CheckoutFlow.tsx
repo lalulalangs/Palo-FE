@@ -180,25 +180,19 @@ export function CheckoutFlow({
       setIsRedirecting(true);
 
       /*
-       * Pesanan dibuat → pembeli langsung dibawa ke halaman pembayaran
-       * gateway. Sebelumnya mereka berhenti di halaman instruksi yang tidak
-       * berisi nomor VA/QR apa pun untuk DOKU Checkout (host-to-host), jadi
-       * pesanan "menunggu pembayaran" tanpa jalan untuk membayar.
+       * Pesanan dibuat → pembeli dialihkan ke halaman `/checkout/berhasil`
+       * menggunakan `router.replace` alih-alih `window.location.assign` di sini.
        *
-       * Navigasi dilakukan dengan `window.location.assign`, bukan `router.push`:
-       * tujuannya situs lain (staging.doku.com), dan router Next hanya untuk
-       * rute internal. `?order=` tetap diteruskan supaya pembeli mendarat
-       * kembali di halaman pesanan bila gateway mengembalikan mereka tanpa
-       * parameter.
+       * Alasan arsitektural:
+       * 1. Menghindari flash glitch "Keranjang masih kosong" yang terjadi jika
+       *    langsung memanggil `window.location.assign` di halaman `/checkout`
+       *    (karena Server Action me-revalidate RSC checkout saat cart sudah kosong).
+       * 2. `router.replace` menimpa entri `/checkout` di history stack peramban.
+       * 3. Di `/checkout/berhasil`, komponen `PaymentRedirectCard` menangani
+       *    countdown otomatis 5 detik ke DOKU, dan melindungi user bila menekan
+       *    tombol BACK agar mendarat di ringkasan pesanan resmi, bukan cart kosong.
        */
-      if (result.paymentUrl) {
-        window.location.assign(result.paymentUrl);
-        return;
-      }
-
-      // Cadangan: tidak ada URL pembayaran (mis. gateway bermasalah). Halaman
-      // hasil tetap berguna karena menampilkan instruksi & status terbaru.
-      router.push(
+      router.replace(
         `/checkout/berhasil?order=${encodeURIComponent(result.order.order_number)}`,
       );
     });
