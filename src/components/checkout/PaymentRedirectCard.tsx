@@ -54,6 +54,19 @@ export function PaymentRedirectCard({
   const hasReturned = alreadyRedirected && !manuallyResumed;
   const redirectTriggeredRef = useRef(false);
 
+  // Tangani Back-Forward Cache (bfcache): saat halaman dipulihkan via tombol back/forward,
+  // pulihkan status redirecting dan trigger ref agar tombol bayar tidak membeku.
+  useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        setIsRedirecting(false);
+        redirectTriggeredRef.current = false;
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
+
   const handlePayNow = useCallback(() => {
     if (redirectTriggeredRef.current) return;
     redirectTriggeredRef.current = true;

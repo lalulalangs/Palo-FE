@@ -194,20 +194,6 @@ export default async function CheckoutSuccessPage({
                 Metode: {detail.payment_method}
               </p>
             ) : null}
-            {/*
-              DOKU Checkout bersifat host-to-host: tidak ada nomor VA/QR yang
-              dibaca dari respons, pembeli harus membuka `payment_url`. Tanpa
-              tombol ini halaman hasil hanya berkata "selesaikan pembayaran"
-              tanpa memberi jalan.
-            */}
-            {paymentUrl ? (
-              <a
-                href={paymentUrl}
-                className={buttonClass({ size: "lg", fullWidth: true, className: "mt-4" })}
-              >
-                Lanjut ke halaman pembayaran DOKU
-              </a>
-            ) : null}
 
             {/*
               Instruksi dirender apa adanya dari `payment.instructions`
