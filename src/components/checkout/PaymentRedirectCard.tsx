@@ -8,7 +8,7 @@ interface PaymentRedirectCardProps {
   orderNumber: string;
 }
 
-const TOTAL_DURATION_MS = 5000;
+const TOTAL_DURATION_MS = 3000;
 const TICK_INTERVAL_MS = 100;
 
 function subscribeStorage(onStoreChange: () => void): () => void {
@@ -29,10 +29,13 @@ function checkAlreadyRedirected(key: string): boolean {
  * Kartu transisi pengalihan pembayaran otomatis ke DOKU Checkout.
  *
  * Menerapkan pola UX Guard:
- * - Siklus pertama: countdown 5 detik dengan progress bar menuju DOKU.
- * - Tombol pause/resume agar pembeli dapat menahan pengalihan bila ingin meninjau pesanan.
+ * - Kunjungan pertama: countdown 3 detik dengan progress bar halus menuju DOKU,
+ *   dan tombol tunggal "Bayar Sekarang →".
  * - Anti-loop via `sessionStorage`: jika pembeli menekan tombol BACK di peramban dari DOKU,
- *   countdown tidak berulang otomatis, melainkan masuk ke mode manual.
+ *   countdown tidak berulang otomatis, melainkan masuk ke mode manual dengan tombol
+ *   "Lanjutkan Pembayaran →" dan badge "Menunggu Pembayaran".
+ * - Penanganan bfcache: mendengarkan event `pageshow` saat dipulihkan dari Back-Forward Cache
+ *   agar state tombol dan trigger ref tidak membeku di status redirecting.
  */
 export function PaymentRedirectCard({
   paymentUrl,
@@ -46,12 +49,10 @@ export function PaymentRedirectCard({
     () => false,
   );
 
-  const [manuallyResumed, setManuallyResumed] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [timeLeftMs, setTimeLeftMs] = useState(TOTAL_DURATION_MS);
 
-  const hasReturned = alreadyRedirected && !manuallyResumed;
+  const hasReturned = alreadyRedirected;
   const redirectTriggeredRef = useRef(false);
 
   // Tangani Back-Forward Cache (bfcache): saat halaman dipulihkan via tombol back/forward,
@@ -81,9 +82,9 @@ export function PaymentRedirectCard({
     window.location.assign(paymentUrl);
   }, [paymentUrl, storageKey]);
 
-  // Countdown timer loop
+  // Countdown timer loop (3 detik)
   useEffect(() => {
-    if (hasReturned || isPaused || isRedirecting) {
+    if (hasReturned || isRedirecting) {
       return;
     }
 
@@ -100,26 +101,7 @@ export function PaymentRedirectCard({
     }, TICK_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [hasReturned, isPaused, isRedirecting, handlePayNow]);
-
-  const togglePause = () => {
-    if (hasReturned) {
-      // Mengaktifkan kembali countdown dari awal jika pengguna memintanya
-      setManuallyResumed(true);
-      setTimeLeftMs(TOTAL_DURATION_MS);
-      setIsPaused(false);
-      return;
-    }
-
-    if (isPaused) {
-      if (timeLeftMs <= 0) {
-        setTimeLeftMs(TOTAL_DURATION_MS);
-      }
-      setIsPaused(false);
-    } else {
-      setIsPaused(true);
-    }
-  };
+  }, [hasReturned, isRedirecting, handlePayNow]);
 
   const secondsRemaining = Math.max(1, Math.ceil(timeLeftMs / 1000));
   const progressPercent = Math.min(
@@ -133,7 +115,7 @@ export function PaymentRedirectCard({
       aria-label="Pengalihan Pembayaran DOKU"
       className="overflow-hidden rounded-xl border-2 border-brand-forest bg-surface-white shadow-editorial transition-all"
     >
-      {/* Progress bar di bagian atas kartu */}
+      {/* Progress bar di bagian atas kartu (hanya aktif pada kunjungan pertama) */}
       <div
         role="progressbar"
         aria-valuenow={Math.round(progressPercent)}
@@ -143,9 +125,7 @@ export function PaymentRedirectCard({
         className="h-1.5 w-full bg-surface-sage overflow-hidden"
       >
         <div
-          className={`h-full bg-brand-forest transition-all duration-100 ease-linear ${
-            isPaused || hasReturned ? "opacity-30" : ""
-          }`}
+          className="h-full bg-brand-forest transition-all duration-100 ease-linear"
           style={{ width: `${hasReturned ? 0 : progressPercent}%` }}
         />
       </div>
@@ -155,20 +135,17 @@ export function PaymentRedirectCard({
           {/* Kolom Informasi & Status */}
           <div className="min-w-0 flex-1 space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
-                <LockIcon className="h-3.5 w-3.5" />
-                Pembayaran Aman DOKU
-              </span>
-
               {hasReturned ? (
-                <span className="rounded-full bg-surface-paper px-2.5 py-0.5 text-caption font-medium text-text-secondary">
-                  Mode Manual
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-paper border border-border-soft px-2.5 py-0.5 text-caption font-medium text-text-secondary">
+                  <ClockIcon className="h-3.5 w-3.5" />
+                  Menunggu Pembayaran
                 </span>
-              ) : isPaused ? (
-                <span className="rounded-full bg-surface-paper px-2.5 py-0.5 text-caption font-medium text-text-secondary">
-                  Pengalihan Ditahan
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
+                  <LockIcon className="h-3.5 w-3.5" />
+                  Pembayaran Aman DOKU
                 </span>
-              ) : null}
+              )}
             </div>
 
             <h3 className="font-headline text-headline-sm font-semibold text-brand-deep">
@@ -176,9 +153,7 @@ export function PaymentRedirectCard({
                 ? "Membuka Gerbang Pembayaran DOKU…"
                 : hasReturned
                   ? "Lanjutkan Pembayaran Anda"
-                  : isPaused
-                    ? "Pengalihan Otomatis Ditahan"
-                    : `Mengarahkan ke DOKU dalam ${secondsRemaining} detik`}
+                  : `Mengarahkan ke DOKU dalam ${secondsRemaining} detik`}
             </h3>
 
             <p className="text-body-sm leading-relaxed text-text-secondary">
@@ -186,27 +161,30 @@ export function PaymentRedirectCard({
                 ? "Mohon tunggu sejenak, Anda sedang dialihkan ke sistem pembayaran DOKU Checkout yang aman."
                 : hasReturned
                   ? "Anda kembali dari halaman pembayaran. Klik tombol di bawah untuk melanjutkan pembayaran DOKU kapan saja."
-                  : isPaused
-                    ? "Pengalihan otomatis sedang dijeda. Anda dapat memeriksa rincian pesanan terlebih dahulu atau menekan tombol di bawah saat siap membayar."
-                    : "Anda akan dialihkan otomatis ke DOKU Checkout untuk memilih kanal pembayaran (QRIS, Virtual Account, e-wallet, atau kartu kredit)."}
+                  : "Anda akan dialihkan otomatis ke DOKU Checkout untuk memilih kanal pembayaran (QRIS, Virtual Account, e-wallet, atau kartu kredit)."}
             </p>
           </div>
 
-          {/* Kolom Tombol Aksi */}
-          <div className="flex flex-col gap-2.5 shrink-0 tablet:items-end">
+          {/* Kolom Tombol Aksi Tunggal (Single Primary CTA) */}
+          <div className="shrink-0 tablet:self-center">
             <button
               type="button"
               onClick={handlePayNow}
               disabled={isRedirecting}
               className={buttonClass({
                 size: "md",
-                className: "min-w-[190px] shadow-sm",
+                className: "min-w-[210px] shadow-sm",
               })}
             >
               {isRedirecting ? (
                 <span className="flex items-center gap-2">
                   <SpinnerIcon className="h-4 w-4 animate-spin" />
                   Membuka DOKU…
+                </span>
+              ) : hasReturned ? (
+                <span className="flex items-center gap-2">
+                  Lanjutkan Pembayaran
+                  <ArrowRightIcon className="h-4 w-4" />
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
@@ -215,27 +193,6 @@ export function PaymentRedirectCard({
                 </span>
               )}
             </button>
-
-            {!hasReturned && (
-              <button
-                type="button"
-                onClick={togglePause}
-                disabled={isRedirecting}
-                className="inline-flex min-h-11 items-center justify-center rounded-md px-3 text-label-sm font-medium text-text-secondary transition-colors hover:bg-surface-sage hover:text-brand-forest"
-              >
-                {isPaused ? (
-                  <span className="flex items-center gap-1.5">
-                    <PlayIcon className="h-3.5 w-3.5" />
-                    Lanjutkan Pengalihan ({secondsRemaining}s)
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5">
-                    <PauseIcon className="h-3.5 w-3.5" />
-                    Tahan Pengalihan Otomatis
-                  </span>
-                )}
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -263,6 +220,22 @@ function LockIcon({ className }: { className?: string }) {
   );
 }
 
+function ClockIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
 function ArrowRightIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -276,35 +249,6 @@ function ArrowRightIcon({ className }: { className?: string }) {
       strokeLinejoin="round"
     >
       <path d="M5 12h14M12 5l7 7-7 7" />
-    </svg>
-  );
-}
-
-function PauseIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-    >
-      <path d="M10 4v16M14 4v16" />
-    </svg>
-  );
-}
-
-function PlayIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className={className}
-      fill="currentColor"
-    >
-      <path d="M8 5v14l11-7z" />
     </svg>
   );
 }
