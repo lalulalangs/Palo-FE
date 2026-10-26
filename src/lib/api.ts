@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers as nextHeaders } from "next/headers";
 
 // `ApiError` tinggal di modul sendiri supaya modul ini (yang memakai
 // `next/headers`) tidak ikut terbawa ke bundel Client Component.
@@ -218,6 +218,18 @@ export async function apiRequest<T>(
   // Prioritas tertinggi di `CartService::resolveGuestToken()` — dipakai agar
   // sesi keranjang tamu tidak bergantung pada cookie lintas-domain.
   if (guestToken) headers["X-Guest-Token"] = guestToken;
+
+  // Teruskan IP asli klien untuk penegakan rate limiting yang akurat di backend.
+  try {
+    const incomingHeaders = await nextHeaders();
+    const forwardedFor =
+      incomingHeaders.get("x-forwarded-for") ?? incomingHeaders.get("x-real-ip");
+    if (forwardedFor) {
+      headers["X-Forwarded-For"] = forwardedFor;
+    }
+  } catch {
+    // Di luar request context (mis. saat build statis / sitemap) headers tidak tersedia.
+  }
 
   if (forwardCookies) {
     const cookieHeader = await requestCookieHeader();
