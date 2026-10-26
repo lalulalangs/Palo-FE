@@ -55,12 +55,12 @@ export interface NavLink {
 /**
  * Navigasi utama.
  *
- * Item pertama adalah `Koleksi` (bukan `Katalog`): `design.md` §3 menetapkan
- * menu global `Koleksi`, `Cerita Palo`, `Toko Senaru`. Diganti, BUKAN
- * ditambah — lima item tidak muat di 768px. `/produk` tetap terjangkau lewat
- * ikon pencarian di header, footer, breadcrumb produk, dan CTA di `/koleksi`.
+ * Menu navigasi global: `Katalog`, `Koleksi`, `Cerita Palo`, `Toko Senaru`, `Lacak Pesanan`.
+ * Jarak antar-menu responsif (`gap-4 desktop:gap-8`) dan label link diberi `whitespace-nowrap`
+ * agar kelima item tertata rapi di tablet (768px+) dan desktop tanpa overflow.
  */
 export const PRIMARY_NAV: NavLink[] = [
+  { href: "/produk", label: "Katalog" },
   { href: "/koleksi", label: "Koleksi" },
   { href: "/cerita", label: "Cerita Palo" },
   { href: "/kontak", label: "Toko Senaru" },
@@ -184,12 +184,12 @@ export function SiteHeader({
           </Link>
 
           <nav aria-label="Navigasi utama" className="hidden tablet:block">
-            <ul className="flex items-center gap-8">
+            <ul className="flex items-center gap-4 desktop:gap-8">
               {PRIMARY_NAV.map((link) => (
                 <li key={link.href}>
                   <ActiveLink
                     href={link.href}
-                    className={`inline-flex ${HEADER_HEIGHT_CLASS} items-center border-b-2 text-label-md font-medium transition-colors`}
+                    className={`inline-flex ${HEADER_HEIGHT_CLASS} shrink-0 items-center whitespace-nowrap border-b-2 text-label-md font-medium transition-colors`}
                     activeClassName={
                       transparan
                         ? "border-surface-white font-semibold text-surface-white"
@@ -287,21 +287,6 @@ export function SiteHeader({
                       </ActiveLink>
                     </li>
                   ))}
-                  {/*
-                    "Katalog" hanya ada di drawer seluler. Tanpa ini pengguna
-                    ponsel kehilangan satu-satunya tautan TEKS ke `/produk`
-                    (ikon pencarian hanya terbaca "Cari produk" oleh pembaca
-                    layar). Drawer bertumpuk vertikal, jadi tidak ada batas
-                    lebar seperti nav tablet.
-                  */}
-                  <li>
-                    <Link
-                      href="/produk"
-                      className="flex min-h-11 items-center rounded-md px-3 text-label-md text-text-primary transition-colors hover:bg-surface-sage"
-                    >
-                      Katalog
-                    </Link>
-                  </li>
                   <li>
                     <Link
                       href={isLoggedIn ? "/me" : "/daftar"}
