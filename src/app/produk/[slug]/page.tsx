@@ -140,7 +140,14 @@ export default async function ProductDetailPage({
 
       <Container className="pb-12 tablet:pb-16">
         <div className="grid gap-8 desktop:grid-cols-12 desktop:gap-12">
-          <div className="desktop:col-span-7">
+          {/*
+            Penanda uji M0: `media: []` adalah fakta data, bukan gambar yang
+            gagal dimuat. Galeri merendernya sebagai blok tenang tanpa `<img>`.
+          */}
+          <div
+            className="desktop:col-span-7"
+            data-pdp-media={product.images.length === 0 ? "empty" : "present"}
+          >
             <ProductGallery
               images={product.images}
               productName={product.name}
@@ -148,19 +155,20 @@ export default async function ProductDetailPage({
             />
           </div>
 
+          {/* Panel tanpa kartu di mobile: bingkai hanya mulai 768 px. */}
           <div className="desktop:col-span-5">
-            <div className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6">
+            <div className="tablet:rounded-xl tablet:border tablet:border-border-soft tablet:bg-surface-white tablet:p-6">
               <ProductPurchasePanel product={product} />
             </div>
           </div>
         </div>
 
-        {product.description ? (
-          <section className="mt-12 border-t border-border-soft pt-8">
-            <h2 className="text-headline-sm text-text-primary">
-              Deskripsi produk
-            </h2>
-            <div className="mt-3 max-w-3xl space-y-4 text-body-md leading-relaxed text-text-secondary">
+        <section className="mt-8 border-t border-border-soft pt-8 tablet:mt-10">
+          <h2 className="text-headline-sm text-text-primary">
+            Deskripsi produk
+          </h2>
+          {product.description ? (
+            <div className="mt-3 max-w-3xl space-y-3 text-body-md leading-relaxed text-text-secondary">
               {product.description
                 .split("\n")
                 .filter((line) => line.trim().length > 0)
@@ -168,20 +176,28 @@ export default async function ProductDetailPage({
                   <p key={index}>{paragraph.trim()}</p>
                 ))}
             </div>
-          </section>
-        ) : (
-          <section className="mt-12 border-t border-border-soft pt-8">
-            <h2 className="text-headline-sm text-text-primary">
-              Deskripsi produk
-            </h2>
+          ) : (
             <div className="mt-3 max-w-2xl">
               <PlaceholderNotice
                 title="Deskripsi belum diisi"
                 body="PRD §1.1A: deskripsi, bahan, dan spesifikasi produk belum dapat dipastikan dari sumber publik yang terakses. Admin harus mengisinya sebelum dipublikasikan."
               />
             </div>
-          </section>
-        )}
+          )}
+          {/*
+            Jalan keluar satu-satunya untuk pertanyaan ukuran/ketersediaan.
+            Tautan teks, bukan tombol sekunder: CTA primer tetap satu.
+          */}
+          <p className="mt-4 max-w-3xl text-body-md text-text-secondary">
+            Ada pertanyaan soal ukuran atau ketersediaan sebelum memesan?
+          </p>
+          <Link
+            href="/kontak"
+            className="mt-1 inline-flex min-h-11 items-center text-label-md font-semibold text-brand-forest underline underline-offset-4 transition-colors hover:text-brand-deep"
+          >
+            Tanya Customer Service →
+          </Link>
+        </section>
       </Container>
 
       {relatedProducts.length > 0 ? (

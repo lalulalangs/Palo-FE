@@ -17,7 +17,8 @@ export type ButtonVariant =
   | "secondary"
   | "outline"
   | "ghost"
-  | "danger";
+  | "danger"
+  | "blocked";
 
 export type ButtonSize = "sm" | "md" | "lg";
 
@@ -32,6 +33,16 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
     "bg-transparent text-text-primary border border-transparent hover:bg-surface-sage",
   danger:
     "bg-surface-white text-feedback-error border border-feedback-error hover:bg-feedback-error-soft",
+  /*
+   * `blocked` — tombol non-aktif yang alasannya terbaca.
+   *
+   * `disabled:opacity-55` menurunkan `text-secondary` di atas putih ke
+   * 2,22:1, jadi label "Stok habis" justru jadi teks yang tidak terbaca.
+   * Varian ini menyatakan sebabnya lewat warna permukaan + border, tanpa
+   * opasitas (WCAG 2.1 AA 1.4.3).
+   */
+  blocked:
+    "bg-surface-paper text-text-secondary border border-border-soft",
 };
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
@@ -55,9 +66,13 @@ export function buttonClass(options?: {
     className = "",
   } = options ?? {};
   return [
-    "inline-flex items-center justify-center rounded-md font-semibold tracking-wide",
+    // Radius 8 px (`--radius-lg`, design.md:57) — 6 px ada di bawah skala.
+    "inline-flex items-center justify-center rounded-lg font-semibold tracking-wide",
     "transition-colors duration-150",
-    "disabled:cursor-not-allowed disabled:opacity-55",
+    "disabled:cursor-not-allowed",
+    // Varian `blocked` sudah menyatakan keadaannya lewat warna permukaan;
+    // opasitas tambahan hanya menurunkan kontras teks alasannya.
+    variant === "blocked" ? "" : "disabled:opacity-55",
     VARIANT_CLASS[variant],
     SIZE_CLASS[size],
     fullWidth ? "w-full" : "",

@@ -28,9 +28,9 @@ export interface QuantityStepperProps {
   /** Nama butir untuk pesan batas maksimum, mis. "Varian Ukuran L". */
   itemName?: string;
   /**
-   * Catatan pengganti teks bawaan ("Maksimal N per pesanan"). Dipakai
-   * keranjang, yang butuh menyebut sisa stok dan jumlah di keranjang —
-   * pemakai lain (PDP) tidak mengirim apa pun, jadi teks bawaannya tetap.
+   * Catatan pengganti pesan batas. Pemanggil WAJIB mengirimnya bila ingin
+   * menjelaskan angka: teks bawaan "Maksimal N per pesanan" sudah pensiun
+   * karena N adalah stok SKU, bukan kebijakan toko (H5).
    */
   note?: { text: string; tone: "muted" | "warn" };
   className?: string;
@@ -82,7 +82,7 @@ export function QuantityStepper({
           type="button"
           onClick={() => commit(value - 1)}
           disabled={disabled || atMin}
-          aria-label={`Kurangi jumlah ${label}`}
+          aria-label={`Kurangi ${label}`}
           className="flex h-11 w-11 items-center justify-center text-text-secondary transition-colors hover:bg-surface-sage hover:text-brand-forest disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span aria-hidden="true" className="text-title-md leading-none">
@@ -108,7 +108,7 @@ export function QuantityStepper({
           type="button"
           onClick={() => commit(value + 1)}
           disabled={disabled || atMax}
-          aria-label={`Tambah jumlah ${label}`}
+          aria-label={`Tambah ${label}`}
           className="flex h-11 w-11 items-center justify-center text-text-secondary transition-colors hover:bg-surface-sage hover:text-brand-forest disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span aria-hidden="true" className="text-title-md leading-none">
@@ -127,7 +127,7 @@ export function QuantityStepper({
           note?.tone === "warn" ? "text-feedback-warn" : "text-text-secondary",
         ].join(" ")}
       >
-        {notice ?? note?.text ?? `Maksimal ${max} per pesanan.`}
+        {notice ?? note?.text ?? null}
       </p>
     </div>
   );
