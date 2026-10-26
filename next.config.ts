@@ -126,6 +126,20 @@ const nextConfig: NextConfig = {
   },
 
   /**
+   * Pengalihan rute (redirects).
+   * Mengarahkan `/katalog` langsung ke `/produk` secara permanen (308).
+   */
+  async redirects() {
+    return [
+      {
+        source: "/katalog",
+        destination: "/produk",
+        permanent: true,
+      },
+    ];
+  },
+
+  /**
    * Halaman checkout & lacik selalu dinamis (data per pengguna + token
    * Sanctum). Tidak ada ISR di sana.
    */
