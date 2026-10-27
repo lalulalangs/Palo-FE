@@ -761,11 +761,30 @@ export interface OrderDetail extends OrderSummary {
  * mewajibkan `items` (min 1) dan membuat nama/telepon opsional. Yang dikirim
  * adalah bentuk yang benar-benar diterima backend.
  */
+export interface GuestShippingAddress {
+  destination_id?: number | null;
+  street?: string | null;
+  subdistrict?: string | null;
+  district?: string | null;
+  city?: string | null;
+  province?: string | null;
+  postal_code?: string | null;
+}
+
 export interface GuestWhatsAppRequest {
   items: CheckoutLineItem[];
   guest_name: string | null;
   guest_phone: string | null;
   note: string | null;
+  shipping_address?: GuestShippingAddress | null;
+  courier?: string | null;
+  destination_id?: number | null;
+  street?: string | null;
+  city?: string | null;
+  district?: string | null;
+  subdistrict?: string | null;
+  province?: string | null;
+  postal_code?: string | null;
 }
 
 export interface GuestWhatsAppResult {

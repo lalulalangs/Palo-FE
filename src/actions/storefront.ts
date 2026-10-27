@@ -291,6 +291,34 @@ export async function createGuestCheckoutAction(
     };
   }
 
+  const destinationIdRaw = readText(formData, "destination_id");
+  const parsedDestinationId = Number.parseInt(destinationIdRaw, 10);
+  const destinationId =
+    Number.isFinite(parsedDestinationId) && parsedDestinationId > 0
+      ? parsedDestinationId
+      : null;
+
+  const street = readOptionalText(formData, "street");
+  const city = readOptionalText(formData, "city");
+  const district = readOptionalText(formData, "district");
+  const subdistrict = readOptionalText(formData, "subdistrict");
+  const province = readOptionalText(formData, "province");
+  const postalCode = readOptionalText(formData, "postal_code");
+  const courier = readOptionalText(formData, "courier") ?? "cs_recommendation";
+
+  const shippingAddress =
+    destinationId || street || city
+      ? {
+          destination_id: destinationId,
+          street,
+          city,
+          district,
+          subdistrict,
+          province,
+          postal_code: postalCode,
+        }
+      : null;
+
   let result: GuestWhatsAppResult;
   try {
     result = await createGuestWhatsAppCheckout({
@@ -298,6 +326,15 @@ export async function createGuestCheckoutAction(
       guest_name: readOptionalText(formData, "guest_name"),
       guest_phone: readOptionalText(formData, "guest_phone"),
       note: readOptionalText(formData, "note"),
+      shipping_address: shippingAddress,
+      courier,
+      destination_id: destinationId,
+      street,
+      city,
+      district,
+      subdistrict,
+      province,
+      postal_code: postalCode,
     });
   } catch (error) {
     return toActionError(error);

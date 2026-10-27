@@ -4,19 +4,51 @@ import { useActionState, useEffect, useMemo, useRef, useState, useSyncExternalSt
 
 import { createGuestCheckoutAction } from "@/actions/storefront";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
+import { DestinationPicker, type PickedDestination } from "@/components/checkout/DestinationPicker";
 import { buttonClass } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { fieldError, isActionError } from "@/lib/action-result";
+import { addressRegion } from "@/lib/checkout-form";
 import { formatHarga } from "@/lib/format";
 import type {
   GuestCheckoutActionState,
   GuestResultHandoff,
 } from "@/lib/guest-handoff";
 import { stockStateOf } from "@/lib/cart-stock";
-import type { CartItem } from "@/lib/types";
+import type { CartItem, ShippingDestination } from "@/lib/types";
 
 const ACTIVE_GUEST_ORDER_KEY = "palorinjani_active_guest_order";
 const ACTIVE_ORDER_TTL_MS = 60 * 60 * 1000; // 1 jam
+
+const COURIER_OPTIONS = [
+  {
+    id: "cs_recommendation",
+    label: "Rekomendasi CS",
+    badge: "Paling Hemat",
+    desc: "CS carikan opsi terbaik",
+  },
+  {
+    id: "jne",
+    label: "JNE",
+    badge: null,
+    desc: "Reguler / YES",
+  },
+  {
+    id: "jnt",
+    label: "J&T Express",
+    badge: null,
+    desc: "Reguler / EZ",
+  },
+] as const;
+
+const EMPTY_DESTINATION: PickedDestination = {
+  destination_id: 0,
+  city: "",
+  province: "",
+  district: null,
+  subdistrict: null,
+  postal_code: null,
+};
 
 function subscribeStorage(onStoreChange: () => void): () => void {
   if (typeof window === "undefined") return () => {};
@@ -54,8 +86,11 @@ function getActiveOrderServerSnapshot(): string | null {
 
 /**
  * Formulir checkout tamu via WhatsApp (PRD §3.11).
- * Dilengkapi dengan proteksi honeypot anti-bot dan session guard
- * agar mencegah submit pesanan berulang/spam.
+ * Dilengkapi dengan 4 seksi logis:
+ * 1. Data Pemesan (nama & no. WhatsApp)
+ * 2. Alamat Pengiriman (DestinationPicker & Detail Jalan)
+ * 3. Pilihan Ekspedisi (Segmented Radio Cards)
+ * 4. Catatan & Selesai (Catatan & CTA Primer dengan spinner)
  */
 export function GuestCheckoutForm({
   items,
@@ -71,6 +106,12 @@ export function GuestCheckoutForm({
   >(createGuestCheckoutAction, null);
   const error = isActionError(state) ? state : null;
   const handoff = state?.ok ? state.handoff : null;
+
+  // State alamat tujuan pengiriman
+  const [destination, setDestination] = useState<PickedDestination>(EMPTY_DESTINATION);
+
+  // State pilihan kurir (default: cs_recommendation)
+  const [selectedCourier, setSelectedCourier] = useState<string>("cs_recommendation");
 
   // Baca sessionStorage secara reaktif via useSyncExternalStore
   const storedHandoffJson = useSyncExternalStore(
@@ -116,6 +157,10 @@ export function GuestCheckoutForm({
     window.location.reload();
   };
 
+  const handleSelectDestination = (dest: ShippingDestination | null) => {
+    setDestination(addressRegion(dest));
+  };
+
   const activeHandoff = handoff ?? (isDismissed ? null : savedHandoff);
 
   // Gerbang yang sama dipakai baris keranjang dan ringkasan: stok basi
@@ -132,28 +177,21 @@ export function GuestCheckoutForm({
   }
 
   return (
-    <form action={formAction} className="space-y-4">
-      <h2 className="text-headline-sm text-text-primary">
-        Checkout lewat WhatsApp
-      </h2>
-      <p className="text-caption leading-relaxed text-text-secondary">
-        Tanpa akun. Daftar belanja disusun otomatis ke percakapan WhatsApp
-        Customer Service untuk pengecekan stok fisik, rekomendasi ukuran, dan
-        konfirmasi pembayaran.
-      </p>
+    <form action={formAction} className="space-y-6">
+      <div>
+        <h2 className="text-headline-sm text-text-primary">
+          Checkout lewat WhatsApp
+        </h2>
+        <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+          Tanpa akun. Daftar belanja dan informasi pengiriman disusun otomatis ke percakapan WhatsApp
+          Customer Service untuk pengecekan fisik, rekomendasi ongkir, dan konfirmasi pembayaran.
+        </p>
+      </div>
 
-      {/*
-        Item dikirim sebagai satu field `sku_id:quantity` yang diserialisasi
-        dari cart yang sudah dirender server. Backend tetap memvalidasi ulang
-        SKU, harga, dan stok dari database (PRD §3.6), jadi ini bukan lapisan
-        keamanan — hanya menghindari array yang bisa dimanipulasi di form.
-      */}
+      {/* Item diserialisasi dari cart yang dirender server */}
       <input type="hidden" name="items" value={serializeItems(items)} />
 
-      {/*
-        Honeypot anti-bot: disembunyikan dari visual pengguna dan pembaca layar.
-        Bot otomatis yang mengisi seluruh input akan mengisi field ini dan ditolak server.
-      */}
+      {/* Honeypot anti-bot: disembunyikan visual dan ARIA */}
       <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
         <label htmlFor="guest-company">Perusahaan</label>
         <input
@@ -165,72 +203,235 @@ export function GuestCheckoutForm({
         />
       </div>
 
-      <Input
-        id="guest-name"
-        name="guest_name"
-        label="Nama (opsional)"
-        hint="Membantu Customer Service menyapa Anda di WhatsApp."
-        autoComplete="name"
-        maxLength={120}
-        disabled={isPending}
-        error={fieldError(error, "guest_name")}
-      />
+      {/* Hidden inputs untuk wilayah destinasi hasil DestinationPicker */}
+      <input type="hidden" name="destination_id" value={destination.destination_id || ""} />
+      <input type="hidden" name="city" value={destination.city} />
+      <input type="hidden" name="district" value={destination.district ?? ""} />
+      <input type="hidden" name="subdistrict" value={destination.subdistrict ?? ""} />
+      <input type="hidden" name="province" value={destination.province} />
+      <input type="hidden" name="postal_code" value={destination.postal_code ?? ""} />
 
-      <Input
-        id="guest-phone"
-        name="guest_phone"
-        type="tel"
-        inputMode="tel"
-        label="Nomor WhatsApp (opsional)"
-        hint="Isi bila ingin nomor Anda dicantumkan di pesan."
-        autoComplete="tel"
-        maxLength={32}
-        disabled={isPending}
-        error={fieldError(error, "guest_phone")}
-      />
+      {/* =========================================================================
+          SEKSI 1: Data Pemesan
+      ========================================================================= */}
+      <section aria-labelledby="section-buyer-title" className="space-y-3">
+        <div className="border-b border-border-soft pb-2">
+          <h3 id="section-buyer-title" className="text-label-md font-semibold text-text-primary">
+            1. Data Pemesan
+          </h3>
+          <p className="text-caption text-text-secondary">
+            Nama dan nomor kontak untuk percakapan dengan Customer Service.
+          </p>
+        </div>
 
-      <Textarea
-        id="guest-note"
-        name="note"
-        label="Catatan (opsional)"
-        placeholder="Contoh: mohon dikirimkan pada jam kerja."
-        maxLength={500}
-        disabled={isPending}
-        error={fieldError(error, "note")}
-      />
+        <div className="grid gap-3 tablet:grid-cols-2">
+          <Input
+            id="guest-name"
+            name="guest_name"
+            label="Nama lengkap (opsional)"
+            hint="Membantu Customer Service menyapa Anda di WhatsApp."
+            autoComplete="name"
+            maxLength={120}
+            disabled={isPending}
+            error={fieldError(error, "guest_name")}
+          />
 
-      {hasBlockingItem ? (
-        <PlaceholderNotice
-          title="Ada barang yang perlu disesuaikan dulu"
-          body="Satu atau lebih barang habis atau jumlahnya melebihi sisa stok. Sesuaikan jumlahnya sebelum melanjutkan."
-          variant="paper"
-        />
-      ) : null}
-
-      {error ? (
-        <div role="alert">
-          <PlaceholderNotice
-            title="Belum bisa menghubungi Customer Service"
-            body={error.message}
-            variant="paper"
+          <Input
+            id="guest-phone"
+            name="guest_phone"
+            type="tel"
+            inputMode="tel"
+            label="Nomor WhatsApp (opsional)"
+            hint="Isi bila ingin nomor Anda dicantumkan di pesan."
+            autoComplete="tel"
+            maxLength={32}
+            disabled={isPending}
+            error={fieldError(error, "guest_phone")}
           />
         </div>
-      ) : null}
+      </section>
 
-      <button
-        type="submit"
-        disabled={isPending || hasBlockingItem}
-        className={buttonClass({ variant, fullWidth: true, size: "lg" })}
-      >
-        {isPending ? "Menyiapkan pesan…" : "Lanjut ke WhatsApp CS"}
-      </button>
+      {/* =========================================================================
+          SEKSI 2: Alamat Pengiriman
+      ========================================================================= */}
+      <section aria-labelledby="section-shipping-title" className="space-y-3">
+        <div className="border-b border-border-soft pb-2">
+          <h3 id="section-shipping-title" className="text-label-md font-semibold text-text-primary">
+            2. Alamat Pengiriman
+          </h3>
+          <p className="text-caption text-text-secondary">
+            Pilih wilayah tujuan dan detail jalan untuk memudahkan CS menghitung ongkir resmi.
+          </p>
+        </div>
 
-      <p className="text-caption leading-relaxed text-text-secondary">
-        Pesanan langsung tercatat di sistem setelah tombol ini ditekan.
-        Pembayaran (VA/QRIS) disepakati lewat WhatsApp dan baru diproses
-        setelah admin memverifikasinya.
-      </p>
+        <DestinationPicker
+          picked={destination}
+          disabled={isPending}
+          onSelect={handleSelectDestination}
+          error={fieldError(error, "destination_id")}
+        />
+
+        <Input
+          id="guest-street"
+          name="street"
+          label="Detail alamat jalan (opsional)"
+          placeholder="Nama jalan, nomor rumah, RT/RW, atau patokan"
+          autoComplete="street-address"
+          maxLength={300}
+          disabled={isPending}
+          error={fieldError(error, "street")}
+          hint="Membantu estimasi ongkos kirim dan pengantaran kurir."
+        />
+      </section>
+
+      {/* =========================================================================
+          SEKSI 3: Pilihan Ekspedisi
+      ========================================================================= */}
+      <section aria-labelledby="courier-group-label" className="space-y-3">
+        <div className="border-b border-border-soft pb-2">
+          <h3 id="courier-group-label" className="text-label-md font-semibold text-text-primary">
+            3. Pilihan Ekspedisi
+          </h3>
+          <p className="text-caption text-text-secondary">
+            Pilih preferensi jasa pengiriman. Tarif ongkir final akan dikonfirmasi via WhatsApp.
+          </p>
+        </div>
+
+        <div
+          role="radiogroup"
+          aria-labelledby="courier-group-label"
+          className="grid grid-cols-1 gap-2.5 tablet:grid-cols-3"
+        >
+          {COURIER_OPTIONS.map((option) => {
+            const isSelected = selectedCourier === option.id;
+            return (
+              <label
+                key={option.id}
+                className={[
+                  "relative flex min-h-12 cursor-pointer select-none flex-col justify-between rounded-lg border p-3.5 transition-all",
+                  isSelected
+                    ? "border-brand-forest bg-surface-sage/50 ring-2 ring-brand-forest ring-offset-1"
+                    : "border-border-soft bg-surface-white hover:border-brand-forest/40 hover:bg-surface-paper",
+                  isPending ? "cursor-not-allowed opacity-60" : "",
+                ].join(" ")}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-label-md font-semibold text-text-primary">
+                    {option.label}
+                  </span>
+                  {option.badge ? (
+                    <span className="shrink-0 rounded-full bg-brand-forest px-2 py-0.5 text-[11px] font-bold tracking-wide text-surface-white">
+                      {option.badge}
+                    </span>
+                  ) : null}
+                </div>
+                <span className="mt-1 text-caption text-text-secondary">
+                  {option.desc}
+                </span>
+                <input
+                  type="radio"
+                  name="courier"
+                  value={option.id}
+                  checked={isSelected}
+                  disabled={isPending}
+                  onChange={() => setSelectedCourier(option.id)}
+                  className="sr-only"
+                />
+              </label>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SEKSI 4: Catatan & Submit
+      ========================================================================= */}
+      <section aria-labelledby="section-note-title" className="space-y-3">
+        <div className="border-b border-border-soft pb-2">
+          <h3 id="section-note-title" className="text-label-md font-semibold text-text-primary">
+            4. Catatan & Selesai
+          </h3>
+          <p className="text-caption text-text-secondary">
+            Tambahkan instruksi khusus untuk Customer Service jika ada.
+          </p>
+        </div>
+
+        <Textarea
+          id="guest-note"
+          name="note"
+          label="Catatan (opsional)"
+          placeholder="Contoh: Titipkan di pos satpam bila rumah kosong, atau butuh rekomendasi ukuran."
+          maxLength={500}
+          disabled={isPending}
+          error={fieldError(error, "note")}
+        />
+
+        {hasBlockingItem ? (
+          <PlaceholderNotice
+            title="Ada barang yang perlu disesuaikan dulu"
+            body="Satu atau lebih barang habis atau jumlahnya melebihi sisa stok. Sesuaikan jumlahnya sebelum melanjutkan."
+            variant="paper"
+          />
+        ) : null}
+
+        {error ? (
+          <div role="alert">
+            <PlaceholderNotice
+              title="Belum bisa menghubungi Customer Service"
+              body={error.message}
+              variant="paper"
+            />
+          </div>
+        ) : null}
+
+        <button
+          type="submit"
+          disabled={isPending || hasBlockingItem}
+          className={buttonClass({ variant, fullWidth: true, size: "lg" })}
+        >
+          {isPending ? (
+            <span className="inline-flex items-center gap-2">
+              <SpinnerIcon className="h-5 w-5 animate-spin" />
+              <span>Menyiapkan pesan…</span>
+            </span>
+          ) : (
+            "Lanjut ke WhatsApp CS"
+          )}
+        </button>
+
+        <p className="text-caption leading-relaxed text-text-secondary">
+          Pesanan langsung tercatat di sistem setelah tombol ini ditekan.
+          Pembayaran (VA/QRIS) disepakati lewat WhatsApp dan baru diproses
+          setelah admin memverifikasinya.
+        </p>
+      </section>
     </form>
+  );
+}
+
+function SpinnerIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
   );
 }
 
