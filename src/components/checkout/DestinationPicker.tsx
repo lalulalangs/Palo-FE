@@ -204,8 +204,8 @@ export function DestinationPicker({
         </p>
         <div className="rounded-md border border-brand-forest bg-surface-sage p-3">
           <div className="flex items-start gap-2">
-            <LineIcon name="pin" className="mt-0.5 text-brand-forest" />
-            <div className="min-w-0">
+            <LineIcon name="pin" className="mt-0.5 shrink-0 text-brand-forest" />
+            <div className="min-w-0 break-words">
               <p className="text-body-md font-semibold text-brand-forest">
                 {area || picked.city}
               </p>

@@ -202,8 +202,8 @@ export function CheckoutFlow({
     <div className="space-y-6">
       <CheckoutSteps steps={STEPS} current={step} />
 
-      <div className="grid gap-8 desktop:grid-cols-12 desktop:gap-10">
-        <div className="desktop:col-span-7">
+      <div className="grid min-w-0 gap-8 desktop:grid-cols-12 desktop:gap-10">
+        <div className="min-w-0 desktop:col-span-7">
           {/* ---- Langkah 1: alamat ---- */}
           {step === 0 ? (
             <section
@@ -496,7 +496,7 @@ export function CheckoutFlow({
         </div>
 
         {/* ---- Ringkasan ---- */}
-        <div className="desktop:col-span-5">
+        <div className="min-w-0 desktop:col-span-5">
           <CheckoutSummary
             cart={cart}
             accountName={userName}

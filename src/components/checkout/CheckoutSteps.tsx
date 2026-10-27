@@ -18,7 +18,7 @@ export function CheckoutSteps({
   current: number;
 }) {
   return (
-    <nav aria-label="Langkah checkout">
+    <nav aria-label="Langkah checkout" className="min-w-0 w-full">
       <ol className="flex flex-col gap-2 tablet:flex-row tablet:items-center tablet:gap-4">
         {steps.map((step, index) => {
           const isDone = index < current;

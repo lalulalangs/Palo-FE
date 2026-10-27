@@ -108,7 +108,7 @@ export function CheckoutSummary({
           <h3 className="text-label-md font-semibold text-text-primary">
             Dikirim ke
           </h3>
-          <address className="mt-1 text-body-sm not-italic leading-relaxed text-text-secondary">
+          <address className="mt-1 break-words text-body-sm not-italic leading-relaxed text-text-secondary">
             {address.recipient_name} · {address.phone}
             <span className="block">{address.street}</span>
             {address.subdistrict ? (
