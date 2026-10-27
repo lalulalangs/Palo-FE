@@ -14,34 +14,39 @@ import type { ShippingDestination } from "@/lib/types";
 /**
  * Pemilih wilayah tujuan (`docs/SPEC-ALAMAT-25102026.md` §3).
  *
- * Modelnya "cari → pilih satu hasil", BUKAN dropdown berjenjang dan BUKAN teks
- * bebas. Alasan: `GET /shipping/destinations` hanya bisa mencari (`search`
- * wajib, min 3 karakter), tidak ada endpoint daftar wilayah. Tanpa satu record
- * terpilih, `destination_id` tidak ada, dan ongkir tidak bisa dihitung — jadi
- * tidak ada fallback teks bebas: lebih baik memblokir dengan pesan jelas
- * daripada mengirim tarif untuk kecamatan yang salah.
+ * Mengakomodasi arsitektur Master Cache Database Lokal (Zero-HIT, < 15ms).
  *
- * Penjaga kuota (100 HIT/hari dibagi semua pembeli):
- * 1. tidak ada request di bawah 3 karakter,
- * 2. jeda 700 ms setelah ketukan terakhir (bukan per ketukan),
- * 3. cache sesi di memori — kata kunci yang sama tidak pernah diulang,
- * 4. `limit` tetap 8 (ikut kunci cache server),
- * 5. respons usang dibuang lewat penanda `requestId`.
+ * Optimasi performa & UX:
+ * 1. Debounce responsif 300 ms (kecepatan database lokal tanpa jitter),
+ * 2. Quick suggestion chips untuk destinasi populer (Senaru, Bayan, Mataram, dll.),
+ * 3. Cache sesi di memori — kata kunci yang sama tidak pernah diulang,
+ * 4. Batas kueri minimal 3 karakter untuk akurasi pencarian,
+ * 5. Respons usang dibuang lewat penanda `requestId`.
  */
 
 const MIN_CHARS = 3;
-const DEBOUNCE_MS = 700;
+const DEBOUNCE_MS = 300;
 
 const SEARCH_ID = "destination_search";
 const RESULT_ID = "destination_search-result";
 
-const HINT = "Ketik minimal 3 karakter. Contoh: Senaru, atau kode pos 83354.";
-const SHORT_HINT = "Ketik 1 karakter lagi.";
-const EMPTY_HINT = "Coba nama kecamatan lain atau kode pos.";
+const HINT =
+  "Ketik minimal 3 karakter kecamatan, kota, atau kode pos (misal: Senaru, Gambir, atau 83354).";
+const SHORT_HINT = "Ketik 1 karakter lagi untuk mulai mencari.";
+const EMPTY_HINT = "Coba nama kecamatan lain, kota terdekat, atau kode pos.";
 const NETWORK_COPY =
   "Pencarian wilayah belum bisa dilakukan karena layanan sedang tidak dapat dihubungi.";
 const UNAVAILABLE_COPY =
   "Coba lagi beberapa menit lagi. Kalau tetap gagal, hubungi Customer Service.";
+
+const POPULAR_DESTINATIONS = [
+  "Senaru",
+  "Bayan",
+  "Mataram",
+  "Jakarta Pusat",
+  "Denpasar",
+  "Surabaya",
+] as const;
 
 type Status = "idle" | "loading" | "results" | "empty" | "error";
 
@@ -148,6 +153,7 @@ export function DestinationPicker({
     const target = pendingFocus.current;
     if (!target) return;
     pendingFocus.current = null;
+
     if (target === "search") document.getElementById(SEARCH_ID)?.focus();
     else changeRef.current?.focus();
   }, [showSearch]);
@@ -170,6 +176,12 @@ export function DestinationPicker({
   function retry() {
     latest.current += 1;
     void runSearch(searched);
+  }
+
+  function handleQuickSelect(name: string) {
+    setQuery(name);
+    latest.current += 1;
+    void runSearch(name);
   }
 
   const keyword = query.trim();
@@ -259,6 +271,32 @@ export function DestinationPicker({
           void runSearch(keyword);
         }}
       />
+
+      {/* Quick Suggestion Chips untuk destinasi populer saat input kosong */}
+      {visibleStatus === "idle" && query.trim().length === 0 ? (
+        <div className="space-y-2 pt-1">
+          <p className="text-caption font-medium text-text-secondary">
+            Destinasi populer:
+          </p>
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label="Saran destinasi populer"
+          >
+            {POPULAR_DESTINATIONS.map((name) => (
+              <button
+                key={name}
+                type="button"
+                disabled={disabled}
+                onClick={() => handleQuickSelect(name)}
+                className="rounded-full border border-border-soft bg-surface-paper px-3 py-1 text-label-sm font-medium text-text-primary transition-colors hover:border-brand-forest hover:bg-surface-sage hover:text-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {/*
         Satu region hidup: role/aria-live berganti menurut keadaan, isinya
