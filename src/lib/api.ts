@@ -13,6 +13,8 @@ import type {
   AuthUser,
   BannerItem,
   BrandInfo,
+  CancelGuestOrderRequest,
+  CancelGuestOrderResult,
   Cart,
   CategoryItem,
   CheckoutRequest,
@@ -1623,6 +1625,28 @@ export async function createCustomInquiry(
     throw new ApiError("Server tidak mengembalikan tautan WhatsApp.", 502);
   }
   return data as unknown as GuestWhatsAppResult;
+}
+
+/**
+ * `POST /guest/cancel-order` — Batalkan pesanan WhatsApp tamu dari antarmuka pengguna.
+ * Memperbarui status pesanan di database/dashboard admin menjadi dibatalkan.
+ */
+export async function cancelGuestOrder(
+  request: CancelGuestOrderRequest,
+): Promise<CancelGuestOrderResult> {
+  const payload = await apiRequest<Record<string, unknown>>("/guest/cancel-order", {
+    method: "POST",
+    body: request,
+    guestToken: await getGuestToken(),
+    forwardCookies: true,
+  });
+  return {
+    success: payload?.success !== false,
+    message:
+      typeof payload?.message === "string"
+        ? payload.message
+        : "Pesanan berhasil dibatalkan.",
+  };
 }
 
 /* -------------------------------------------------------------------------- */

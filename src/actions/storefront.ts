@@ -8,6 +8,7 @@ import {
   AUTH_TOKEN_COOKIE,
   addCartItem,
   apiRequest,
+  cancelGuestOrder,
   clearGuestToken,
   createCustomInquiry,
   createGuestWhatsAppCheckout,
@@ -312,6 +313,40 @@ export async function createGuestCheckoutAction(
   };
 
   return { ok: true, handoff };
+}
+
+/**
+ * Batalkan pesanan WhatsApp tamu.
+ * Memanggil backend untuk membatalkan pesanan di database/dashboard admin.
+ */
+export async function cancelGuestOrderAction(input: {
+  orderNumber?: string | null;
+  referenceCode: string;
+  reason?: string | null;
+}): Promise<ActionResult<{ success: boolean; message: string }>> {
+  if (!input.referenceCode?.trim()) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Kode referensi pesanan tidak valid.",
+      fieldErrors: {},
+    };
+  }
+
+  try {
+    const result = await cancelGuestOrder({
+      order_number: input.orderNumber ?? null,
+      reference_code: input.referenceCode.trim(),
+      reason: input.reason ?? null,
+    });
+
+    revalidatePath("/keranjang");
+    revalidatePath("/");
+
+    return { ok: true, data: result };
+  } catch (error) {
+    return toActionError(error);
+  }
 }
 
 /* -------------------------------------------------------------------------- */

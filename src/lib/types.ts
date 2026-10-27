@@ -796,6 +796,17 @@ export interface CustomInquiryRequest {
   items: CheckoutLineItem[] | null;
 }
 
+export interface CancelGuestOrderRequest {
+  order_number?: string | null;
+  reference_code: string;
+  reason?: string | null;
+}
+
+export interface CancelGuestOrderResult {
+  success: boolean;
+  message: string;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Auth                                                                       */
 /* -------------------------------------------------------------------------- */
