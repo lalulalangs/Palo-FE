@@ -6,6 +6,7 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { CartLineItem } from "@/components/cart/CartLineItem";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { GuestCheckoutForm } from "@/components/cart/GuestCheckoutForm";
+import { ActiveGuestOrderBanner } from "@/components/cart/ActiveGuestOrderBanner";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button, buttonClass } from "@/components/ui/Button";
@@ -94,6 +95,8 @@ export default async function CartPage() {
       />
 
       <Container className="py-8 tablet:py-12">
+        <ActiveGuestOrderBanner />
+
         {cartUnavailable ? (
           <div className="mb-8">
             <PlaceholderNotice

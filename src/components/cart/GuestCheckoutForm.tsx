@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import { createGuestCheckoutAction } from "@/actions/storefront";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
@@ -15,22 +15,47 @@ import type {
 import { stockStateOf } from "@/lib/cart-stock";
 import type { CartItem } from "@/lib/types";
 
+const ACTIVE_GUEST_ORDER_KEY = "palorinjani_active_guest_order";
+const ACTIVE_ORDER_TTL_MS = 60 * 60 * 1000; // 1 jam
+
+function subscribeStorage(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", onStoreChange);
+  return () => window.removeEventListener("storage", onStoreChange);
+}
+
+function getActiveOrderSnapshot(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(ACTIVE_GUEST_ORDER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as {
+      handoff: GuestResultHandoff;
+      timestamp: number;
+    };
+    if (
+      parsed &&
+      parsed.handoff &&
+      typeof parsed.timestamp === "number" &&
+      Date.now() - parsed.timestamp < ACTIVE_ORDER_TTL_MS
+    ) {
+      return JSON.stringify(parsed.handoff);
+    }
+    sessionStorage.removeItem(ACTIVE_GUEST_ORDER_KEY);
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function getActiveOrderServerSnapshot(): string | null {
+  return null;
+}
+
 /**
  * Formulir checkout tamu via WhatsApp (PRD §3.11).
- *
- * Yang harus dipahami sebelum mengubah apa pun di sini:
- *
- * 1. **Ini BUKAN checkout.** Tombolnya membuka WhatsApp, bukan membuat order.
- *    Tidak ada `order_number`, tidak ada reservasi stok, tidak ada payment
- *    gateway (KONTRAK-API §5). Karena itu halaman hasilnya menampilkan notice
- *    itu dengan jujur, bukan memakai kata "berhasil".
- * 2. **Nama dan telepon opsional.** Backend (`GuestCheckoutController`)
- *    mewajibkan `items` dan membiarkan `guest_name`/`guest_phone` kosong.
- *    Memaksa keduanya wajib akan membuang pengguna yang sudah menyusun
- *    keranjang tanpa alasan yang jelas.
- * 3. **Spesifikasi custom tidak masuk ke sini.** PRD §1.1A: pembelian partai
- *    adalah permintaan lewat CS, bukan SKU berbayar. Jalur itu punya endpoint
- *    sendiri (`/guest/custom-inquiry`) dan tidak dicampur ke form pemesanan.
+ * Dilengkapi dengan proteksi honeypot anti-bot dan session guard
+ * agar mencegah submit pesanan berulang/spam.
  */
 export function GuestCheckoutForm({
   items,
@@ -45,14 +70,66 @@ export function GuestCheckoutForm({
     FormData
   >(createGuestCheckoutAction, null);
   const error = isActionError(state) ? state : null;
-  // Sukses = hasil dikembalikan action dan panel ditampilkan DI SINI.
-  // Tidak ada cookie, tidak ada redirect, tidak ada halaman perantara.
   const handoff = state?.ok ? state.handoff : null;
+
+  // Baca sessionStorage secara reaktif via useSyncExternalStore
+  const storedHandoffJson = useSyncExternalStore(
+    subscribeStorage,
+    getActiveOrderSnapshot,
+    getActiveOrderServerSnapshot,
+  );
+
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  const savedHandoff = useMemo(() => {
+    if (!storedHandoffJson) return null;
+    try {
+      return JSON.parse(storedHandoffJson) as GuestResultHandoff;
+    } catch {
+      return null;
+    }
+  }, [storedHandoffJson]);
+
+  // Simpan ke sessionStorage saat action mengembalikan handoff baru
+  useEffect(() => {
+    if (handoff) {
+      try {
+        sessionStorage.setItem(
+          ACTIVE_GUEST_ORDER_KEY,
+          JSON.stringify({ handoff, timestamp: Date.now() }),
+        );
+        window.dispatchEvent(new Event("storage"));
+      } catch {
+        // Abaikan bila sessionStorage diblokir
+      }
+    }
+  }, [handoff]);
+
+  const handleNewOrder = () => {
+    try {
+      sessionStorage.removeItem(ACTIVE_GUEST_ORDER_KEY);
+      window.dispatchEvent(new Event("storage"));
+    } catch {
+      // Abaikan bila sessionStorage diblokir
+    }
+    setIsDismissed(true);
+    window.location.reload();
+  };
+
+  const activeHandoff = handoff ?? (isDismissed ? null : savedHandoff);
+
   // Gerbang yang sama dipakai baris keranjang dan ringkasan: stok basi
   // (jumlah > sisa stok) juga memblokir jalur tamu, bukan hanya stok habis.
   const hasBlockingItem = items.some((item) => stockStateOf(item) !== "cukup");
 
-  if (handoff) return <GuestResultPanel handoff={handoff} />;
+  if (activeHandoff) {
+    return (
+      <GuestResultPanel
+        handoff={activeHandoff}
+        onNewOrder={handleNewOrder}
+      />
+    );
+  }
 
   return (
     <form action={formAction} className="space-y-4">
@@ -72,6 +149,21 @@ export function GuestCheckoutForm({
         keamanan — hanya menghindari array yang bisa dimanipulasi di form.
       */}
       <input type="hidden" name="items" value={serializeItems(items)} />
+
+      {/*
+        Honeypot anti-bot: disembunyikan dari visual pengguna dan pembaca layar.
+        Bot otomatis yang mengisi seluruh input akan mengisi field ini dan ditolak server.
+      */}
+      <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+        <label htmlFor="guest-company">Perusahaan</label>
+        <input
+          id="guest-company"
+          name="hp_company"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
 
       <Input
         id="guest-name"
@@ -144,16 +236,14 @@ export function GuestCheckoutForm({
 
 /**
  * Hasil setelah pesan WhatsApp disiapkan.
- *
- * Dulu ini halaman `/keranjang/sukses` yang dibuka lewat redirect + cookie
- * serah-terima. Cookie itu yang berulang kali gagal (mutasi saat render, lalu
- * tidak pernah sampai ke browser), jadi hasilnya sekarang dirender di tempat
- * pengguna menekan tombol — tidak ada perpindahan halaman yang bisa gagal.
- *
- * Fokus dipindah ke judul supaya pembaca layar langsung tahu isi formulir
- * sudah berganti menjadi hasil.
  */
-function GuestResultPanel({ handoff }: { handoff: GuestResultHandoff }) {
+function GuestResultPanel({
+  handoff,
+  onNewOrder,
+}: {
+  handoff: GuestResultHandoff;
+  onNewOrder?: () => void;
+}) {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -229,6 +319,16 @@ function GuestResultPanel({ handoff }: { handoff: GuestResultHandoff }) {
         Buka WhatsApp dan kirim pesan
       </a>
 
+      {onNewOrder ? (
+        <button
+          type="button"
+          onClick={onNewOrder}
+          className={buttonClass({ variant: "outline", size: "md", fullWidth: true })}
+        >
+          Buat Pesanan Baru
+        </button>
+      ) : null}
+
       <p className="text-caption leading-relaxed text-text-secondary">
         Tautan ini membuka percakapan dengan pesan yang sudah terisi. Membuka
         tautan tidak mengirim apa pun — Anda tetap menekan tombol kirim di
@@ -240,10 +340,6 @@ function GuestResultPanel({ handoff }: { handoff: GuestResultHandoff }) {
 
 /**
  * `sku_id:quantity` dipisah koma — format yang dibaca Server Action.
- *
- * Baris `habis` dibuang, dan baris `kurang` dikirim dengan jumlah yang sudah
- * diturunkan ke sisa stok. Ini lapisan UX, bukan keamanan: backend tetap
- * memvalidasi SKU, harga, dan stok.
  */
 function serializeItems(items: CartItem[]): string {
   return items

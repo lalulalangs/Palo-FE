@@ -269,6 +269,17 @@ export async function createGuestCheckoutAction(
   _prev: GuestCheckoutActionState | null,
   formData: FormData,
 ): Promise<GuestCheckoutActionState> {
+  // Honeypot anti-bot: tolak langsung jika field terisi
+  const honeypot = readOptionalText(formData, "hp_company");
+  if (honeypot) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Permintaan tidak dapat diproses.",
+      fieldErrors: {},
+    };
+  }
+
   const items = readCartItems(formData);
   if (items.length === 0) {
     return {
@@ -299,8 +310,6 @@ export async function createGuestCheckoutAction(
     estimated_total: result.estimated_total,
     estimated_total_display: result.estimated_total_display,
   };
-
-  revalidatePath("/keranjang");
 
   return { ok: true, handoff };
 }

@@ -1599,6 +1599,7 @@ export async function createGuestWhatsAppCheckout(
   const payload = await apiRequest<unknown>("/guest/whatsapp-checkout", {
     method: "POST",
     body: request,
+    guestToken: await getGuestToken(),
     forwardCookies: true,
   });
   const data = unwrap<Record<string, unknown>>(payload, "data");
