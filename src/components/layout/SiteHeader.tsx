@@ -2,63 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 import { Container } from "./Container";
 import { BrandLogo } from "./BrandLogo";
 import { ActiveLink } from "./ActiveLink";
 
-/**
- * Navigasi utama.
- *
- * ===================================================================
- *  PERILAKU TRANSPARAN DI BERANDA
- * ===================================================================
- * Di beranda, header melayang DI ATAS foto hero:
- *
- *   - belum di-scroll  -> latar transparan, teks terang, header `fixed`
- *                         (foto hero terlihat sampai paling atas halaman)
- *   - sudah di-scroll  -> latar putih, teks gelap, tetap `fixed`
- *
- * Di halaman lain tidak ada hero, jadi header memakai perilaku lama:
- * `sticky` dengan latar putih.
- *
- * Kenapa `fixed`, bukan `sticky`: elemen `sticky` masih mengambil ruang di
- * alur layout, jadi hero SELALU mulai DI BAWAH header — header transparan
- * tidak akan pernah memperlihatkan foto, hanya warna halaman. `fixed`
- * melepas header dari alur sehingga foto hero bisa naik sampai ke titik nol.
- *
- * Posisi (`fixed`/`sticky`) ditentukan oleh `pathname` yang stabil, bukan
- * oleh posisi scroll. Kalau posisinya ikut berubah saat scroll, halaman
- * akan melompat setiap kali header berubah warna — dan itu yang paling
- * menonjolkan bug-nya.
- *
- * Hanya WARNA yang berubah saat scroll.
- *
- * ===================================================================
- *  CATATAN AKSESIBILITAS
- * ===================================================================
- * Teks terang di atas foto hanya aman kalau teks itu punya bayangan.
- * Foto banner milik admin, dan admin bisa memasang foto terang — kalau
- * tidak ada bayangan, navinya hilang. Karena itu kelas transparan
- * selalu menyertakan `drop-shadow`.
- *
- * Tanpa JavaScript, header tetap transparan di beranda (hasil render
- * server) — itu kondisi yang benar, karena beranda memang hero-nya ada
- * di paling atas.
- */
 export interface NavLink {
   href: string;
   label: string;
 }
 
-/**
- * Navigasi utama.
- *
- * Menu navigasi global: `Katalog`, `Koleksi`, `Cerita Palo`, `Toko Senaru`, `Lacak Pesanan`.
- * Jarak antar-menu responsif (`gap-4 desktop:gap-8`) dan label link diberi `whitespace-nowrap`
- * agar kelima item tertata rapi di tablet (768px+) dan desktop tanpa overflow.
- */
 export const PRIMARY_NAV: NavLink[] = [
   { href: "/produk", label: "Katalog" },
   { href: "/koleksi", label: "Koleksi" },
@@ -67,37 +21,9 @@ export const PRIMARY_NAV: NavLink[] = [
   { href: "/lacak", label: "Lacak Pesanan" },
 ];
 
-/**
- * Berapa piksel scroll sebelum header berubah warna.
- *
- * Bukan 0 supaya goyang kecil dari trackpad tidak langsung membalik
- * warna header. 8px cukup kecil untuk terasa seketika.
- */
 const SCROLL_THRESHOLD = 8;
-
-/** Tinggi header. Punya satu sumber kebenaran supaya hero bisa mengompensasi. */
 export const HEADER_HEIGHT_CLASS = "h-20";
 
-/* -------------------------------------------------------------------------- */
-/* Langganan event scroll                                                    */
-/* -------------------------------------------------------------------------- */
-
-/*
- * `useSyncExternalStore` (bukan `useState` + `useEffect`) karena posisi scroll
- * adalah data dari LUAR React. Hook ini dirancang tepat untuk itu, dan
- * menyelesaikan dua masalah sekaligus:
- *
- *   1. Saat browser memulihkan posisi scroll setelah reload, React
- *      membandingkan snapshot server dengan snapshot client dan langsung
- *      renders ulang. Dengan `useState` + `useEffect`,/state baru hanya
- *      tersedia SETELAH efek berjalan — header sempat transparan di atas
- *      konten yang sebenarnya sudah tergulir.
- *
- *   2. Tidak perlu `setState()` di dalam efek, yang oleh aturan
- *      `react-hooks/set-state-in-effect` memang dilarang.
- */
-
-/** Snapshot harus nilai primitif yang stabil — bukan objek baru tiap call. */
 function subscribeScroll(onStoreChange: () => void): () => void {
   window.addEventListener("scroll", onStoreChange, { passive: true });
   return () => window.removeEventListener("scroll", onStoreChange);
@@ -107,7 +33,6 @@ function scrollSnapshot(): boolean {
   return window.scrollY > SCROLL_THRESHOLD;
 }
 
-/** Nilai saat render di server: belum ada scroll, jadi belum ter-scroll. */
 function scrollServerSnapshot(): boolean {
   return false;
 }
@@ -117,15 +42,13 @@ export function SiteHeader({
   isLoggedIn,
 }: {
   cartCount: number;
-  /**
-   * Hanya keberadaan cookie, bukan validitas token: kalau token sudah mati,
-   * tautan `/me` akan mengarahkan ulang ke halaman masuk. Mengambil
-   * `GET /auth/me` di setiap render layout terlalu mahal untuk sebuah ikon.
-   */
   isLoggedIn: boolean;
 }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
+
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
 
   const scrolled = useSyncExternalStore(
     subscribeScroll,
@@ -135,16 +58,73 @@ export function SiteHeader({
 
   const transparan = isHome && !scrolled;
 
+  const closeMenu = () => {
+    if (detailsRef.current?.open) {
+      detailsRef.current.open = false;
+    }
+  };
+
+  const handleNavClick = (event: React.MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.closest("a")) {
+      closeMenu();
+    }
+  };
+
+  // Tutup menu mobile ketika navigasi berpindah halaman
+  useEffect(() => {
+    closeMenu();
+  }, [pathname]);
+
+  // Click-outside, tap-outside, dan tombol Escape
+  useEffect(() => {
+    const details = detailsRef.current;
+    if (!details) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!details.open) return;
+      // Jika interaksi terjadi di luar elemen <details>, tutup menu
+      if (!details.contains(event.target as Node)) {
+        details.open = false;
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && details.open) {
+        details.open = false;
+        summaryRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  // Tutup menu jika layar diperlebar ke ukuran tablet/desktop (>= 768px)
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 48rem)");
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (e.matches && detailsRef.current?.open) {
+        detailsRef.current.open = false;
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleMediaChange);
+    return () => mediaQuery.removeEventListener("change", handleMediaChange);
+  }, []);
+
   return (
     <header
       className={[
         "z-50",
         isHome ? "fixed inset-x-0 top-0" : "sticky top-0",
         transparan
-          ? // Tanpa `backdrop-blur` di mode transparan: blur pada latar
-            // transparan hanya menghasilkan kabut tipis yang justru
-            // mengurangi kontras teks terang.
-            "border-b border-transparent bg-transparent"
+          ? "border-b border-transparent bg-transparent"
           : "border-b border-border-soft bg-surface-white/95 backdrop-blur-md",
       ].join(" ")}
     >
@@ -154,9 +134,6 @@ export function SiteHeader({
             href="/"
             className="flex min-w-0 items-center gap-3 rounded-md py-1"
           >
-            {/* Logo sengaja TIDAK ikut berubah warna saat header
-                transparan. Pemilik meminta logo tetap utuh di dalam
-                petak putihnya, persis seperti berkas aslinya. */}
             <BrandLogo className="h-11 w-11 shrink-0" preload />
             <span className="hidden min-w-0 flex-col text-left tablet:flex">
               <span
@@ -253,10 +230,11 @@ export function SiteHeader({
               </span>
             </Link>
 
-            <details className="relative tablet:hidden">
+            <details ref={detailsRef} className="relative tablet:hidden">
               <summary
+                ref={summaryRef}
                 className={[
-                  "flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-md transition-colors",
+                  "flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-md transition-colors [&::-webkit-details-marker]:hidden",
                   transparan
                     ? "text-surface-white drop-shadow hover:bg-surface-white/15"
                     : "text-text-secondary hover:bg-surface-sage hover:text-brand-forest",
@@ -265,13 +243,9 @@ export function SiteHeader({
                 <MenuIcon />
                 <span className="sr-only">Buka menu navigasi</span>
               </summary>
-              {/*
-                Panel dropdown TETAP berlatar putih, walaupun header sedang
-                transparan. Menu yang mengambang tanpa latar akan menumpuk
-                teks di atas foto dan isinya tidak terbaca.
-              */}
               <nav
                 aria-label="Navigasi utama seluler"
+                onClick={handleNavClick}
                 className="absolute right-0 top-14 z-50 w-60 rounded-lg border border-border-soft bg-surface-white p-2 shadow-editorial-strong"
               >
                 <ul className="flex flex-col">
@@ -304,8 +278,6 @@ export function SiteHeader({
     </header>
   );
 }
-
-/* Ikon inline (SVG) — bukan Material Symbols dari CDN. */
 
 function SearchIcon() {
   return (
