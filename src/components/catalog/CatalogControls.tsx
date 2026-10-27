@@ -69,9 +69,9 @@ export function CatalogSearch({ initialQuery }: { initialQuery: string }) {
         push(value.trim());
         inputRef.current?.blur();
       }}
-      className="flex flex-col gap-3 tablet:flex-row tablet:items-center"
+      className="flex min-w-0 flex-col gap-3 tablet:flex-row tablet:items-center"
     >
-      <div className="relative flex-1">
+      <div className="relative min-w-0 flex-1">
         <label htmlFor="katalog-q" className="sr-only">
           Cari produk berdasarkan nama
         </label>
@@ -88,7 +88,7 @@ export function CatalogSearch({ initialQuery }: { initialQuery: string }) {
           onBlur={() => push(value.trim())}
           placeholder="Cari nama produk…"
           autoComplete="off"
-          className="min-h-11 w-full rounded-md border border-border-soft bg-surface-white px-4 py-2 text-body-md text-text-primary placeholder:text-text-secondary/60 focus:border-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
+          className="min-h-11 w-full min-w-0 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-body-md text-text-primary placeholder:text-text-secondary/60 focus:border-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
         />
         {isPending ? (
           <span className="absolute inset-y-0 right-3 flex items-center text-caption text-text-secondary">
@@ -158,7 +158,7 @@ export function CategoryPills({
   return (
     <ul
       aria-label="Filter kategori"
-      className="-mx-4 flex gap-2 overflow-x-auto px-4 py-1 tablet:mx-0 tablet:flex-wrap tablet:px-0"
+      className="-mx-4 flex max-w-full min-w-0 gap-2 overflow-x-auto px-4 py-1 tablet:mx-0 tablet:max-w-none tablet:flex-wrap tablet:px-0"
       data-pending={isPending ? "true" : "false"}
     >
       <li>
@@ -328,47 +328,49 @@ export function CatalogRefinements() {
           <legend className="mb-2 text-label-md font-semibold text-text-primary">
             Rentang harga (rupiah)
           </legend>
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <label htmlFor="katalog-min" className="sr-only">
-                Harga minimum
-              </label>
-              <input
-                id="katalog-min"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={1000}
-                placeholder="Min"
-                value={localMin}
-                onChange={(event) => setLocalMin(event.target.value)}
-                disabled={isPending}
-                className="min-h-11 w-full rounded-md border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
-              />
-            </div>
-            <span aria-hidden="true" className="text-text-secondary">
-              –
-            </span>
-            <div className="flex-1">
-              <label htmlFor="katalog-max" className="sr-only">
-                Harga maksimum
-              </label>
-              <input
-                id="katalog-max"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={1000}
-                placeholder="Maks"
-                value={localMax}
-                onChange={(event) => setLocalMax(event.target.value)}
-                disabled={isPending}
-                className="min-h-11 w-full rounded-md border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
-              />
+          <div className="flex flex-col gap-2 tablet:flex-row tablet:items-center">
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <label htmlFor="katalog-min" className="sr-only">
+                  Harga minimum
+                </label>
+                <input
+                  id="katalog-min"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={1000}
+                  placeholder="Min"
+                  value={localMin}
+                  onChange={(event) => setLocalMin(event.target.value)}
+                  disabled={isPending}
+                  className="min-h-11 w-full min-w-0 rounded-md border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
+                />
+              </div>
+              <span aria-hidden="true" className="shrink-0 text-text-secondary">
+                –
+              </span>
+              <div className="min-w-0 flex-1">
+                <label htmlFor="katalog-max" className="sr-only">
+                  Harga maksimum
+                </label>
+                <input
+                  id="katalog-max"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={1000}
+                  placeholder="Maks"
+                  value={localMax}
+                  onChange={(event) => setLocalMax(event.target.value)}
+                  disabled={isPending}
+                  className="min-h-11 w-full min-w-0 rounded-md border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
+                />
+              </div>
             </div>
             <button
               type="submit"
-              className="min-h-11 rounded-md border border-brand-forest bg-brand-forest px-4 text-label-sm font-semibold text-surface-white transition-colors hover:bg-brand-deep"
+              className="min-h-11 w-full shrink-0 rounded-md border border-brand-forest bg-brand-forest px-4 text-label-sm font-semibold text-surface-white transition-colors hover:bg-brand-deep tablet:w-auto"
             >
               Terapkan
             </button>

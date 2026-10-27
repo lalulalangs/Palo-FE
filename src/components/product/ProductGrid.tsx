@@ -95,8 +95,8 @@ export function ProductGrid({
       komentar akan ikut dijadikan kandidat utility lalu menghasilkan CSS
       yang gagal di-parse.
     */
-    <div className={["@container", className].filter(Boolean).join(" ")}>
-      <ul className="grid grid-cols-2 gap-4 @lg:grid-cols-3 @lg:gap-6 @5xl:grid-cols-4">
+    <div className={["@container w-full min-w-0", className].filter(Boolean).join(" ")}>
+      <ul className="grid w-full min-w-0 grid-cols-2 gap-4 @lg:grid-cols-3 @lg:gap-6 @5xl:grid-cols-4">
         {tampil.map((product, index) => (
           <li key={product.id} className="flex">
             <ProductCard product={product} preload={index < 2} />

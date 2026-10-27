@@ -143,11 +143,11 @@ export default async function CatalogPage({
       </PageHeader>
 
       <Container className="py-8 tablet:py-12">
-        <div className="grid gap-8 desktop:grid-cols-12 desktop:gap-10">
+        <div className="grid min-w-0 gap-8 desktop:grid-cols-12 desktop:gap-10">
           {/* ---- Panel filter ---- */}
           <aside
             aria-label="Filter katalog"
-            className="space-y-6 desktop:col-span-4 desktop:col-start-1"
+            className="min-w-0 space-y-6 desktop:col-span-4 desktop:col-start-1"
           >
             <Suspense fallback={null}>
               <CategoryPills
@@ -167,7 +167,7 @@ export default async function CatalogPage({
           </aside>
 
           {/* ---- Hasil ---- */}
-          <div className="desktop:col-span-8">
+          <div className="min-w-0 desktop:col-span-8">
             <div className="flex flex-col gap-4 tablet:flex-row tablet:items-center tablet:justify-between">
               {/*
                 `role="status"`: pembaca layar diberi tahu berapa hasil yang

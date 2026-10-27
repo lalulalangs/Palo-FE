@@ -152,10 +152,10 @@ export default async function CategoryPage({
       />
 
       <Container className="py-8 tablet:py-12">
-        <div className="grid gap-8 desktop:grid-cols-12 desktop:gap-10">
+        <div className="grid min-w-0 gap-8 desktop:grid-cols-12 desktop:gap-10">
           <aside
             aria-label="Filter kategori"
-            className="space-y-6 desktop:col-span-4"
+            className="min-w-0 space-y-6 desktop:col-span-4"
           >
             <Suspense fallback={null}>
               <CatalogRefinements />
@@ -163,7 +163,7 @@ export default async function CategoryPage({
             <ClearFilters href={`/kategori/${slug}`} />
           </aside>
 
-          <div className="desktop:col-span-8">
+          <div className="min-w-0 desktop:col-span-8">
             <div className="flex flex-col gap-4 tablet:flex-row tablet:items-center tablet:justify-between">
               <p role="status" aria-live="polite" className="text-label-md text-text-secondary">
                 {apiAvailable
