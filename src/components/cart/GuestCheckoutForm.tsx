@@ -22,21 +22,13 @@ const ACTIVE_ORDER_TTL_MS = 60 * 60 * 1000; // 1 jam
 
 const COURIER_OPTIONS = [
   {
-    id: "cs_recommendation",
-    label: "Rekomendasi CS",
-    badge: "Paling Hemat",
-    desc: "CS carikan opsi terbaik",
-  },
-  {
     id: "jne",
     label: "JNE",
-    badge: null,
     desc: "Reguler / YES",
   },
   {
     id: "jnt",
     label: "J&T Express",
-    badge: null,
     desc: "Reguler / EZ",
   },
 ] as const;
@@ -110,8 +102,8 @@ export function GuestCheckoutForm({
   // State alamat tujuan pengiriman
   const [destination, setDestination] = useState<PickedDestination>(EMPTY_DESTINATION);
 
-  // State pilihan kurir (default: cs_recommendation)
-  const [selectedCourier, setSelectedCourier] = useState<string>("cs_recommendation");
+  // State pilihan kurir (default: jne)
+  const [selectedCourier, setSelectedCourier] = useState<string>("jne");
 
   // Baca sessionStorage secara reaktif via useSyncExternalStore
   const storedHandoffJson = useSyncExternalStore(
@@ -300,7 +292,7 @@ export function GuestCheckoutForm({
         <div
           role="radiogroup"
           aria-labelledby="courier-group-label"
-          className="grid grid-cols-1 gap-2.5 tablet:grid-cols-3"
+          className="grid grid-cols-2 gap-3"
         >
           {COURIER_OPTIONS.map((option) => {
             const isSelected = selectedCourier === option.id;
@@ -308,28 +300,19 @@ export function GuestCheckoutForm({
               <label
                 key={option.id}
                 className={[
-                  "relative flex min-h-[5.5rem] cursor-pointer select-none flex-col justify-between rounded-lg border p-3 transition-all",
+                  "relative flex min-h-12 cursor-pointer select-none flex-col justify-center rounded-lg border p-3 transition-all",
                   isSelected
                     ? "border-brand-forest bg-surface-sage/50 ring-2 ring-brand-forest ring-offset-1"
                     : "border-border-soft bg-surface-white hover:border-brand-forest/40 hover:bg-surface-paper",
                   isPending ? "cursor-not-allowed opacity-60" : "",
                 ].join(" ")}
               >
-                <div className="flex flex-col gap-1">
-                  {option.badge ? (
-                    <span className="self-start rounded-full bg-brand-forest px-2 py-0.5 text-[10px] font-bold tracking-tight text-surface-white">
-                      {option.badge}
-                    </span>
-                  ) : (
-                    <span className="h-4" aria-hidden="true" />
-                  )}
-                  <span className="text-label-sm font-semibold leading-tight text-text-primary">
-                    {option.label}
-                  </span>
-                  <span className="text-[11px] leading-snug text-text-secondary">
-                    {option.desc}
-                  </span>
-                </div>
+                <span className="text-label-md font-semibold text-text-primary">
+                  {option.label}
+                </span>
+                <span className="mt-0.5 text-caption text-text-secondary">
+                  {option.desc}
+                </span>
                 <input
                   type="radio"
                   name="courier"

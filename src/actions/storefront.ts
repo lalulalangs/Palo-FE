@@ -304,7 +304,7 @@ export async function createGuestCheckoutAction(
   const subdistrict = readOptionalText(formData, "subdistrict");
   const province = readOptionalText(formData, "province");
   const postalCode = readOptionalText(formData, "postal_code");
-  const courier = readOptionalText(formData, "courier") ?? "cs_recommendation";
+  const courier = readOptionalText(formData, "courier") ?? "jne";
 
   const shippingAddress =
     destinationId || street || city
