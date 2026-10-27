@@ -82,7 +82,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-caption text-text-secondary">
+            <p className="text-body-sm text-text-secondary">
               {item.sku_code}
             </p>
             <h3 className="mt-0.5 text-title-md text-text-primary">
@@ -98,7 +98,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
               )}
             </h3>
             {item.variant_name ? (
-              <p className="mt-1 text-caption text-text-secondary">
+              <p className="mt-1 text-body-sm text-text-secondary">
                 Varian: {item.variant_name}
               </p>
             ) : null}
@@ -170,7 +170,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
 
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span className="block text-caption text-text-secondary">
+            <span className="block text-body-sm text-text-secondary">
               Harga satuan
             </span>
             <span className="text-title-md font-semibold text-brand-forest">
@@ -207,7 +207,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
           </div>
 
           <div className="text-right">
-            <span className="block text-caption text-text-secondary">
+            <span className="block text-body-sm text-text-secondary">
               Subtotal
             </span>
             <span className="text-title-md font-semibold text-text-primary">
@@ -221,7 +221,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
             mencukupi") dan hasil `Sesuaikan ke N` langsung diumumkan begitu
             muncul, tanpa memindahkan fokus.
           */}
-        <p role="status" aria-live="polite" className="mt-2 text-caption">
+        <p role="status" aria-live="polite" className="mt-2 text-body-sm">
           {error ? <span className="text-feedback-error">{error}</span> : null}
           {adjusted ? (
             <span className="text-text-primary">{adjusted}</span>

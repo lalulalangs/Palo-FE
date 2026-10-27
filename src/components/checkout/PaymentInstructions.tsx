@@ -41,7 +41,7 @@ export function PaymentInstructions({ payment }: { payment: PaymentInfo }) {
   return (
     <div className="space-y-4">
       {method ? (
-        <p className="text-caption text-text-secondary">
+        <p className="text-body-sm text-text-secondary">
           Metode:{" "}
           <span className="font-semibold text-text-primary">
             {/* `online` = kanal belum dipilih; jangan tampilkan sebagai jargon. */}
@@ -71,7 +71,7 @@ export function PaymentInstructions({ payment }: { payment: PaymentInfo }) {
           <p className="text-caption uppercase tracking-widest text-text-secondary">
             {bankName ? `QRIS ${bankName}` : "QRIS"}
           </p>
-          <p className="mt-1 select-all break-all font-mono text-caption leading-relaxed text-text-primary">
+          <p className="mt-1 select-all break-all font-mono text-body-sm leading-relaxed text-text-primary">
             {qrString}
           </p>
         </div>

@@ -73,7 +73,7 @@ export function CollectionCard({
         ) : null}
 
         {count === null ? null : (
-          <p className="text-caption text-text-secondary">
+          <p className="text-body-sm text-text-secondary">
             {count === 0 ? "Belum ada produk" : `${formatAngka(count)} produk`}
           </p>
         )}

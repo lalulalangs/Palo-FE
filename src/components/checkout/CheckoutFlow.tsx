@@ -216,7 +216,7 @@ export function CheckoutFlow({
               >
                 Alamat pengiriman
               </h2>
-              <p className="mt-1 text-caption text-text-secondary">
+              <p className="mt-1 text-body-sm text-text-secondary">
                 Dipakai kurir untuk mengirim paket dan menghitung ongkir.
               </p>
 
@@ -258,7 +258,7 @@ export function CheckoutFlow({
                   >
                     Metode pengiriman
                   </h2>
-                  <p className="mt-1 text-caption text-text-secondary">
+                  <p className="mt-1 text-body-sm text-text-secondary">
                     Ke {destinationCity}
                   </p>
                 </div>
@@ -278,7 +278,7 @@ export function CheckoutFlow({
                 <p
                   role="status"
                   aria-live="polite"
-                  className="mt-4 text-caption text-text-secondary"
+                  className="mt-4 text-body-sm text-text-secondary"
                 >
                   Menghitung ongkir dari layanan kurir…
                 </p>
@@ -387,7 +387,7 @@ export function CheckoutFlow({
                   <h3 className="text-title-md font-semibold text-text-primary">
                     Harga berubah sejak keranjang dibuka
                   </h3>
-                  <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+                  <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
                     {orderError.message}
                   </p>
 
@@ -403,12 +403,12 @@ export function CheckoutFlow({
                             <span className="block text-title-sm text-text-primary">
                               {change.product_name}
                             </span>
-                            <span className="block text-caption text-text-secondary">
+                            <span className="block text-body-sm text-text-secondary">
                               {change.sku_code} · {change.quantity} pcs
                             </span>
                           </span>
                           <span className="shrink-0 text-right">
-                            <span className="block text-caption text-text-secondary line-through">
+                            <span className="block text-body-sm text-text-secondary line-through">
                               {formatHarga(change.old_price, null)}
                             </span>
                             <span className="block text-title-sm font-semibold text-text-primary">
@@ -486,7 +486,7 @@ export function CheckoutFlow({
                 </Link>
               </div>
 
-              <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+              <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
                 Harga, stok, dan voucher divalidasi ulang oleh server saat tombol
                 ditekan, memakai nilai terbaru — bukan angka yang dikirim dari
                 peramban ini (PRD §3.6).

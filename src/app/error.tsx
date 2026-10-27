@@ -43,9 +43,9 @@ export default function GlobalError({
         </p>
 
         {error.digest ? (
-          <p className="mt-4 text-caption text-text-secondary">
+          <p className="mt-4 text-body-sm text-text-secondary">
             Kode kesalahan:{" "}
-            <code className="rounded-sm bg-surface-sage px-1.5 py-0.5 font-mono text-caption text-text-primary">
+            <code className="rounded-sm bg-surface-sage px-1.5 py-0.5 font-mono text-body-sm text-text-primary">
               {error.digest}
             </code>
           </p>

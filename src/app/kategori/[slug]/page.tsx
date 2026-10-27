@@ -144,7 +144,7 @@ export default async function CategoryPage({
         breadcrumbs={crumbs}
         aside={
           meta ? (
-            <p className="text-caption text-text-secondary">
+            <p className="text-body-sm text-text-secondary">
               {formatAngka(meta.total)} produk
             </p>
           ) : null

@@ -91,7 +91,7 @@ export function CatalogSearch({ initialQuery }: { initialQuery: string }) {
           className="min-h-11 w-full min-w-0 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-body-md text-text-primary placeholder:text-text-secondary/60 focus:border-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
         />
         {isPending ? (
-          <span className="absolute inset-y-0 right-3 flex items-center text-caption text-text-secondary">
+          <span className="absolute inset-y-0 right-3 flex items-center text-body-sm text-text-secondary">
             Memuat…
           </span>
         ) : null}

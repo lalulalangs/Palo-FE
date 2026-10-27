@@ -210,7 +210,7 @@ export function DestinationPicker({
                 {area || picked.city}
               </p>
               {detail ? (
-                <p className="text-caption text-text-secondary">{detail}</p>
+                <p className="text-body-sm text-text-secondary">{detail}</p>
               ) : null}
             </div>
           </div>
@@ -230,7 +230,7 @@ export function DestinationPicker({
           </button>
         </div>
         {error ? (
-          <p className="text-caption font-semibold text-feedback-error">
+          <p className="text-body-sm font-semibold text-feedback-error">
             {error}
           </p>
         ) : null}

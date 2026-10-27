@@ -60,7 +60,7 @@ export function Select({
         ))}
       </select>
       {error ? (
-        <p id={errorId ?? undefined} className="text-caption font-semibold text-feedback-error">
+        <p id={errorId ?? undefined} className="text-body-sm font-semibold text-feedback-error">
           {error}
         </p>
       ) : null}

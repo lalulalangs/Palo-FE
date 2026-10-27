@@ -53,14 +53,14 @@ export function AuthAside() {
         {KEUNGGULAN.map((item) => (
           <li key={item.title} className="border-l-2 border-accent-earth pl-4">
             <h2 className="text-title-md text-surface-white">{item.title}</h2>
-            <p className="mt-1 text-caption leading-relaxed text-surface-paper/80">
+            <p className="mt-1 text-body-sm leading-relaxed text-surface-paper/80">
               {item.body}
             </p>
           </li>
         ))}
       </ul>
 
-      <p className="mt-8 text-caption leading-relaxed text-surface-paper/75">
+      <p className="mt-8 text-body-sm leading-relaxed text-surface-paper/75">
         Password disimpan dengan hashing standar industri dan tidak pernah
         dicatat di log (PRD §3.12). Percobaan login dibatasi 10 kali per menit.
       </p>

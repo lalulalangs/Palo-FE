@@ -66,7 +66,7 @@ export function CheckoutSummary({
         Ringkasan pesanan
       </h2>
 
-      <p className="py-3 text-caption text-text-secondary">
+      <p className="py-3 text-body-sm text-text-secondary">
         Akun: <span className="font-medium text-text-primary">{accountName}</span>
         <span className="block break-all">{accountEmail}</span>
       </p>
@@ -88,11 +88,11 @@ export function CheckoutSummary({
                 {item.product_name}
               </p>
               {item.variant_name ? (
-                <p className="truncate text-caption text-text-secondary">
+                <p className="truncate text-body-sm text-text-secondary">
                   {item.variant_name}
                 </p>
               ) : null}
-              <p className="text-caption text-text-secondary">
+              <p className="text-body-sm text-text-secondary">
                 {pluralItem(item.quantity)}
               </p>
             </div>
@@ -108,7 +108,7 @@ export function CheckoutSummary({
           <h3 className="text-label-md font-semibold text-text-primary">
             Dikirim ke
           </h3>
-          <address className="mt-1 text-caption not-italic leading-relaxed text-text-secondary">
+          <address className="mt-1 text-body-sm not-italic leading-relaxed text-text-secondary">
             {address.recipient_name} · {address.phone}
             <span className="block">{address.street}</span>
             {address.subdistrict ? (
@@ -154,7 +154,7 @@ export function CheckoutSummary({
           </dd>
         </div>
         {service ? (
-          <div className="flex items-start justify-between gap-3 text-caption">
+          <div className="flex items-start justify-between gap-3 text-body-sm">
             <dt className="text-text-secondary">Layanan</dt>
             <dd className="text-right text-text-secondary">
               {service.courier} {service.service} ·{" "}
@@ -173,7 +173,7 @@ export function CheckoutSummary({
         </p>
       </div>
 
-      <p className="mt-2 text-caption leading-relaxed text-text-secondary">
+      <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
         Harga, stok, dan voucher divalidasi ulang oleh server saat pesanan
         dibuat, termasuk total ini.
       </p>
@@ -184,7 +184,7 @@ export function CheckoutSummary({
         `paymentMethod` tetap diterima (kontrak backend) tapi tidak lagi
         ditampilkan sebagai pilihan pembeli.
       */}
-      <p className="mt-4 border-t border-border-soft pt-4 text-caption text-text-secondary">
+      <p className="mt-4 border-t border-border-soft pt-4 text-body-sm text-text-secondary">
         Pembayaran:{" "}
         <span className="font-medium text-text-primary">
           Online lewat DOKU
@@ -192,7 +192,7 @@ export function CheckoutSummary({
         — kanal dipilih di halaman pembayaran.
       </p>
 
-      <p className="mt-1 text-caption text-text-secondary">
+      <p className="mt-1 text-body-sm text-text-secondary">
         {pluralItem(itemCount)} dalam keranjang
       </p>
     </aside>

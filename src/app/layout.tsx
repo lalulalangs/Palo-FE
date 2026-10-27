@@ -195,7 +195,7 @@ export default async function RootLayout({
         {!isMaintenance && <SiteFooter brand={resolveBrand(brand)} />}
 
         <noscript>
-          <div className="mx-auto w-full max-w-3xl px-4 py-6 text-center text-caption text-text-secondary">
+          <div className="mx-auto w-full max-w-3xl px-4 py-6 text-center text-body-sm text-text-secondary">
             Sebagian fitur keranjang dan filter memerlukan JavaScript. Katalog,
             halaman produk, cerita brand, dan informasi toko tetap dapat dibaca
             tanpa JavaScript.

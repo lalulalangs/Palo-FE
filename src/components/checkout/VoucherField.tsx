@@ -147,16 +147,16 @@ export function VoucherField({
         {error ? (
           <VoucherError error={error} voucher={found} subtotal={subtotal} />
         ) : isChecking ? (
-          <p className="text-caption text-text-secondary">Memeriksa kode…</p>
+          <p className="text-body-sm text-text-secondary">Memeriksa kode…</p>
         ) : notice ? (
-          <p className="text-caption text-text-secondary">{notice}</p>
+          <p className="text-body-sm text-text-secondary">{notice}</p>
         ) : null}
       </div>
 
       {vouchers.length > 0 ? (
         <VoucherList vouchers={vouchers} disabled={pause} onUse={apply} />
       ) : (
-        <p className="text-caption leading-relaxed text-text-secondary">
+        <p className="text-body-sm leading-relaxed text-text-secondary">
           Daftar kode sedang tidak dapat dimuat. Kode tetap bisa dimasukkan
           manual.
         </p>
@@ -195,7 +195,7 @@ function VoucherChip({
         Diskon{" "}
         {formatHarga(voucher.discount_amount, voucher.formatted_discount_amount)}
       </p>
-      <p className="text-caption text-text-secondary">
+      <p className="text-body-sm text-text-secondary">
         Subtotal setelah diskon{" "}
         {formatHarga(voucher.final_subtotal, voucher.formatted_final_subtotal)}
       </p>
@@ -243,13 +243,13 @@ function VoucherError({
   return (
     <div className="rounded-md border border-feedback-error/40 bg-feedback-error-soft/40 p-3">
       <p className="text-label-md font-semibold text-feedback-error">{title}</p>
-      <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+      <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
         {body}
       </p>
 
       {gap ? (
         <>
-          <p className="mt-2 text-caption text-text-secondary">
+          <p className="mt-2 text-body-sm text-text-secondary">
             Kurang{" "}
             <strong className="font-semibold text-feedback-error">
               {formatHarga(gap, null)}
@@ -258,14 +258,14 @@ function VoucherError({
             {formatHarga(voucher?.min_purchase ?? 0, voucher?.formatted_min_purchase)}
             .
           </p>
-          <p className="mt-1 text-caption text-feedback-warn">
+          <p className="mt-1 text-body-sm text-feedback-warn">
             Mengikuti keranjang yang terakhir dibaca server.
           </p>
         </>
       ) : null}
 
       {error.kind === "voucher" && expired ? (
-        <p className="mt-2 text-caption text-text-secondary">
+        <p className="mt-2 text-body-sm text-text-secondary">
           Coba kode lain dari daftar.
         </p>
       ) : null}
@@ -290,7 +290,7 @@ function VoucherList({
         <span className="hidden group-open:inline">Tutup daftar kode</span>
       </summary>
 
-      <p className="text-caption leading-relaxed text-text-secondary">
+      <p className="text-body-sm leading-relaxed text-text-secondary">
         Server memutuskan kecocokan kode dengan isi keranjang saat kode
         diterapkan.
       </p>
@@ -313,18 +313,18 @@ function VoucherList({
                 ) : null}
               </p>
               {voucher.description ? (
-                <p className="text-caption text-text-secondary">
+                <p className="text-body-sm text-text-secondary">
                   {voucher.description}
                 </p>
               ) : null}
               {voucher.min_purchase > 0 ? (
-                <p className="text-caption text-text-secondary">
+                <p className="text-body-sm text-text-secondary">
                   Minimal belanja{" "}
                   {formatHarga(voucher.min_purchase, voucher.formatted_min_purchase)}
                 </p>
               ) : null}
               {voucher.end_date ? (
-                <p className="text-caption text-text-secondary">
+                <p className="text-body-sm text-text-secondary">
                   Berlaku sampai {formatTanggalPendek(voucher.end_date)}
                 </p>
               ) : null}

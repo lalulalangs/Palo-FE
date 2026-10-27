@@ -217,7 +217,7 @@ export default async function HomePage() {
                   >
                     <span>{category.name}</span>
                     {category.products_count !== null ? (
-                      <span className="text-caption text-text-secondary">
+                      <span className="text-body-sm text-text-secondary">
                         {category.products_count} produk
                       </span>
                     ) : null}
@@ -237,9 +237,9 @@ export default async function HomePage() {
        */}
       <section className="bg-surface-paper py-10">
         <Container>
-          <p className="max-w-3xl text-caption leading-relaxed text-text-secondary">
+          <p className="max-w-3xl text-body-sm leading-relaxed text-text-secondary">
             Halaman ini dibangun di atas{" "}
-            <code className="rounded-sm bg-surface-sage px-1 py-0.5 text-caption">
+            <code className="rounded-sm bg-surface-sage px-1 py-0.5 text-body-sm">
               KONTRAK-API.md
             </code>{" "}
             sehingga nama, harga, dan stok selalu dibaca dari server — tidak ada

@@ -99,13 +99,13 @@ export default async function ContactPage() {
                 </p>
                 <p>{resolved.address}</p>
                 <p>
-                  <span className="text-caption text-text-secondary">
+                  <span className="font-semibold text-text-primary">
                     Koordinat:{" "}
                   </span>
                   {resolved.coordinates}
                 </p>
                 <p>
-                  <span className="text-caption text-text-secondary">
+                  <span className="font-semibold text-text-primary">
                     Jam operasional:{" "}
                   </span>
                   {resolved.openingHours}
@@ -140,12 +140,12 @@ export default async function ContactPage() {
               <h3 className="text-title-md text-text-primary">
                 Status data gerai
               </h3>
-              <p className="mt-2 text-caption leading-relaxed text-text-secondary">
+              <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
                 {resolved.isApiBacked
                   ? "Data di atas berhasil dibaca dari server. Nilai yang masih berupa placeholder berarti admin belum mengisinya."
                   : "Server belum dapat dihubungi, jadi seluruh data gerai di halaman ini ditampilkan sebagai placeholder."}
               </p>
-              <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+              <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
                 Nama brand resmi:{" "}
                 <code className="rounded-sm bg-surface-sage px-1 py-0.5">
                   {PLACEHOLDER_BRAND.brandName}
@@ -268,7 +268,7 @@ export default async function ContactPage() {
                 title="Ajukan pertanyaan grosir atau ekspedisi"
                 description="Untuk pembelian dalam jumlah besar, kebutuhan ekspedisi, atau kerja sama reseller. Isi form ini, lalu lanjutkan ke WhatsApp Customer Service dengan pesan yang sudah tersusun."
               />
-              <p className="mt-4 text-caption leading-relaxed text-text-secondary">
+              <p className="mt-4 text-body-sm leading-relaxed text-text-secondary">
                 Halaman ini tidak menjanjikan harga, ketersediaan, maupun
                 tenggat. Semuanya dibicarakan langsung dengan Customer Service.
               </p>

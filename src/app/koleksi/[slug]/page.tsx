@@ -196,11 +196,11 @@ export default async function KoleksiDetailPage({
         description={collection.tagline ?? undefined}
         aside={
           <div className="space-y-1">
-            <p className="text-caption text-text-secondary">
+            <p className="text-body-sm text-text-secondary">
               {`${formatAngka(total)} produk`}
             </p>
             {collection.ended_at ? (
-              <p className="text-caption text-text-secondary">
+              <p className="text-body-sm text-text-secondary">
                 Tayang sampai {formatTanggal(collection.ended_at)}
               </p>
             ) : null}

@@ -94,11 +94,11 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           Pertanyaan siap dikirim ke WhatsApp
         </h3>
 
-        <p className="mt-4 text-caption text-text-secondary">Kode referensi</p>
+        <p className="mt-4 text-body-sm text-text-secondary">Kode referensi</p>
         <p className="mt-1 break-words font-mono text-title-lg font-bold tracking-wider text-brand-deep">
           {result.reference_code}
         </p>
-        <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+        <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
           Sebutkan kode ini di awal percakapan supaya Customer Service menemukan
           catatan Anda.
         </p>
@@ -116,14 +116,14 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
         >
           Buka WhatsApp dan kirim pesan
         </a>
-        <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+        <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
           Tautan ini membuka percakapan dengan pesan yang sudah terisi. Anda
           tetap perlu menekan tombol kirim di WhatsApp.
         </p>
 
         {result.notice ? (
           // Keterangan server, bukan janji kita — ditampilkan apa adanya.
-          <div className="mt-4 rounded-lg border border-border-soft bg-surface-paper p-4 text-caption leading-relaxed text-text-secondary">
+          <div className="mt-4 rounded-lg border border-border-soft bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
             {result.notice}
           </div>
         ) : null}
@@ -157,7 +157,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
       className={CARD}
     >
       {defaultName ? (
-        <p className="mb-4 text-caption leading-relaxed text-text-secondary">
+        <p className="mb-4 text-body-sm leading-relaxed text-text-secondary">
           {PREFILL_NOTE}
         </p>
       ) : null}
@@ -222,7 +222,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
             {copy.title}
           </p>
           {copy.body ? (
-            <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+            <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
               {copy.body}
             </p>
           ) : null}
@@ -241,7 +241,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
             : "Kirim pertanyaan lewat WhatsApp"}
       </button>
 
-      <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+      <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
         Tombol ini menyusun pesan WhatsApp, belum mengirim pertanyaan. Pesan baru
         sampai ke Customer Service setelah Anda menekan kirim di WhatsApp.
       </p>

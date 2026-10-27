@@ -447,9 +447,9 @@ function GuestResultPanel({
       </h2>
 
       <div className="rounded-lg border-2 border-accent-earth/50 bg-surface-paper p-4">
-        <p className="text-title-md text-brand-deep">Pesanan sudah masuk</p>
+        <p className="mt-2 text-title-md text-brand-deep">Pesanan sudah masuk</p>
         <p className="mt-2 text-body-md text-text-secondary">{handoff.notice}</p>
-        <p className="mt-2 text-caption leading-relaxed text-text-secondary">
+        <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
           Customer Service akan menghubungi Anda lewat WhatsApp untuk memilih
           pembayaran (VA atau QRIS). Pesanan baru diproses setelah pembayaran
           diverifikasi admin. Bila tidak dibayar dalam 1×24 jam, pesanan
@@ -475,7 +475,7 @@ function GuestResultPanel({
         <p className="mt-1 font-mono text-title-lg font-bold tracking-wider text-brand-deep">
           {handoff.reference_code}
         </p>
-        <p className="mt-1 text-caption text-text-secondary">
+        <p className="mt-1 text-body-sm text-text-secondary">
           Sebutkan kode ini di awal percakapan supaya Customer Service bisa
           menemukan catatan Anda.
         </p>
@@ -490,7 +490,7 @@ function GuestResultPanel({
               handoff.estimated_total_display,
             )}
           </strong>{" "}
-          <span className="text-caption text-text-secondary">
+          <span className="text-body-sm text-text-secondary">
             (belum termasuk ongkos kirim)
           </span>
         </p>
@@ -515,7 +515,7 @@ function GuestResultPanel({
         </button>
       ) : null}
 
-      <p className="text-caption leading-relaxed text-text-secondary">
+      <p className="text-body-sm leading-relaxed text-text-secondary">
         Tautan ini membuka percakapan dengan pesan yang sudah terisi. Membuka
         tautan tidak mengirim apa pun — Anda tetap menekan tombol kirim di
         WhatsApp.

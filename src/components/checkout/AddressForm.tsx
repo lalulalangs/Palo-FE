@@ -259,7 +259,7 @@ export function AddressForm({
         OD-05 masih DITUNDA, jadi pilihan "Ambil di Gerai" tidak pernah
         muncul di sini sampai kebijakan pemilik dikonfirmasi.
       */}
-      <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+      <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
         Saat ini seluruh pesanan dikirim via kurir. Layanan pengambilan di
         gerai belum diaktifkan.
       </p>

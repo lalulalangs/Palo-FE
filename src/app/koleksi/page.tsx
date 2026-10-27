@@ -78,7 +78,7 @@ export default async function KoleksiPage() {
         breadcrumbs={crumbs}
         aside={
           apiAvailable && items.length > 0 ? (
-            <p className="text-caption text-text-secondary">
+            <p className="text-body-sm text-text-secondary">
               {formatAngka(items.length)} koleksi
             </p>
           ) : null

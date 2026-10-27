@@ -75,7 +75,7 @@ export function AuthForm({
       <h2 className="text-headline-sm text-text-primary">
         {isRegister ? "Buat akun baru" : "Selamat datang kembali"}
       </h2>
-      <p className="mt-1 text-caption text-text-secondary">
+      <p className="mt-1 text-body-sm text-text-secondary">
         {isRegister
           ? "Akun dipakai untuk pembayaran online, riwayat pesanan, dan pelacakan status."
           : "Masukkan kredensial akun terdaftar Anda."}
@@ -194,7 +194,7 @@ export function AuthForm({
         di halaman auth.
       */}
       <div className="mt-6 rounded-md bg-surface-sage/70 p-3">
-        <p className="text-caption leading-relaxed text-text-secondary">
+        <p className="text-body-sm leading-relaxed text-text-secondary">
           Ingin belanja tanpa akun? Anda tetap bisa menyelesaikan pesanan lewat
           WhatsApp Customer Service dari halaman keranjang.
         </p>

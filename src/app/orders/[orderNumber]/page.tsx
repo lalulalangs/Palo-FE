@@ -231,7 +231,7 @@ export default async function OrderDetailPage({
               </div>
             </dl>
 
-            <p className="mt-4 border-t border-border-soft pt-3 text-caption leading-relaxed text-text-secondary">
+            <p className="mt-4 border-t border-border-soft pt-3 text-body-sm leading-relaxed text-text-secondary">
               {courier
                 ? `Kurir: ${courier}`
                 : "Kurir belum tercatat di pesanan ini"}

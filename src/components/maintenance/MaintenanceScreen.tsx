@@ -33,7 +33,7 @@ export function MaintenanceScreen({ brand }: MaintenanceScreenProps) {
           <p className="text-body-md text-text-primary leading-relaxed">
             Platform e-commerce dan integrasi layanan transaksi publik Palo Mountain Goods saat ini sedang dalam fase finalisasi sistem, konfigurasi payment gateway, dan sinkronisasi basis data inventaris.
           </p>
-          <div className="mt-4 pt-4 border-t border-border-soft flex flex-col gap-2 font-mono text-caption text-text-secondary">
+          <div className="mt-4 pt-4 border-t border-border-soft flex flex-col gap-2 font-mono text-body-sm text-text-secondary">
             <div>
               <span className="text-brand-forest font-semibold">● ENVIRONMENT:</span> PRODUCTION STABLE
             </div>

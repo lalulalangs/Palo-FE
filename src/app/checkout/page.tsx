@@ -89,7 +89,7 @@ export default async function CheckoutPage({
               </Link>
             </div>
             {redirectTo ? (
-              <p className="mt-4 text-caption text-text-secondary">
+              <p className="mt-4 text-body-sm text-text-secondary">
                 Anda datang dari halaman{" "}
                 <code className="rounded-sm bg-surface-sage px-1 py-0.5">
                   {redirectTo}
@@ -98,7 +98,7 @@ export default async function CheckoutPage({
                 halamannya memang bisa diakses.
               </p>
             ) : null}
-            <p className="mt-4 text-caption text-text-secondary">
+            <p className="mt-4 text-body-sm text-text-secondary">
               Ingin checkout tanpa akun? Keranjang tetap bisa diselesaikan
               lewat WhatsApp Customer Service.
             </p>

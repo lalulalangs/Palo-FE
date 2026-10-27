@@ -123,7 +123,7 @@ export function QuantityStepper({
         role="status"
         aria-live="polite"
         className={[
-          "mt-1.5 text-caption",
+          "mt-1.5 text-body-sm",
           note?.tone === "warn" ? "text-feedback-warn" : "text-text-secondary",
         ].join(" ")}
       >

@@ -98,7 +98,7 @@ export default async function TrackOrderPage({
               />
             )}
 
-            <p className="mt-6 text-caption leading-relaxed text-text-secondary">
+            <p className="mt-6 text-body-sm leading-relaxed text-text-secondary">
               Nomor resi dan tautan pelacakan ke situs kurir sengaja tidak
               ditampilkan di sini. Nomor resi baru diisi admin saat pesanan
               berstatus &ldquo;Dikirim&rdquo; (PRD §3.9), dan tidak ada endpoint

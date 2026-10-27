@@ -121,7 +121,7 @@ export default async function StoryPage() {
                 &ldquo;Di gunung, kita tidak menaklukkan puncak; kita belajar
                 melangkah pelan dan mendengarkan.&rdquo;
               </p>
-              <footer className="mt-2 text-caption text-text-secondary">
+              <footer className="mt-2 text-body-sm text-text-secondary">
                 Catatan penjelajah, jalur Senaru.
               </footer>
             </blockquote>
@@ -130,7 +130,7 @@ export default async function StoryPage() {
           <aside className="tablet:col-span-5">
             <div className="rounded-lg border border-border-soft bg-surface-white p-5">
               <h2 className="text-title-lg text-brand-deep">Identitas brand</h2>
-              <dl className="mt-3 divide-y divide-border-soft text-caption">
+              <dl className="mt-3 divide-y divide-border-soft text-body-sm">
                 <div className="flex flex-wrap gap-x-2 py-2">
                   <dt className="text-text-secondary">Nama brand</dt>
                   <dd className="font-medium text-text-primary">
@@ -158,7 +158,7 @@ export default async function StoryPage() {
                   </div>
                 ) : null}
               </dl>
-              <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+              <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
                 Data di atas dibaca dari panel admin lewat{" "}
                 <code className="rounded-sm bg-surface-sage px-1 py-0.5">
                   GET /brand

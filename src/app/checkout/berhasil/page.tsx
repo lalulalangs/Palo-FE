@@ -169,7 +169,7 @@ export default async function CheckoutSuccessPage({
             <p className="mt-1 font-mono text-headline-md font-bold tracking-wider text-brand-deep">
               {detail.order_number}
             </p>
-            <p className="mt-2 text-caption text-text-secondary">
+            <p className="mt-2 text-body-sm text-text-secondary">
               Dibuat {formatTanggalWaktu(detail.placed_at)}
             </p>
             <p className="mt-4 text-title-lg font-semibold text-brand-forest">
@@ -190,7 +190,7 @@ export default async function CheckoutSuccessPage({
             </h2>
 
             {detail.payment_method ? (
-              <p className="mt-1 text-caption text-text-secondary">
+              <p className="mt-1 text-body-sm text-text-secondary">
                 Metode: {detail.payment_method}
               </p>
             ) : null}
@@ -216,7 +216,7 @@ export default async function CheckoutSuccessPage({
               {instructions}
             </p>
             {detail.payment_expires_at ? (
-              <p className="mt-1 text-caption text-text-secondary">
+              <p className="mt-1 text-body-sm text-text-secondary">
                 Batas akhir: {formatWaktu(detail.payment_expires_at)}
               </p>
             ) : null}
@@ -242,7 +242,7 @@ export default async function CheckoutSuccessPage({
                     <span className="block text-title-md text-text-primary">
                       {item.product_name}
                     </span>
-                    <span className="block text-caption text-text-secondary">
+                    <span className="block text-body-sm text-text-secondary">
                       {item.variant_name ? `${item.variant_name} · ` : ""}
                       {item.sku_code} · {item.quantity} pcs
                     </span>
@@ -253,7 +253,7 @@ export default async function CheckoutSuccessPage({
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+            <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
               Rincian ini dibaca dari snapshot pesanan, sehingga tetap lengkap
               walau produknya nanti dihapus dari katalog (PRD §3.5).
             </p>

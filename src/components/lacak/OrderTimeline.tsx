@@ -53,7 +53,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
             <h2 className="mt-1 font-mono text-headline-sm font-bold tracking-wider text-brand-deep">
               {order.order_number}
             </h2>
-            <p className="mt-1 text-caption text-text-secondary">
+            <p className="mt-1 text-body-sm text-text-secondary">
               Dibuat {formatTanggalWaktu(order.placed_at)}
             </p>
           </div>
@@ -76,7 +76,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
             <h3 className="text-label-md font-semibold text-text-primary">
               Dikirim ke
             </h3>
-            <address className="mt-1 text-caption not-italic leading-relaxed text-text-secondary">
+            <address className="mt-1 text-body-sm not-italic leading-relaxed text-text-secondary">
               {order.shipping_address.recipient_name} ·{" "}
               {order.shipping_address.phone}
               <span className="block">{order.shipping_address.street}</span>
@@ -112,11 +112,11 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
               {order.tracking_number}
             </p>
             {order.shipping_courier ? (
-              <p className="mt-1 text-caption text-text-secondary">
+              <p className="mt-1 text-body-sm text-text-secondary">
                 {order.shipping_courier} {order.shipping_service ?? ""}
               </p>
             ) : null}
-            <p className="mt-2 text-caption leading-relaxed text-text-secondary">
+            <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
               Status kiriman tidak dilacak dari halaman ini. Lacak langsung di
               situs kurir menggunakan nomor resi di atas.
             </p>
@@ -144,7 +144,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
             <PaymentInstructions payment={order.payment} />
           </div>
           {order.payment_expires_at ? (
-            <p className="mt-3 border-t border-border-soft pt-3 text-caption text-text-secondary">
+            <p className="mt-3 border-t border-border-soft pt-3 text-body-sm text-text-secondary">
               Batas akhir pembayaran:{" "}
               {formatTanggalWaktu(order.payment_expires_at)}
             </p>
@@ -161,7 +161,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
         </h2>
 
         {history.length === 0 ? (
-          <p className="mt-3 text-caption text-text-secondary">
+          <p className="mt-3 text-body-sm text-text-secondary">
             Riwayat status belum tercatat.
           </p>
         ) : (
@@ -175,12 +175,12 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
                 <p className="text-title-md font-semibold text-text-primary">
                   {labelStatusOrder(entry.to_status ?? order.status)}
                 </p>
-                <p className="text-caption text-text-secondary">
+                <p className="text-body-sm text-text-secondary">
                   {formatTanggalWaktu(entry.occurred_at)}
                   {entry.actor_type ? ` · ${entry.actor_type}` : ""}
                 </p>
                 {entry.note ? (
-                  <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+                  <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
                     {entry.note}
                   </p>
                 ) : null}
@@ -189,7 +189,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
           </ol>
         )}
 
-        <p className="mt-5 border-t border-border-soft pt-4 text-caption leading-relaxed text-text-secondary">
+        <p className="mt-5 border-t border-border-soft pt-4 text-body-sm leading-relaxed text-text-secondary">
           Status diperbarui oleh webhook dari payment gateway dan oleh admin,
           keduanya lewat service terpusat (ARSITEKTUR §6). Halaman ini hanya
           menampilkan hasilnya.
@@ -213,7 +213,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
                 <span className="block text-title-md text-text-primary">
                   {item.product_name}
                 </span>
-                <span className="block text-caption text-text-secondary">
+                <span className="block text-body-sm text-text-secondary">
                   {item.variant_name ? `${item.variant_name} · ` : ""}
                   {item.sku_code} · {item.quantity} pcs
                 </span>
@@ -224,7 +224,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-caption leading-relaxed text-text-secondary">
+        <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
           Rincian ini berasal dari snapshot pesanan, bukan dari katalog, jadi
           tetap lengkap walaupun produknya sudah tidak dijual (PRD §3.5).
         </p>
