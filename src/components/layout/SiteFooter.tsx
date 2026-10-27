@@ -151,7 +151,7 @@ export function SiteFooter({ brand }: { brand: ResolvedBrand | null }) {
               Toko &amp; Kontak
             </h2>
 
-            <address className="mt-4 space-y-3 text-caption not-italic leading-relaxed text-surface-paper/70">
+            <address className="mt-4 space-y-3 text-body-sm not-italic leading-relaxed text-surface-paper/85">
               <p>{brand?.address ?? "[Alamat Toko dari Admin]"}</p>
 
               {/* Jam operasional TIDAK di-hardcode. system_map §4.1.4 /
@@ -222,12 +222,12 @@ function FooterLinkGroup({
       >
         {heading}
       </h2>
-      <ul className="mt-4 space-y-1 text-caption">
+      <ul className="mt-4 space-y-1 text-body-sm font-medium">
         {links.map((link) => (
           <li key={link.href}>
             <Link
               href={link.href}
-              className="inline-flex min-h-11 items-center text-surface-paper/70 transition-colors hover:text-surface-white"
+              className="inline-flex min-h-11 items-center text-surface-paper/85 transition-colors hover:text-surface-white"
             >
               {link.label}
             </Link>

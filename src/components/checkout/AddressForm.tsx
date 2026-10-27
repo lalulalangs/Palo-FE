@@ -189,7 +189,7 @@ export function AddressForm({
       />
 
       {errorCount > 0 ? (
-        <p role="alert" className="text-caption text-feedback-error">
+        <p role="alert" className="text-body-sm font-semibold text-feedback-error">
           {errorCount} isian perlu diperbaiki sebelum ongkir dihitung.
         </p>
       ) : null}
@@ -226,7 +226,7 @@ export function AddressForm({
                   ? "Sesi Anda berakhir"
                   : "Ongkir belum dapat dihitung"}
           </p>
-          <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+          <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
             {quoteError.message}
             {quoteError.kind === "address"
               ? " Pilih satu hasil dari pencarian agar ongkir dihitung ke kecamatan yang benar."

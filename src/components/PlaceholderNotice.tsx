@@ -38,7 +38,7 @@ export function PlaceholderNotice({
       <InfoIcon />
       <div className="min-w-0">
         <p className="text-label-md font-semibold text-brand-deep">{title}</p>
-        <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+        <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
           {body}
         </p>
       </div>

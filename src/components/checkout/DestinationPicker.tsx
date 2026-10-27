@@ -275,7 +275,7 @@ export function DestinationPicker({
       {/* Quick Suggestion Chips untuk destinasi populer saat input kosong */}
       {visibleStatus === "idle" && query.trim().length === 0 ? (
         <div className="space-y-2 pt-1">
-          <p className="text-caption font-medium text-text-secondary">
+          <p className="text-body-sm font-medium text-text-secondary">
             Destinasi populer:
           </p>
           <div
@@ -310,11 +310,11 @@ export function DestinationPicker({
         aria-atomic="true"
       >
         {visibleStatus === "loading" ? (
-          <p className="text-caption text-text-secondary">Mencari wilayah…</p>
+          <p className="text-body-sm text-text-secondary">Mencari wilayah…</p>
         ) : null}
 
         {visibleStatus === "empty" ? (
-          <p className="text-caption text-text-secondary">
+          <p className="text-body-sm text-text-secondary">
             Tidak ada wilayah yang cocok dengan &ldquo;{searched}&rdquo;.{" "}
             {EMPTY_HINT}
           </p>
@@ -322,7 +322,7 @@ export function DestinationPicker({
 
         {visibleStatus === "results" ? (
           <>
-            <p className="text-caption text-text-secondary">
+            <p className="text-body-sm text-text-secondary">
               {results.length} wilayah ditemukan.
             </p>
             <ul className="mt-2 divide-y divide-border-soft rounded-md border border-border-soft">
@@ -342,7 +342,7 @@ export function DestinationPicker({
                         .filter(Boolean)
                         .join(", ")}
                     </span>
-                    <span className="text-caption text-text-secondary">
+                    <span className="text-body-sm text-text-secondary">
                       {[
                         titleCase(destination.district_name),
                         titleCase(destination.province_name),
@@ -365,7 +365,7 @@ export function DestinationPicker({
                 ? "Pencarian wilayah belum bisa dilakukan"
                 : "Pencarian wilayah sedang tidak tersedia"}
             </p>
-            <p className="text-caption leading-relaxed text-text-secondary">
+            <p className="text-body-sm leading-relaxed text-text-secondary">
               {failure.kind === "network" ? NETWORK_COPY : UNAVAILABLE_COPY}
             </p>
             <div className="flex flex-wrap items-center gap-2">

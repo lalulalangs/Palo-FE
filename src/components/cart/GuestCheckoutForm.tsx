@@ -174,7 +174,7 @@ export function GuestCheckoutForm({
         <h2 className="text-headline-sm text-text-primary">
           Checkout lewat WhatsApp
         </h2>
-        <p className="mt-1 text-caption leading-relaxed text-text-secondary">
+        <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
           Tanpa akun. Daftar belanja dan informasi pengiriman disusun otomatis ke percakapan WhatsApp
           Customer Service untuk pengecekan fisik, rekomendasi ongkir, dan konfirmasi pembayaran.
         </p>
@@ -211,7 +211,7 @@ export function GuestCheckoutForm({
           <h3 id="section-buyer-title" className="text-label-md font-semibold text-text-primary">
             1. Data Pemesan
           </h3>
-          <p className="text-caption text-text-secondary">
+          <p className="text-body-sm text-text-secondary">
             Nama dan nomor kontak untuk percakapan dengan Customer Service.
           </p>
         </div>
@@ -251,7 +251,7 @@ export function GuestCheckoutForm({
           <h3 id="section-shipping-title" className="text-label-md font-semibold text-text-primary">
             2. Alamat Pengiriman
           </h3>
-          <p className="text-caption text-text-secondary">
+          <p className="text-body-sm text-text-secondary">
             Pilih wilayah tujuan dan detail jalan untuk memudahkan CS menghitung ongkir resmi.
           </p>
         </div>
@@ -284,7 +284,7 @@ export function GuestCheckoutForm({
           <h3 id="courier-group-label" className="text-label-md font-semibold text-text-primary">
             3. Pilihan Ekspedisi
           </h3>
-          <p className="text-caption text-text-secondary">
+          <p className="text-body-sm text-text-secondary">
             Pilih preferensi jasa pengiriman. Tarif ongkir final akan dikonfirmasi via WhatsApp.
           </p>
         </div>
@@ -310,7 +310,7 @@ export function GuestCheckoutForm({
                 <span className="text-label-md font-semibold text-text-primary">
                   {option.label}
                 </span>
-                <span className="mt-0.5 text-caption text-text-secondary">
+                <span className="mt-0.5 text-body-sm text-text-secondary">
                   {option.desc}
                 </span>
                 <input
@@ -336,7 +336,7 @@ export function GuestCheckoutForm({
           <h3 id="section-note-title" className="text-label-md font-semibold text-text-primary">
             4. Catatan & Selesai
           </h3>
-          <p className="text-caption text-text-secondary">
+          <p className="text-body-sm text-text-secondary">
             Tambahkan instruksi khusus untuk Customer Service jika ada.
           </p>
         </div>
@@ -384,7 +384,7 @@ export function GuestCheckoutForm({
           )}
         </button>
 
-        <p className="text-caption leading-relaxed text-text-secondary">
+        <p className="text-body-sm leading-relaxed text-text-secondary">
           Pesanan langsung tercatat di sistem setelah tombol ini ditekan.
           Pembayaran (VA/QRIS) disepakati lewat WhatsApp dan baru diproses
           setelah admin memverifikasinya.

@@ -71,12 +71,12 @@ export function Input({
         ) : null}
       </div>
       {hint ? (
-        <p id={hintId ?? undefined} className="text-caption text-text-secondary">
+        <p id={hintId ?? undefined} className="text-body-sm text-text-secondary">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p id={errorId ?? undefined} className="text-caption font-semibold text-feedback-error">
+        <p id={errorId ?? undefined} className="text-body-sm font-semibold text-feedback-error">
           {error}
         </p>
       ) : null}
@@ -128,12 +128,12 @@ export function Textarea({
         {...rest}
       />
       {hint ? (
-        <p id={hintId ?? undefined} className="text-caption text-text-secondary">
+        <p id={hintId ?? undefined} className="text-body-sm text-text-secondary">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p id={errorId ?? undefined} className="text-caption font-semibold text-feedback-error">
+        <p id={errorId ?? undefined} className="text-body-sm font-semibold text-feedback-error">
           {error}
         </p>
       ) : null}

@@ -76,7 +76,7 @@ export function CartSummary({
           <p className="text-title-lg font-semibold text-text-primary">
             Total sementara
           </p>
-          <p className="text-caption text-text-secondary">
+          <p className="text-body-sm text-text-secondary">
             Belum termasuk ongkir resmi tujuan
           </p>
         </div>
@@ -97,12 +97,12 @@ export function CartSummary({
 
       {action ? <div className="space-y-3">{action}</div> : null}
 
-      <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-label-sm leading-relaxed text-text-secondary">
+      <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-body-sm leading-relaxed text-text-secondary">
         Keranjang tidak memblokir stok. Stok dan harga divalidasi ulang oleh
         server saat pesanan dibuat, sehingga nilai di atas bisa berubah.
       </p>
 
-      <p className="mt-3 text-caption text-text-secondary">
+      <p className="mt-3 text-body-sm text-text-secondary">
         Jumlah item: {formatAngka(summary.item_count)}
       </p>
 

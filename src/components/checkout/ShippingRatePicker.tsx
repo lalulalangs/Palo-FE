@@ -35,7 +35,7 @@ export function ShippingRatePicker({
         Metode pengiriman ke {destinationCity}
       </legend>
 
-      <p className="mt-1 text-caption text-text-secondary">
+      <p className="mt-1 text-body-sm text-text-secondary">
         Ongkos dihitung ulang di server setiap kali alamat atau isi keranjang
         berubah.
       </p>
@@ -69,7 +69,7 @@ export function ShippingRatePicker({
                   <span className="block text-title-md font-semibold text-text-primary">
                     {service.courier} {service.service}
                   </span>
-                  <span className="block text-caption text-text-secondary">
+                  <span className="block text-body-sm text-text-secondary">
                     {service.description
                       ? `${service.description} · `
                       : ""}
@@ -83,7 +83,7 @@ export function ShippingRatePicker({
                   {formatRupiah(service.cost)}
                 </span>
                 {isSelected ? (
-                  <span className="block text-caption text-text-secondary">
+                  <span className="block text-body-sm text-text-secondary">
                     Terpilih
                   </span>
                 ) : null}
