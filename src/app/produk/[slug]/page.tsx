@@ -188,7 +188,7 @@ export default async function ProductDetailPage({
             Tautan teks, bukan tombol sekunder: CTA primer tetap satu.
           */}
           <p className="mt-4 max-w-3xl text-body-md text-text-secondary">
-            Butuh rekomendasi ukuran atau info ketersediaan barang?
+            Butuh rekomendasi ukuran atau info ketersediaan produk?
           </p>
           <Link
             href="/kontak"

@@ -291,7 +291,7 @@ function VoucherList({
       </summary>
 
       <p className="text-body-sm leading-relaxed text-text-secondary">
-        Potongan diskon akan otomatis disesuaikan dengan barang yang ada di keranjangmu.
+        Potongan diskon akan otomatis disesuaikan dengan produk yang ada di keranjangmu.
       </p>
 
       <ul className="mt-2 divide-y divide-border-soft border-y border-border-soft">

@@ -41,7 +41,7 @@ const PRINSIP = [
   {
     number: "01",
     title: "Menghormati tempat, bukan mengalahkannya",
-    body: "Setiap keputusan desain berangkat dari penghormatan pada lanskap Senaru: udara dingin di sekitar kawah Segara Anak, kabut yang turun cepat di lereng, dan ritme kerja warga yang mengikuti cuaca. Yang kami rancang adalah barang yang dipakai berulang di kondisi nyata, bukan barang yang hanya terlihat rapi di studio foto.",
+    body: "Setiap keputusan desain berangkat dari penghormatan pada lanskap Senaru: udara dingin di sekitar kawah Segara Anak, kabut yang turun cepat di lereng, dan ritme kerja warga yang mengikuti cuaca. Yang kami rancang adalah produk yang dipakai berulang di kondisi nyata, bukan produk yang hanya terlihat rapi di studio foto.",
   },
   {
     number: "02",
@@ -99,8 +99,8 @@ export default async function StoryPage() {
               <p>
                 Palo Mountain Goods tidak berdiri di ruang kerja yang steril.
                 Namanya diambil dari lembah Senaru, dan seluruh arah
-                kerjasanya diarahkan ke satu hal: barang yang dipakai di
-                lapangan harus bisa bertahan lebih lama daripada barang yang
+                kerjasanya diarahkan ke satu hal: produk yang dipakai di
+                lapangan harus bisa bertahan lebih lama daripada produk yang
                 hanya dipakai untuk potret.              </p>
               <p>
                 Kami rutin berada di jalur yang sama: naik menuju kawah, lalu

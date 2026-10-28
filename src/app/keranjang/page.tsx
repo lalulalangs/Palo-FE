@@ -41,7 +41,7 @@ import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
 export const metadata: Metadata = buildMetadata({
   title: "Keranjang Belanja",
   description:
-    "Rincian barang yang dipilih, dengan dua jalur pemesanan: lanjutkan lewat WhatsApp Customer Service tanpa akun, atau checkout online dengan akun terdaftar.",
+    "Rincian produk yang dipilih, dengan dua jalur pemesanan: lanjutkan lewat WhatsApp Customer Service tanpa akun, atau checkout online dengan akun terdaftar.",
   path: "/keranjang",
   noIndex: true,
 });
@@ -78,10 +78,10 @@ export default async function CartPage() {
     blocked.length === 0
       ? null
       : hasKurang && hasHabis
-        ? `Yuk, cek lagi keranjangmu. Ada barang yang habis dan melebihi sisa stok: ${blockedNames}.`
+        ? `Yuk, cek lagi keranjangmu. Ada produk yang habis dan melebihi sisa stok: ${blockedNames}.`
         : hasKurang
-          ? `Yuk, sesuaikan jumlah barang yang melebihi sisa stok: ${blockedNames}.`
-          : `Yuk, hapus barang yang sudah habis dari keranjang: ${blockedNames}.`;
+          ? `Yuk, sesuaikan jumlah produk yang melebihi sisa stok: ${blockedNames}.`
+          : `Yuk, hapus produk yang sudah habis dari keranjang: ${blockedNames}.`;
 
   return (
     <>
@@ -90,7 +90,7 @@ export default async function CartPage() {
       <PageHeader
         eyebrow="Ekspedisi dari Senaru"
         title="Keranjang belanja"
-        description="Cek kembali barang pilihanmu dan pilih cara belanja yang paling nyaman buatmu."
+        description="Cek kembali produk pilihanmu dan pilih cara belanja yang paling nyaman buatmu."
         breadcrumbs={crumbs}
       />
 
@@ -131,7 +131,7 @@ export default async function CartPage() {
           <div className="grid gap-8 desktop:grid-cols-12 desktop:gap-10">
             {/* ---- Item ---- */}
             <section
-              aria-label="Barang di keranjang"
+              aria-label="Produk di keranjang"
               className="desktop:col-span-7"
             >
               <div className="divide-y divide-border-soft rounded-lg border border-border-soft bg-surface-white">
@@ -141,7 +141,7 @@ export default async function CartPage() {
               </div>
 
               <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-label-sm leading-relaxed text-text-secondary">
-                Barang di keranjang belum otomatis terpesan, ya. Yuk, lanjut checkout sekarang biar stok dan harganya aman!
+                Produk di keranjang belum otomatis terpesan, ya. Yuk, lanjut checkout sekarang biar stok dan harganya aman!
               </p>
             </section>
 

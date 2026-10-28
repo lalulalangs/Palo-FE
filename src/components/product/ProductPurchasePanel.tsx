@@ -332,7 +332,7 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
           </p>
         ) : (
           <p className="text-label-sm leading-relaxed text-text-secondary">
-            Stok terbatas! Yuk, langsung checkout biar barang incaranmu nggak kehabisan.
+            Stok terbatas! Yuk, langsung checkout biar produk incaranmu nggak kehabisan.
           </p>
         )}
 

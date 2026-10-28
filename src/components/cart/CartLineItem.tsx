@@ -136,7 +136,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
 
         {state === "habis" ? (
           <p className="mt-2 rounded-md bg-surface-paper px-3 py-2 text-label-sm font-semibold text-feedback-warn">
-            Yah, stok produk ini lagi habis. Yuk, hapus dulu dari keranjang biar kamu bisa lanjut checkout barang lainnya!
+            Yah, stok produk ini lagi habis. Yuk, hapus dulu dari keranjang biar kamu bisa lanjut checkout produk lainnya!
           </p>
         ) : null}
 

@@ -198,7 +198,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
         className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
       >
         <h2 id="rincian-pesanan" className="text-headline-sm text-brand-deep">
-          Rincian barang
+          Rincian produk
         </h2>
         <ul className="mt-4 divide-y divide-border-soft">
           {order.items.map((item) => (
@@ -222,7 +222,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
           ))}
         </ul>
         <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-          Rincian barang ini mencatat pesanan aslimu, sehingga tetap tersimpan rapi meski stok produk di katalog sudah berganti.
+          Rincian produk ini mencatat pesanan aslimu, sehingga tetap tersimpan rapi meski stok produk di katalog sudah berganti.
         </p>
       </section>
     </div>

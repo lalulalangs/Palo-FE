@@ -152,7 +152,7 @@ export default async function CheckoutPage({
         <PageHeader
           eyebrow="Checkout"
           title="Keranjang belanjamu masih kosong"
-          description="Belum ada barang untuk di-checkout. Yuk, temukan produk idamanmu di katalog!"
+          description="Belum ada produk untuk di-checkout. Yuk, temukan produk idamanmu di katalog!"
           breadcrumbs={[
             { name: "Beranda", href: "/" },
             { name: "Keranjang", href: "/keranjang" },
@@ -186,7 +186,7 @@ export default async function CheckoutPage({
         <PageHeader
           eyebrow="Checkout"
           title="Cek kembali keranjangmu, ya"
-          description="Beberapa barang di keranjangmu perlu disesuaikan sebelum melanjutkan checkout."
+          description="Beberapa produk di keranjangmu perlu disesuaikan sebelum melanjutkan checkout."
           breadcrumbs={[
             { name: "Beranda", href: "/" },
             { name: "Keranjang", href: "/keranjang" },
@@ -196,8 +196,8 @@ export default async function CheckoutPage({
         <Container className="py-10 tablet:py-14">
           <div className="mx-auto max-w-2xl">
             <PlaceholderNotice
-              title="Ada barang yang perlu disesuaikan"
-              body={`Barang berikut habis atau jumlahnya melebihi sisa stok: ${blocked
+              title="Ada produk yang perlu disesuaikan"
+              body={`Produk berikut habis atau jumlahnya melebihi sisa stok: ${blocked
                 .map((item) => item.product_name)
                 .join(", ")}. Yuk, sesuaikan di keranjang sebelum melanjutkan.`}
               variant="paper"

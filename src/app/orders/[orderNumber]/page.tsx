@@ -311,7 +311,7 @@ function describeNextStep(order: OrderDetail): NextStep {
       return {
         waitingForPayment: false,
         title: "Pesanan selesai",
-        body: "Paket sudah sampai di tujuan! Terima kasih sudah mempercayakan pesananmu bersama Palo Mountain Goods. Selamat menikmati barang barumu!",
+        body: "Paket sudah sampai di tujuan! Terima kasih sudah mempercayakan pesananmu bersama Palo Mountain Goods. Selamat menikmati produk barumu!",
       };
 
     case "menunggu_pembayaran":
@@ -334,7 +334,7 @@ function describeNextStep(order: OrderDetail): NextStep {
       return {
         waitingForPayment: false,
         title: "Waktu pembayaran berakhir",
-        body: "Batas waktu pembayaran untuk pesanan ini sudah lewat, jadi stoknya dikembalikan ke katalog. Kamu masih bisa pesan ulang barang favoritmu lewat keranjang, ya!",
+        body: "Batas waktu pembayaran untuk pesanan ini sudah lewat, jadi stoknya dikembalikan ke katalog. Kamu masih bisa pesan ulang produk favoritmu lewat keranjang, ya!",
       };
 
     case "dibatalkan":

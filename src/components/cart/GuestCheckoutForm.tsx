@@ -352,8 +352,8 @@ export function GuestCheckoutForm({
 
         {hasBlockingItem ? (
           <PlaceholderNotice
-            title="Ada barang yang perlu disesuaikan dulu"
-            body="Satu atau lebih barang habis atau jumlahnya melebihi sisa stok. Sesuaikan jumlahnya sebelum melanjutkan."
+            title="Ada produk yang perlu disesuaikan dulu"
+            body="Satu atau lebih produk habis atau jumlahnya melebihi sisa stok. Sesuaikan jumlahnya sebelum melanjutkan."
             variant="paper"
           />
         ) : null}

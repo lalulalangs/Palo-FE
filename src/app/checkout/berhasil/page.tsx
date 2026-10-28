@@ -229,7 +229,7 @@ export default async function CheckoutSuccessPage({
               id="ringkasan-item"
               className="text-headline-sm text-brand-deep"
             >
-              Rincian barang
+              Rincian produk
             </h2>
             <ul className="mt-4 divide-y divide-border-soft">
               {detail.items.map((item) => (
