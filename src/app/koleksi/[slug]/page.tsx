@@ -80,7 +80,7 @@ export async function generateMetadata({
   const description =
     collection.seo_meta?.meta_description ??
     collection.tagline ??
-    `Koleksi ${name} di Palo Mountain Goods. Temukan perlengkapan outdoor pilihan yang siap menemani setiap petualanganmu.`;
+    `Koleksi ${name} di Palo Mountain Goods. Temukan koleksi pakaian dan apparel pilihan yang siap menemani gayamu.`;
 
   return buildMetadata({
     title,

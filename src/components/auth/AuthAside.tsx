@@ -59,7 +59,7 @@ export function AuthAside() {
       </ul>
 
       <p className="mt-8 text-body-sm leading-relaxed text-surface-paper/75">
-        Keamanan data dan privasimu selalu jadi prioritas utama kami. Belanja perlengkapan outdoor jadi lebih tenang dan nyaman!
+        Keamanan data dan privasimu selalu jadi prioritas utama kami. Belanja koleksi pakaian jadi lebih tenang dan nyaman!
       </p>
     </section>
   );

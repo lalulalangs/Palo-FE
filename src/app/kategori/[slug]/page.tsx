@@ -63,7 +63,7 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: category.name,
-    description: `Temukan koleksi pilihan ${category.name} dari Palo Mountain Goods untuk melengkapi setiap aktivitas luar ruanganmu.`,
+    description: `Temukan koleksi pakaian ${category.name} pilihan dari Palo Mountain Goods untuk melengkapi setiap aktivitas dan gayamu.`,
     path: `/kategori/${category.slug}`,
   });
 }

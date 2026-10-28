@@ -31,7 +31,7 @@ export function MaintenanceScreen({ brand }: MaintenanceScreenProps) {
         {/* Friendly Microcopy */}
         <div className="mt-8 w-full max-w-2xl text-left border border-border-soft bg-surface-white p-6 rounded-lg shadow-editorial">
           <p className="text-body-md text-text-primary leading-relaxed">
-            Palo Mountain Goods sedang menyiapkan pengalaman belanja perlengkapan outdoor yang lebih nyaman, cepat, dan praktis buat kamu. Kami akan segera kembali menemani langkah petualanganmu!
+            Palo Mountain Goods sedang menyiapkan pengalaman belanja koleksi pakaian yang lebih nyaman, cepat, dan praktis buat kamu. Kami akan segera kembali menemani langkah dan gayamu!
           </p>
           <div className="mt-4 pt-4 border-t border-border-soft flex flex-col gap-2 text-body-sm text-text-secondary">
             <div>

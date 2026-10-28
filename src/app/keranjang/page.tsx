@@ -113,7 +113,7 @@ export default async function CartPage() {
               Keranjang belanjamu masih kosong, nih
             </h2>
             <p className="mt-3 text-body-md text-text-secondary">
-              Yuk, jelajahi katalog dan temukan berbagai perlengkapan outdoor idamanmu!
+              Yuk, jelajahi katalog dan temukan berbagai koleksi pakaian idamanmu!
             </p>
             <div className="mt-6 flex flex-col gap-3 tablet:flex-row tablet:justify-center">
               <Link href="/produk" className={buttonClass({ size: "lg" })}>

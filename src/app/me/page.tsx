@@ -110,7 +110,7 @@ export default async function AccountPage() {
                   {/* Di luar kartu putih: `text-secondary` di atas paper hanya
                       4,45:1, gagal AA untuk teks 16 px (spec §8). */}
                   <p className="mt-3 text-body-md text-text-primary">
-                    Yuk, temukan perlengkapan outdoor idamanmu dan buat pesanan pertamamu!
+                    Yuk, temukan koleksi pakaian idamanmu dan buat pesanan pertamamu!
                   </p>
                   <div className="mt-6 flex flex-col gap-3 tablet:flex-row tablet:justify-center">
                     <Link href="/produk" className={buttonClass({ size: "lg" })}>

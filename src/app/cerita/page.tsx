@@ -207,7 +207,7 @@ export default async function StoryPage() {
             <p className="mt-3 text-body-lg text-text-secondary">
               {catalog && catalog.products.length > 0
                 ? `${catalog.products.length} produk sudah aktif di katalog.`
-                : "Koleksi perlengkapan outdoor terbaik kami sedang disiapkan. Yuk, cek kembali secara berkala!"}
+                : "Koleksi pakaian terbaik kami sedang disiapkan. Yuk, cek kembali secara berkala!"}
             </p>
 
             <div className="mt-6 flex flex-col justify-center gap-3 tablet:flex-row">
