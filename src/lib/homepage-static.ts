@@ -154,18 +154,12 @@ export const HOMEPAGE: HomepageEditorial = {
     chapter: "CHAPTER 01",
     tag: "LOOKBOOK REEL",
     caption: "Suara Langkah Pertama di Ketinggian 601 MDPL",
-    spec: "720P VERTICAL • STEREO AUDIO",
+    spec: null,
     eyebrow: "VISUAL ESSAY // LOOKBOOK DIARY",
     title: "Merekam Sunyi, Embun Pagi, dan Ketangguhan Kain di Lereng Senaru",
     body: "Sebuah pembuka visual yang merangkum ritme hidup di gerbang pendakian Rinjani. Melalui lensa film portrait, kami mengabadikan bagaimana koleksi katun berat dan perlengkapan ekspedisi Palo menyatu dengan kabut hutan lembap, batuan vulkanik, dan langkah kaki para penjelajah.",
     cta_primary_label: "Eksplorasi Koleksi Terkait",
     cta_primary_url: "/produk",
-    facts: [
-      { label: "LOKASI PEREKAMAN", value: "Jalur Senaru, Lombok Utara" },
-      {
-        label: "DESAIN & KELENGKAPAN",
-        value: "Chase The Edge & Crater of Serenity",
-      },
-    ],
+    facts: [],
   },
 };
