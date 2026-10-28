@@ -233,7 +233,7 @@ export default async function HomePage() {
       <section className="bg-surface-paper py-10">
         <Container>
           <p className="max-w-3xl text-body-md leading-relaxed text-text-secondary">
-            Temukan koleksi pakaian pilihan yang siap menemani setiap langkah dan gayamu. Dirancang nyaman dan berkarakter langsung dari Senaru, kaki Gunung Rinjani.
+            Temukan berbagai produk pilihan yang siap menemani setiap langkah dan aktivitasmu. Dirancang nyaman dan berkualitas langsung dari Senaru, kaki Gunung Rinjani.
           </p>
 
           {!catalogAvailable ? (

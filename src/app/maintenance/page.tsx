@@ -6,7 +6,7 @@ import { MaintenanceScreen } from "@/components/maintenance/MaintenanceScreen";
 export const metadata: Metadata = {
   title: "Sedang Dalam Pemeliharaan — Palo Mountain Goods",
   description:
-    "Etalase digital Palo Mountain Goods sedang dalam persiapan peningkatan sistem. Koleksi pakaian dan merchandise lereng Gunung Rinjani.",
+    "Etalase digital Palo Mountain Goods sedang dalam persiapan peningkatan sistem. Produk pilihan langsung dari lereng Gunung Rinjani.",
   robots: {
     index: false,
     follow: false,

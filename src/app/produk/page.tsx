@@ -124,7 +124,7 @@ export default async function CatalogPage({
       <PageHeader
         eyebrow="Katalog resmi"
         title={activeCategoryName ?? "Koleksi & Perlengkapan"}
-        description="Jelajahi koleksi pakaian dan apparel terbaik kami. Yuk, temukan outfit yang pas buat temani keseharian dan gayamu!"
+        description="Jelajahi berbagai produk pilihan terbaik kami. Yuk, temukan barang favorit yang pas buat temani keseharian dan aktivitasmu!"
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Katalog", href: "/produk" },

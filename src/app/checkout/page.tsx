@@ -152,7 +152,7 @@ export default async function CheckoutPage({
         <PageHeader
           eyebrow="Checkout"
           title="Keranjang belanjamu masih kosong"
-          description="Belum ada barang untuk di-checkout. Yuk, temukan koleksi pakaian idamanmu di katalog!"
+          description="Belum ada barang untuk di-checkout. Yuk, temukan produk idamanmu di katalog!"
           breadcrumbs={[
             { name: "Beranda", href: "/" },
             { name: "Keranjang", href: "/keranjang" },

@@ -311,7 +311,7 @@ function describeNextStep(order: OrderDetail): NextStep {
       return {
         waitingForPayment: false,
         title: "Pesanan selesai",
-        body: "Paket sudah sampai di tujuan! Terima kasih sudah mempercayakan pilihan pakaianmu bersama Palo Mountain Goods. Selamat menikmati outfit barumu!",
+        body: "Paket sudah sampai di tujuan! Terima kasih sudah mempercayakan pesananmu bersama Palo Mountain Goods. Selamat menikmati barang barumu!",
       };
 
     case "menunggu_pembayaran":

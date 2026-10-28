@@ -47,7 +47,7 @@ export async function generateMetadata({
   const description =
     product?.short_description ??
     product?.description ??
-    "Detail produk dari katalog Palo Mountain Goods. Temukan koleksi pakaian dan apparel pilihan yang siap menemani gayamu.";
+    "Detail produk dari katalog Palo Mountain Goods. Temukan berbagai produk pilihan yang siap menemani setiap aktivitasmu.";
 
   return buildMetadata({
     title: name,
