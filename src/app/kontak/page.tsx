@@ -11,7 +11,6 @@ import { getBrand, getCurrentUser } from "@/lib/api";
 import { resolveBrand, whatsappLink } from "@/lib/brand";
 import { breadcrumbJsonLd, contactPageJsonLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/metadata";
-import { PLACEHOLDER_BRAND } from "@/lib/placeholders";
 
 /**
  * Toko Senaru & kontak.
@@ -40,7 +39,7 @@ import { PLACEHOLDER_BRAND } from "@/lib/placeholders";
 export const metadata: Metadata = buildMetadata({
   title: "Toko Senaru & Kontak",
   description:
-    "Informasi gerai dan kanal kontak resmi Palo Mountain Goods di Senaru, Lombok Utara. Alamat, nomor WhatsApp Customer Service, dan jam operasional dibaca dari panel admin.",
+    "Informasi gerai dan kanal kontak resmi Palo Mountain Goods di Senaru, Lombok Utara. Hubungi kami via WhatsApp, email, atau kunjungi langsung basecamp kami.",
   path: "/kontak",
 });
 
@@ -79,7 +78,7 @@ export default async function ContactPage() {
       <PageHeader
         eyebrow="Gerai basecamp Senaru"
         title="Toko & kanal kontak resmi"
-        description="Semua data di halaman ini dibaca dari panel admin lewat GET /brand, sehingga dapat diperbarui tanpa deploy ulang. Nilai yang belum diisi ditandai apa adanya."
+        description="Ada pertanyaan soal produk atau pesananmu? Yuk, ngobrol langsung dengan tim kami!"
         breadcrumbs={crumbs}
       />
 
@@ -129,8 +128,8 @@ export default async function ContactPage() {
               ) : (
                 <div className="mt-5">
                   <PlaceholderNotice
-                    title="Tautan peta belum diisi"
-                    body="Alamat lengkap dan tautan peta berasal dari panel admin. Selama belum diisi, halaman ini sengaja tidak menautkan peta mana pun agar tidak mengarahkan orang ke lokasi yang keliru."
+                    title="Info lokasi peta lagi disiapkan"
+                    body="Detail peta digital lagi kami siapkan, ya. Kalau butuh panduan rute ke gerai, kamu bisa langsung hubungi tim kami!"
                   />
                 </div>
               )}
@@ -138,18 +137,16 @@ export default async function ContactPage() {
 
             <div className="mt-4 rounded-lg border border-border-soft bg-surface-white p-5">
               <h3 className="text-title-md text-text-primary">
-                Status data gerai
+                Kunjungi Basecamp Kami
               </h3>
               <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
-                {resolved.isApiBacked
-                  ? "Data di atas berhasil dibaca dari server. Nilai yang masih berupa placeholder berarti admin belum mengisinya."
-                  : "Server belum dapat dihubungi, jadi seluruh data gerai di halaman ini ditampilkan sebagai placeholder."}
+                Basecamp kami di Senaru selalu terbuka untuk konsultasi perlengkapan dan persiapan pendakianmu ke Gunung Rinjani.
               </p>
               <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-                Nama brand resmi:{" "}
-                <code className="rounded-sm bg-surface-sage px-1 py-0.5">
-                  {PLACEHOLDER_BRAND.brandName}
-                </code>
+                Lokasi resmi:{" "}
+                <span className="font-medium text-text-primary">
+                  {resolved.brandName} · Senaru, Lombok Utara
+                </span>
               </p>
             </div>
           </section>
@@ -159,7 +156,7 @@ export default async function ContactPage() {
             <SectionHeading
               eyebrow="Koneksi langsung"
               title="Kanal kontak"
-              description="Pilih kanal yang paling sesuai. Nomor WhatsApp dan email sengaja tidak ditulis langsung di kode agar bisa diubah dari panel admin."
+              description="Pilih kanal yang paling nyaman buatmu. Tim kami siap membantu menjawab pertanyaan seputar produk dan pesanan."
             />
 
             <div className="mt-4 space-y-4">
@@ -189,8 +186,8 @@ export default async function ContactPage() {
                 ) : (
                   <div className="mt-3">
                     <PlaceholderNotice
-                      title="Nomor belum diisi"
-                      body="Nomor CS dikonfigurasi dari panel admin (PRD §3.11). Selama kosong, halaman ini tidak menampilkan nomor telepon dan tidak menautkan ke WhatsApp mana pun."
+                      title="WhatsApp CS segera aktif"
+                      body="Layanan chat via WhatsApp lagi kami siapkan. Yuk, hubungi kami via email atau cek kembali nanti, ya!"
                     />
                   </div>
                 )}
@@ -213,8 +210,8 @@ export default async function ContactPage() {
                 ) : (
                   <div className="mt-3">
                     <PlaceholderNotice
-                      title="Alamat email belum diisi"
-                      body="Alamat email resmi diisi dari panel admin. Selama kosong, halaman ini tidak menampilkan alamat surel karangan."
+                      title="Email kontak segera hadir"
+                      body="Kanal email resmi lagi dipersiapkan untuk melayani pertanyaanmu dengan lebih baik."
                     />
                   </div>
                 )}
@@ -239,8 +236,8 @@ export default async function ContactPage() {
                 ) : (
                   <div className="mt-3">
                     <PlaceholderNotice
-                      title="Akun belum diisi"
-                      body="Tautan Instagram diisi dari panel admin. Mockup lama menuliskan handle langsung di HTML, sehingga tautan itu akan rusak begitu brand mengganti akun."
+                      title="Instagram segera hadir"
+                      body="Keseruan petualangan dan update produk terbaru di Instagram bakal segera hadir buat kamu!"
                     />
                   </div>
                 )}
@@ -250,8 +247,8 @@ export default async function ContactPage() {
             {!hasAnyContact ? (
               <div className="mt-4">
                 <PlaceholderNotice
-                  title="Belum ada kanal kontak aktif"
-                  body="Admin belum mengisi nomor WhatsApp, email, maupun Instagram. Sementara itu, pembeli tetap bisa memesan lewat halaman katalog dan menyelesaikan pesanan lewat WhatsApp dari nomor yang diberikan admin secara langsung."
+                  title="Kanal kontak sedang dipersiapkan"
+                  body="Informasi kontak resmi lagi kami persiapkan. Kamu tetap bisa menjelajahi katalog produk dan memesan perlengkapan favoritmu!"
                   variant="paper"
                 />
               </div>
@@ -279,8 +276,8 @@ export default async function ContactPage() {
                 <InquiryForm defaultName={user?.name ?? ""} />
               ) : (
                 <PlaceholderNotice
-                  title="Nomor WhatsApp CS belum diisi"
-                  body="Formulir pertanyaan hanya ditampilkan setelah admin mengisi nomor Customer Service, karena seluruh pertanyaan diarahkan ke nomor itu."
+                  title="Layanan tanya jawab segera siap"
+                  body="Fitur tanya jawab grosir dan ekspedisi lagi kami persiapkan. Hubungi tim kami langsung untuk info lebih lanjut ya!"
                   variant="paper"
                 />
               )}

@@ -117,8 +117,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
               </p>
             ) : null}
             <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
-              Status kiriman tidak dilacak dari halaman ini. Lacak langsung di
-              situs kurir menggunakan nomor resi di atas.
+              Kamu bisa melacak progres pengiriman paket secara real-time langsung di situs web kurir menggunakan nomor resi di atas, ya.
             </p>
           </section>
         ) : null}
@@ -190,9 +189,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
         )}
 
         <p className="mt-5 border-t border-border-soft pt-4 text-body-sm leading-relaxed text-text-secondary">
-          Status diperbarui oleh webhook dari payment gateway dan oleh admin,
-          keduanya lewat service terpusat (ARSITEKTUR §6). Halaman ini hanya
-          menampilkan hasilnya.
+          Status pesanan diperbarui secara otomatis mengikuti perkembangan terbaru dari tim kami dan pihak ekspedisi.
         </p>
       </section>
 
@@ -225,8 +222,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
           ))}
         </ul>
         <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-          Rincian ini berasal dari snapshot pesanan, bukan dari katalog, jadi
-          tetap lengkap walaupun produknya sudah tidak dijual (PRD §3.5).
+          Rincian barang ini mencatat pesanan aslimu, sehingga tetap tersimpan rapi meski stok produk di katalog sudah berganti.
         </p>
       </section>
     </div>

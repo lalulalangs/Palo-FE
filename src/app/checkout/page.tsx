@@ -28,7 +28,7 @@ import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
 export const metadata: Metadata = buildMetadata({
   title: "Checkout",
   description:
-    "Selesaikan pesanan: pilih alamat, metode pengiriman, dan metode pembayaran. Harga dan stok divalidasi ulang oleh server.",
+    "Selesaikan pesanan: pilih alamat, metode pengiriman, dan metode pembayaran. Yuk, tuntaskan belanjaanmu dengan aman dan praktis!",
   path: "/checkout",
   noIndex: true,
 });
@@ -60,8 +60,8 @@ export default async function CheckoutPage({
       <>
         <PageHeader
           eyebrow="Checkout"
-          title="Masuk untuk melanjutkan"
-          description="Checkout online hanya tersedia untuk pelanggan terdaftar, karena itu halaman ini butuh sesi akun yang valid."
+          title="Yuk, masuk ke akunmu dulu"
+          description="Masuk ke akun untuk melanjutkan checkout otomatis dan nikmati kemudahan berbagai metode pembayaran."
           breadcrumbs={[
             { name: "Beranda", href: "/" },
             { name: "Keranjang", href: "/keranjang" },
@@ -71,8 +71,8 @@ export default async function CheckoutPage({
         <Container className="py-10 tablet:py-14">
           <div className="mx-auto max-w-2xl">
             <PlaceholderNotice
-              title="Sesi akun dibutuhkan"
-              body="Endpoint ongkir dan pembuatan pesanan hanya menerima permintaan dengan token Sanctum. Masuk terlebih dahulu, lalu Anda akan dikembalikan ke halaman checkout."
+              title="Masuk ke Akunmu"
+              body="Yuk, masuk ke akunmu terlebih dahulu untuk melanjutkan proses checkout dan memilih metode pembayaran favoritmu."
             />
             <div className="mt-6 flex flex-col gap-3 tablet:flex-row">
               <Link
@@ -90,17 +90,11 @@ export default async function CheckoutPage({
             </div>
             {redirectTo ? (
               <p className="mt-4 text-body-sm text-text-secondary">
-                Anda datang dari halaman{" "}
-                <code className="rounded-sm bg-surface-sage px-1 py-0.5">
-                  {redirectTo}
-                </code>
-                . Setelah masuk, sistem akan mengarahkan kembali ke sana bila
-                halamannya memang bisa diakses.
+                Setelah masuk, kamu akan langsung diarahkan kembali untuk menyelesaikan pesananmu.
               </p>
             ) : null}
             <p className="mt-4 text-body-sm text-text-secondary">
-              Ingin checkout tanpa akun? Keranjang tetap bisa diselesaikan
-              lewat WhatsApp Customer Service.
+              Mau belanja lebih praktis tanpa bikin akun? Kamu juga bisa pesan langsung via WhatsApp Customer Service kami, lho!
             </p>
             <Link
               href="/keranjang"
@@ -157,8 +151,8 @@ export default async function CheckoutPage({
       <>
         <PageHeader
           eyebrow="Checkout"
-          title="Keranjang masih kosong"
-          description="Tidak ada barang untuk di-checkout. Katalog resmi bisa dibuka tanpa akun."
+          title="Keranjang belanjamu masih kosong"
+          description="Belum ada barang untuk di-checkout. Yuk, temukan perlengkapan outdoor idamanmu di katalog!"
           breadcrumbs={[
             { name: "Beranda", href: "/" },
             { name: "Keranjang", href: "/keranjang" },
@@ -191,8 +185,8 @@ export default async function CheckoutPage({
       <>
         <PageHeader
           eyebrow="Checkout"
-          title="Pesanan belum bisa dilanjutkan"
-          description="Sebagian barang di keranjang perlu disesuaikan dulu sebelum checkout."
+          title="Cek kembali keranjangmu, ya"
+          description="Beberapa barang di keranjangmu perlu disesuaikan sebelum melanjutkan checkout."
           breadcrumbs={[
             { name: "Beranda", href: "/" },
             { name: "Keranjang", href: "/keranjang" },
@@ -205,7 +199,7 @@ export default async function CheckoutPage({
               title="Ada barang yang perlu disesuaikan"
               body={`Barang berikut habis atau jumlahnya melebihi sisa stok: ${blocked
                 .map((item) => item.product_name)
-                .join(", ")}. Sesuaikan di keranjang sebelum melanjutkan.`}
+                .join(", ")}. Yuk, sesuaikan di keranjang sebelum melanjutkan.`}
               variant="paper"
             />
             <Link
@@ -225,7 +219,7 @@ export default async function CheckoutPage({
       <PageHeader
         eyebrow="Checkout pelanggan terdaftar"
         title="Konfirmasi pengiriman dan pembayaran"
-        description="Harga, stok, dan voucher divalidasi ulang oleh server saat pesanan dibuat, memakai nilai terbaru."
+        description="Periksa kembali alamat pengiriman dan pilih metode pembayaran favoritmu. Pesananmu siap kami proses!"
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Keranjang", href: "/keranjang" },
@@ -237,7 +231,7 @@ export default async function CheckoutPage({
         <CheckoutFlow
           cart={items}
           defaultAddress={EMPTY_ADDRESS}
-          userName={user?.name ?? "Akun Anda"}
+          userName={user?.name ?? "Akunmu"}
           userEmail={user?.email ?? "Sesi akun aktif"}
           vouchers={vouchers ?? []}
         />

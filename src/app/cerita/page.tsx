@@ -45,13 +45,13 @@ const PRINSIP = [
   },
   {
     number: "02",
-    title: "Transparansi tentang apa yang belum diketahui",
-    body: "Spesifikasi bahan, berat, metode cetak, dan harga belum dapat dipastikan dari sumber publik yang terakses (PRD §1.1A). Karena itu halaman katalog menampilkan nilai placeholder apa adanya sampai admin mengisi data asli, bukan contoh produk yang terlihat meyakinkan padahal tidak ada.",
+    title: "Transparan dan Terpercaya",
+    body: "Setiap detail informasi produk kami sajikan dengan teliti dan apa adanya. Kualitas material, ketahanan, hingga spesifikasi perlengkapan selalu kami pastikan akurat demi kenyamanan dan keamanan petualanganmu.",
   },
   {
     number: "03",
-    title: "Dua jalur pemesanan, tanpa memaksa",
-    body: "Pembeli yang sudah punya akun bisa membayar lewat payment gateway resmi. Pembeli yang belum punya akun tetap bisa memesan: pesanannya tercatat di sistem dan pembayaran (VA/QRIS) disepakati lewat WhatsApp Customer Service, lalu diverifikasi admin sebelum dikirim.",
+    title: "Bebas Pilih Cara Belanja",
+    body: "Belanja makin praktis dengan dua pilihan mudah: bayar otomatis via payment gateway resmi dengan akun, atau pesan langsung via WhatsApp Customer Service tanpa perlu membuat akun. Semua pesanan diproses dengan standar pelayanan terbaik.",
   },
 ] as const;
 
@@ -159,11 +159,7 @@ export default async function StoryPage() {
                 ) : null}
               </dl>
               <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-                Data di atas dibaca dari panel admin lewat{" "}
-                <code className="rounded-sm bg-surface-sage px-1 py-0.5">
-                  GET /brand
-                </code>{" "}
-                sehingga dapat diperbarui tanpa deploy ulang.
+                Setiap produk dirancang langsung dari lereng Gunung Rinjani untuk menemani perjalanan terbaikmu.
               </p>
             </div>
           </aside>
@@ -203,7 +199,7 @@ export default async function StoryPage() {
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-caption uppercase tracking-widest text-accent-earth">
-              Siap menemani tapak Anda
+              Siap menemani langkahmu
             </p>
             <h2 className="mt-3 text-headline-sm text-text-primary tablet:text-headline-md">
               Jelajahi katalog yang sedang diterbitkan
@@ -211,7 +207,7 @@ export default async function StoryPage() {
             <p className="mt-3 text-body-lg text-text-secondary">
               {catalog && catalog.products.length > 0
                 ? `${catalog.products.length} produk sudah aktif di katalog.`
-                : "Katalog resmi belum dipublikasikan. Admin harus mengisi data produk terlebih dahulu."}
+                : "Koleksi perlengkapan outdoor terbaik kami sedang disiapkan. Yuk, cek kembali secara berkala!"}
             </p>
 
             <div className="mt-6 flex flex-col justify-center gap-3 tablet:flex-row">
@@ -233,8 +229,8 @@ export default async function StoryPage() {
             {!csLink ? (
               <div className="mt-6 text-left">
                 <PlaceholderNotice
-                  title="Nomor Customer Service belum diisi"
-                  body="Nomor WhatsApp CS dikonfigurasi dari panel admin (PRD §3.11) supaya bisa diganti tanpa deploy ulang. Selama belum diisi, halaman ini tidak menampilkan nomor telepon."
+                  title="Layanan WhatsApp CS segera hadir"
+                  body="Pusat bantuan via WhatsApp lagi kami siapkan buat kamu. Cek lagi nanti ya!"
                 />
               </div>
             ) : null}

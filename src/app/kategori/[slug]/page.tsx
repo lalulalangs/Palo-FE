@@ -54,8 +54,8 @@ export async function generateMetadata({
         ? "Kategori tidak ditemukan"
         : "Kategori belum dapat dimuat",
       description: unknown
-        ? "Kategori yang Anda cari tidak ada di katalog aktif."
-        : "Daftar kategori belum dapat dibaca dari server. Halaman ini menampilkan nilai placeholder, bukan daftar kategori karangan.",
+        ? "Kategori yang kamu cari belum tersedia di katalog aktif."
+        : "Informasi kategori produk lagi disiapkan. Yuk, coba cek beberapa saat lagi!",
       path: `/kategori/${slug}`,
       noIndex: true,
     });
@@ -63,7 +63,7 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: category.name,
-    description: `Produk dalam kategori ${category.name} dari Palo Mountain Goods, Senaru. Harga dan stok dibaca langsung dari server; filter dan urutan pilihan tersimpan di URL.`,
+    description: `Temukan koleksi pilihan ${category.name} dari Palo Mountain Goods untuk melengkapi setiap aktivitas luar ruanganmu.`,
     path: `/kategori/${category.slug}`,
   });
 }
@@ -136,10 +136,10 @@ export default async function CategoryPage({
         }
         description={
           category
-            ? "Harga dan stok di bawah dibaca langsung dari server. Filter dan urutan pilihan tersimpan di URL sehingga tautannya bisa dibagikan."
+            ? `Temukan pilihan terbaik ${category.name} dari Palo Mountain Goods. Yuk, pilih perlengkapan favoritmu!`
             : slugKnown
-              ? "Kategori ini tidak ada di katalog aktif."
-              : "Daftar kategori belum dapat dibaca dari server, jadi halaman ini tidak menampilkan kategori apa pun. Nama kategori di URL belum bisa diverifikasi dan tidak dapat dipastikan ada atau tidak."
+              ? "Kategori ini belum tersedia di katalog aktif."
+              : "Informasi kategori ini sedang disiapkan. Yuk, cek kategori pilihan lainnya di katalog!"
         }
         breadcrumbs={crumbs}
         aside={
@@ -168,7 +168,7 @@ export default async function CategoryPage({
               <p role="status" aria-live="polite" className="text-label-md text-text-secondary">
                 {apiAvailable
                   ? `Menampilkan ${formatAngka(products.length)} dari ${formatAngka(meta?.total ?? 0)} produk`
-                  : "Katalog belum dapat dimuat dari server."}
+                  : "Katalog belum dapat dimuat saat ini. Yuk, coba beberapa saat lagi!"}
               </p>
               <Suspense fallback={null}>
                 <CatalogSort value={effective.sort} />
@@ -186,7 +186,7 @@ export default async function CategoryPage({
                 }
                 emptyBody={
                   apiAvailable
-                    ? "Kategori ini masih kosong. Katalog resmi harus diisi admin lebih dulu (PRD §1.1A & §6A)."
+                    ? "Produk untuk kategori ini sedang kami siapkan. Yuk, cek kategori seru lainnya!"
                     : API_UNAVAILABLE_NOTICE
                 }
               />

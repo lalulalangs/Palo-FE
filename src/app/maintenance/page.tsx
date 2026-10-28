@@ -4,9 +4,9 @@ import { resolveBrand } from "@/lib/brand";
 import { MaintenanceScreen } from "@/components/maintenance/MaintenanceScreen";
 
 export const metadata: Metadata = {
-  title: "Sedang Dalam Pengembangan — Palo Mountain Goods",
+  title: "Sedang Dalam Pemeliharaan — Palo Mountain Goods",
   description:
-    "Etalase digital Palo Mountain Goods sedang dalam persiapan peluncuran. Perlengkapan luar ruang dan kopi lereng Gunung Rinjani.",
+    "Etalase digital Palo Mountain Goods sedang dalam persiapan peningkatan sistem. Perlengkapan luar ruang dan kopi lereng Gunung Rinjani.",
   robots: {
     index: false,
     follow: false,

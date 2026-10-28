@@ -229,27 +229,16 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* ---- Catatan jujur tentang data yang belum dikonfirmasi ----
-       *
-       * Halaman ini dibangun dari API, jadi nama, harga, dan stok selalu
-       * dibaca dari server. Yang masih placeholder adalah bahan dan berat —
-       * karena tidak terlihat di foto dan belum dikonfirmasi pemilik.
-       */}
+      {/* ---- Ajakan eksplorasi produk ---- */}
       <section className="bg-surface-paper py-10">
         <Container>
-          <p className="max-w-3xl text-body-sm leading-relaxed text-text-secondary">
-            Halaman ini dibangun di atas{" "}
-            <code className="rounded-sm bg-surface-sage px-1 py-0.5 text-body-sm">
-              KONTRAK-API.md
-            </code>{" "}
-            sehingga nama, harga, dan stok selalu dibaca dari server — tidak ada
-            satu pun yang ditulis manual di kode. Sisa bahan dan berat masih
-            placeholder karena belum dikonfirmasi pemilik.
+          <p className="max-w-3xl text-body-md leading-relaxed text-text-secondary">
+            Temukan perlengkapan outdoor pilihan yang siap menemani setiap langkah petualanganmu. Dirancang tangguh dan nyaman langsung dari Senaru, kaki Gunung Rinjani.
           </p>
 
           {!catalogAvailable ? (
             <PlaceholderNotice
-              title="Katalog belum dapat dimuat"
+              title="Koleksi produk lagi disiapkan"
               body={API_UNAVAILABLE_NOTICE}
               className="mt-4"
             />

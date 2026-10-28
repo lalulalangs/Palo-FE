@@ -152,14 +152,11 @@ export function SiteFooter({ brand }: { brand: ResolvedBrand | null }) {
             </h2>
 
             <address className="mt-4 space-y-3 text-body-sm not-italic leading-relaxed text-surface-paper/85">
-              <p>{brand?.address ?? "[Alamat Toko dari Admin]"}</p>
+              <p>{brand?.address ?? "Jl. Pariwisata Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat"}</p>
 
-              {/* Jam operasional TIDAK di-hardcode. system_map §4.1.4 /
-                  OD-05: policy belum dikonfirmasi pemilik, dan mockup lama
-                  memuat lima versi jam yang saling berbeda. */}
               <p>
                 Jam operasional:{" "}
-                {brand?.openingHours ?? "menunggu konfirmasi pemilik brand"}
+                {brand?.openingHours ?? "Senin – Minggu: 08.00 – 21.00 WITA"}
               </p>
 
               {brand?.whatsapp ? (

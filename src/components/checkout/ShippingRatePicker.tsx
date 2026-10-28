@@ -36,8 +36,7 @@ export function ShippingRatePicker({
       </legend>
 
       <p className="mt-1 text-body-sm text-text-secondary">
-        Ongkos dihitung ulang di server setiap kali alamat atau isi keranjang
-        berubah.
+        Ongkos kirim akan otomatis dihitung ulang setiap kali kamu mengubah alamat atau jumlah pesanan.
       </p>
 
       <div className="mt-4 space-y-3">

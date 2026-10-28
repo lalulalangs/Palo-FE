@@ -13,7 +13,6 @@ import { getBrand, getProduct, getProducts } from "@/lib/api";
 import { breadcrumbJsonLd, productJsonLd } from "@/lib/jsonld";
 import type { BreadcrumbItem } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/metadata";
-import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
 
 /**
  * Detail produk.
@@ -48,7 +47,7 @@ export async function generateMetadata({
   const description =
     product?.short_description ??
     product?.description ??
-    "Detail produk dari katalog Palo Mountain Goods. Harga dan stok dibaca langsung dari server.";
+    "Detail produk dari katalog Palo Mountain Goods. Temukan perlengkapan outdoor pilihan yang siap menemani setiap petualanganmu.";
 
   return buildMetadata({
     title: name,
@@ -93,7 +92,7 @@ export default async function ProductDetailPage({
         <div className="mx-auto max-w-2xl">
           <PlaceholderNotice
             title="Detail produk belum dapat dimuat"
-            body={`${API_UNAVAILABLE_NOTICE} Jika produk ini memang tidak lagi diterbitkan, tautannya akan ditandai tidak ditemukan setelah server dapat dihubungi.`}
+            body="Detail produk ini lagi ada kendala saat dimuat. Yuk, coba muat ulang halaman atau cari perlengkapan serupa di katalog kami!"
             variant="paper"
           />
           <Link
@@ -179,8 +178,8 @@ export default async function ProductDetailPage({
           ) : (
             <div className="mt-3 max-w-2xl">
               <PlaceholderNotice
-                title="Deskripsi belum diisi"
-                body="PRD §1.1A: deskripsi, bahan, dan spesifikasi produk belum dapat dipastikan dari sumber publik yang terakses. Admin harus mengisinya sebelum dipublikasikan."
+                title="Deskripsi produk lagi disiapkan"
+                body="Detail spesifikasi dan keunggulan bahan untuk produk ini sedang kami siapkan. Yuk, hubungi Customer Service kami jika ada pertanyaan!"
               />
             </div>
           )}
@@ -189,13 +188,13 @@ export default async function ProductDetailPage({
             Tautan teks, bukan tombol sekunder: CTA primer tetap satu.
           */}
           <p className="mt-4 max-w-3xl text-body-md text-text-secondary">
-            Ada pertanyaan soal ukuran atau ketersediaan sebelum memesan?
+            Butuh rekomendasi ukuran atau info ketersediaan barang?
           </p>
           <Link
             href="/kontak"
             className="mt-1 inline-flex min-h-11 items-center text-label-md font-semibold text-brand-forest underline underline-offset-4 transition-colors hover:text-brand-deep"
           >
-            Tanya Customer Service →
+            Yuk, tanya Customer Service →
           </Link>
         </section>
       </Container>

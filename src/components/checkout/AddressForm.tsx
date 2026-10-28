@@ -116,6 +116,7 @@ export function AddressForm({
         id="recipient_name"
         name="recipient_name"
         label="Nama penerima"
+        hint="Tulis nama lengkap penerima biar paketmu nggak salah alamat."
         autoComplete="name"
         required
         maxLength={120}
@@ -131,7 +132,7 @@ export function AddressForm({
         type="tel"
         inputMode="tel"
         label="Nomor telepon penerima"
-        hint="Dipakai kurir untuk menghubungi bila perlu."
+        hint="Pastikan nomor telepon aktif agar kurir gampang menghubungi saat pengantaran."
         autoComplete="tel"
         required
         maxLength={32}
@@ -145,7 +146,7 @@ export function AddressForm({
         id="street"
         name="street"
         label="Alamat lengkap"
-        hint="Nama jalan, nomor, dan patokan yang mudah ditemukan kurir."
+        hint="Tulis nama jalan, nomor rumah, RT/RW, hingga patokan biar kurir gampang temukan lokasimu."
         autoComplete="street-address"
         required
         maxLength={500}
@@ -166,7 +167,7 @@ export function AddressForm({
         id="postal_code"
         name="postal_code"
         label="Kode pos"
-        hint="Terisi otomatis dari wilayah yang dipilih. Boleh diubah."
+        hint="Terisi otomatis sesuai wilayah pilihanmu. Bisa disesuaikan jika perlu."
         autoComplete="postal-code"
         inputMode="numeric"
         maxLength={10}
@@ -180,7 +181,7 @@ export function AddressForm({
         id="notes"
         name="notes"
         label="Catatan untuk kurir (opsional)"
-        placeholder="Contoh: titip ke pos jaga di depan gerbang."
+        placeholder="Contoh: Tolong bungkus rapi ya, Kak."
         maxLength={500}
         disabled={isDisabled}
         value={values.notes ?? ""}
@@ -190,7 +191,7 @@ export function AddressForm({
 
       {errorCount > 0 ? (
         <p role="alert" className="text-body-sm font-semibold text-feedback-error">
-          {errorCount} isian perlu diperbaiki sebelum ongkir dihitung.
+          Ada isian yang perlu diperiksa lagi sebelum ongkir dihitung, ya.
         </p>
       ) : null}
 
@@ -223,7 +224,7 @@ export function AddressForm({
               : quoteError.kind === "rate-limit"
                 ? "Terlalu banyak percobaan"
                 : quoteError.kind === "auth"
-                  ? "Sesi Anda berakhir"
+                  ? "Sesi masukmu berakhir"
                   : "Ongkir belum dapat dihitung"}
           </p>
           <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
@@ -232,7 +233,7 @@ export function AddressForm({
               ? " Pilih satu hasil dari pencarian agar ongkir dihitung ke kecamatan yang benar."
               : ""}
             {quoteError.kind === "courier"
-              ? " Ongkos tidak dikarang, jadi proses berhenti di sini sampai layanan kurir merespons."
+              ? " Layanan kurir sedang menyiapkan tarif pengiriman terbaik. Coba beberapa saat lagi, ya!"
               : ""}
           </p>
         </div>
@@ -260,8 +261,7 @@ export function AddressForm({
         muncul di sini sampai kebijakan pemilik dikonfirmasi.
       */}
       <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-        Saat ini seluruh pesanan dikirim via kurir. Layanan pengambilan di
-        gerai belum diaktifkan.
+        Pesananmu akan dikirimkan langsung ke alamat tujuan melalui ekspedisi terpercaya.
       </p>
     </form>
   );

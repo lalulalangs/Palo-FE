@@ -358,9 +358,7 @@ export function CheckoutFlow({
                 di sana.
               */}
               <p className="mt-4 rounded-md border border-border-soft bg-surface-paper p-4 text-label-sm leading-relaxed text-text-secondary">
-                Pembayaran diproses lewat halaman DOKU yang aman. Kanal
-                pembayaran (QRIS, Virtual Account, e-wallet, atau kartu kredit)
-                dipilih di sana setelah pesanan dibuat.
+                Tersedia berbagai metode pembayaran aman dan praktis (QRIS, Virtual Account, E-Wallet, atau Kartu Kredit) yang bisa kamu pilih di halaman pembayaran selanjutnya.
               </p>
 
               <div className="mt-6">
@@ -487,9 +485,7 @@ export function CheckoutFlow({
               </div>
 
               <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-                Harga, stok, dan voucher divalidasi ulang oleh server saat tombol
-                ditekan, memakai nilai terbaru — bukan angka yang dikirim dari
-                peramban ini (PRD §3.6).
+                Dengan menekan tombol Buat Pesanan, kamu akan diarahkan ke halaman pembayaran yang aman untuk menyelesaikan transaksi.
               </p>
             </section>
           ) : null}

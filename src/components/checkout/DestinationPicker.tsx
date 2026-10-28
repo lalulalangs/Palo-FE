@@ -31,13 +31,13 @@ const SEARCH_ID = "destination_search";
 const RESULT_ID = "destination_search-result";
 
 const HINT =
-  "Ketik minimal 3 karakter kecamatan, kota, atau kode pos (misal: Senaru, Gambir, atau 83354).";
-const SHORT_HINT = "Ketik 1 karakter lagi untuk mulai mencari.";
-const EMPTY_HINT = "Coba nama kecamatan lain, kota terdekat, atau kode pos.";
+  "Tulis minimal 3 huruf nama kecamatan, kota, atau kode pos (contoh: Senaru atau 83354).";
+const SHORT_HINT = "Ketik 1 huruf lagi untuk mencari wilayahmu.";
+const EMPTY_HINT = "Yuk, coba cari dengan nama kecamatan atau kota terdekat.";
 const NETWORK_COPY =
-  "Pencarian wilayah belum bisa dilakukan karena layanan sedang tidak dapat dihubungi.";
+  "Pencarian wilayah lagi ada kendala sejenak. Tenang, kamu bisa coba lagi sesaat lagi.";
 const UNAVAILABLE_COPY =
-  "Coba lagi beberapa menit lagi. Kalau tetap gagal, hubungi Customer Service.";
+  "Yuk, coba beberapa saat lagi atau hubungi tim Customer Service kami!";
 
 const POPULAR_DESTINATIONS = [
   "Senaru",

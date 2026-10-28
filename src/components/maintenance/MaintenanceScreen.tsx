@@ -19,38 +19,38 @@ export function MaintenanceScreen({ brand }: MaintenanceScreenProps) {
         {/* Status Pill Badge */}
         <div className="mb-5">
           <Badge tone="brand" className="px-3 py-1 font-mono text-label-sm uppercase tracking-wider">
-            System Status: Under Active Development
+            Sedang Ditingkatkan
           </Badge>
         </div>
 
-        {/* Technical & Explicit Headline (Satu Baris Penuh) */}
-        <h1 className="w-full font-headline text-title-lg tablet:text-display-lg text-text-primary tracking-tight whitespace-nowrap">
-          Sistem Sedang Dalam Pengembangan
+        {/* Headline */}
+        <h1 className="w-full font-headline text-title-lg tablet:text-display-lg text-text-primary tracking-tight">
+          Website Sedang Dalam Pemeliharaan
         </h1>
 
-        {/* Technical & To-the-point Copywriting */}
+        {/* Friendly Microcopy */}
         <div className="mt-8 w-full max-w-2xl text-left border border-border-soft bg-surface-white p-6 rounded-lg shadow-editorial">
           <p className="text-body-md text-text-primary leading-relaxed">
-            Platform e-commerce dan integrasi layanan transaksi publik Palo Mountain Goods saat ini sedang dalam fase finalisasi sistem, konfigurasi payment gateway, dan sinkronisasi basis data inventaris.
+            Palo Mountain Goods sedang menyiapkan pengalaman belanja perlengkapan outdoor yang lebih nyaman, cepat, dan praktis buat kamu. Kami akan segera kembali menemani langkah petualanganmu!
           </p>
-          <div className="mt-4 pt-4 border-t border-border-soft flex flex-col gap-2 font-mono text-body-sm text-text-secondary">
+          <div className="mt-4 pt-4 border-t border-border-soft flex flex-col gap-2 text-body-sm text-text-secondary">
             <div>
-              <span className="text-brand-forest font-semibold">● ENVIRONMENT:</span> PRODUCTION STABLE
+              <span className="text-brand-forest font-semibold">● Status Layanan:</span> Pembaruan sistem berkala
             </div>
             <div>
-              <span className="text-brand-forest font-semibold">● ACCESS RESTRICTION:</span> PUBLIC STOREFRONT DISABLED
+              <span className="text-brand-forest font-semibold">● Etalase Toko:</span> Segera hadir kembali
             </div>
             <div>
-              <span className="text-brand-forest font-semibold">● CORE SERVICES:</span> API V1 & ADMIN PANEL ONLINE
+              <span className="text-brand-forest font-semibold">● Pesanan Masuk:</span> Tetap diproses aman oleh tim kami
             </div>
           </div>
         </div>
 
-        {/* Informasi Kontak Ringkas */}
+        {/* Informasi Kontak */}
         <p className="mt-8 text-body-sm text-text-secondary">
-          Untuk keperluan mendesak atau verifikasi sistem, hubungi administrator via{" "}
+          Ada pertanyaan seputar pesanan atau butuh info lebih lanjut? Yuk, hubungi tim kami via{" "}
           <span className="text-text-primary font-medium">
-            {brand.email ?? "admin@palorinjani.com"}
+            {brand.email ?? "halo@palorinjani.com"}
           </span>
         </p>
       </Container>

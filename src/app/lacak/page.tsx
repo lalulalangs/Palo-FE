@@ -29,7 +29,7 @@ import { buildMetadata } from "@/lib/metadata";
 export const metadata: Metadata = buildMetadata({
   title: "Lacak Pesanan",
   description:
-    "Periksa status pesanan Palo Mountain Goods berdasarkan nomor pesanan. Riwayat status dibaca dari catatan pesanan Anda sendiri.",
+    "Periksa status pesanan Palo Mountain Goods berdasarkan nomor pesanan dengan mudah dan praktis.",
   path: "/lacak",
   noIndex: true,
 });
@@ -47,7 +47,7 @@ export default async function TrackOrderPage({
       <PageHeader
         eyebrow="Status pesanan"
         title="Lacak pesanan"
-        description="Masukkan nomor pesanan untuk melihat riwayat status. Halaman ini membaca catatan pesanan milik akun yang sedang masuk."
+        description="Masukkan nomor pesanan untuk melihat riwayat status pesananmu secara langsung."
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Lacak pesanan", href: "/lacak" },
@@ -70,8 +70,8 @@ export default async function TrackOrderPage({
             {!isLoggedIn ? (
               <div className="space-y-4">
                 <PlaceholderNotice
-                  title="Masuk untuk melihat pesanan"
-                  body="Backend hanya mengembalikan pesanan milik pengguna yang sedang login, jadi halaman ini tidak bisa mengonfirmasi keberadaan nomor pesanan milik orang lain."
+                  title="Masuk ke Akunmu"
+                  body="Yuk, masuk ke akunmu untuk melihat riwayat perjalanan paket dan status pesanan dengan lengkap!"
                 />
                 <div className="flex flex-col gap-3 tablet:flex-row">
                   <Link
@@ -93,17 +93,13 @@ export default async function TrackOrderPage({
               </div>
             ) : (
               <PlaceholderNotice
-                title="Nomor pesanan ada di riwayat akun"
-                body="Nomor pesanan dikirim setelah checkout berhasil, dan tetap dapat dibuka kapan pun dari halaman ini selama Anda memakai akun yang memesan."
+                title="Lacak Paketmu Lebih Mudah"
+                body="Nomor pesanan bisa kamu temukan di riwayat belanja atau email konfirmasi pesananmu."
               />
             )}
 
             <p className="mt-6 text-body-sm leading-relaxed text-text-secondary">
-              Nomor resi dan tautan pelacakan ke situs kurir sengaja tidak
-              ditampilkan di sini. Nomor resi baru diisi admin saat pesanan
-              berstatus &ldquo;Dikirim&rdquo; (PRD §3.9), dan tidak ada endpoint
-              pelacakan kiriman di backend — menampilkan tautan dengan nomor
-              karangan akan mengarahkan orang ke halaman yang salah.
+              Nomor resi pengiriman akan otomatis tertera setelah pesananmu diserahkan ke pihak ekspedisi. Pastikan untuk cek status secara berkala, ya!
             </p>
           </aside>
         </div>

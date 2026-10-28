@@ -27,7 +27,7 @@ import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
  * frontend akan berbohong soal total.
  */
 const KOLEKSI_DESCRIPTION =
-  "Kumpulan produk yang dikurasi Palo Mountain Goods. Nama, tagline, jumlah produk, dan banner di halaman ini dibaca langsung dari server.";
+  "Koleksi pilihan dari Palo Mountain Goods. Yuk, pilih perlengkapan favorit yang paling pas buat aktivitasmu!";
 
 export async function generateMetadata(): Promise<Metadata> {
   // Backend mati tidak boleh diindeks sebagai halaman koleksi normal, tapi
@@ -108,8 +108,8 @@ export default async function KoleksiPage() {
           <div className="space-y-6">
             <PlaceholderNotice
               variant="sage"
-              title="Belum ada koleksi yang tayang"
-              body="Server belum mengembalikan koleksi aktif. Halaman ini hanya menampilkan koleksi yang sudah diterbitkan admin."
+              title="Koleksi baru lagi disiapkan"
+              body="Kami sedang menyiapkan deretan koleksi terbaru buat petualanganmu. Yuk, cek katalog produk lainnya dulu!"
             />
             <Link
               href="/produk"

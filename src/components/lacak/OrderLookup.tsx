@@ -65,7 +65,7 @@ export function OrderLookup({ initialOrder }: { initialOrder: string }) {
           id="order-number"
           name="order"
           label="Nomor pesanan"
-          hint="Nomor pesanan dikirim setelah checkout berhasil, dan juga muncul di riwayat pesanan."
+          hint="Tuliskan nomor pesanan yang tertera di riwayat belanja atau email konfirmasimu."
           autoCapitalize="characters"
           autoComplete="off"
           required
@@ -90,15 +90,15 @@ export function OrderLookup({ initialOrder }: { initialOrder: string }) {
       <div role="status" aria-live="polite" className="space-y-4">
         {result?.requiresLogin ? (
           <PlaceholderNotice
-            title="Masuk dulu untuk melihat pesanan"
-            body="Nomor pesanan hanya bisa dilihat oleh akun yang membuatnya, jadi halaman ini tidak mengonfirmasi apakah nomor tersebut ada. Masuk terlebih dahulu, lalu coba lagi."
+            title="Masuk ke Akunmu"
+            body="Untuk keamanan data privasi, detail pesanan hanya dapat dilihat setelah kamu masuk ke akunmu. Yuk, masuk sekarang!"
           />
         ) : null}
 
         {result && !result.requiresLogin && !result.found ? (
           <PlaceholderNotice
             title="Pesanan tidak ditemukan"
-            body="Tidak ada pesanan milik sesi ini dengan nomor tersebut. Periksa kembali penulisan nomor, atau masuk dengan akun yang sama saat memesan."
+            body="Nomor pesanan belum ditemukan. Pastikan format nomor pesanan sudah benar atau masuk dengan akun yang kamu gunakan saat belanja, ya."
             variant="paper"
           />
         ) : null}

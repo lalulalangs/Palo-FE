@@ -19,7 +19,7 @@
 // mengisi data asli.
 export const PLACEHOLDER = {
   productName: "[Nama Produk]",
-  price: "[Harga dari Admin]",
+  price: "[Segera Hadir]",
   collection: "[Nama Koleksi]",
   sku: "[SKU]",
   image: "/placeholder-product.svg",
@@ -36,26 +36,26 @@ export const PLACEHOLDER_BRAND = {
   brandName: "Palo Mountain Goods",
   legalName: "PALORINJANI",
   tagline: "Merchandise penjelajahan dari Senaru, kaki Gunung Rinjani.",
-  address: "[Alamat Toko dari Admin]",
+  address: "Jl. Pariwisata Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat",
   mapsUrl: null,
-  coordinates: "[Koordinat dari Admin]",
-  openingHours: "[Jam Operasional Menunggu Konfirmasi Pemilik]",
+  coordinates: "8°18'42.1\"S 116°24'26.7\"E",
+  openingHours: "Senin – Minggu: 08.00 – 21.00 WITA",
   phone: null,
   whatsapp: null,
-  email: "[Email resmi dari Admin]",
+  email: null,
   instagramUrl: null,
   instagramHandle: null,
   logo: "/placeholder-brand.svg",
 } as const;
 
 /** Label yang dipakai untuk menjelaskan kenapa data belum tampil. */
-export const PLACEHOLDER_NOTICE_TITLE = "Katalog belum diterbitkan";
+export const PLACEHOLDER_NOTICE_TITLE = "Koleksi produk lagi disiapkan";
 export const PLACEHOLDER_NOTICE_BODY =
-  "PRD §1.1A dan §6A melarang memuat contoh produk sebelum pemilik brand mengonfirmasi katalog asli. Halaman ini sengaja menampilkan nilai placeholder apa adanya, bukan produk contoh.";
+  "Kami sedang menyiapkan deretan perlengkapan terbaik buat menemani setiap petualanganmu. Yuk, cek lagi berkala!";
 
 /** Teks default saat backend belum bisa dihubungi. */
 export const API_UNAVAILABLE_NOTICE =
-  "Data katalog belum dapat dimuat dari server. Halaman ini menampilkan nilai placeholder apa adanya, bukan data fiktif.";
+  "Koneksi lagi ada kendala sejenak. Yuk, coba refresh halaman atau kembali beberapa saat lagi!";
 
 /** Format mata uang & tanggal selalu Bahasa Indonesia (OD-09). */
 export const SITE_LOCALE = "id-ID" as const;

@@ -111,8 +111,8 @@ export default async function OrderDetailPage({
               }
               body={
                 notFound
-                  ? "Server hanya mengembalikan pesanan milik akun yang sedang masuk. Nomor ini mungkin bukan milik akun Anda, atau tertulis berbeda dengan yang ada di riwayat pesanan."
-                  : "Server belum bisa dihubungi. Pesanan Anda tetap tersimpan — status pembayaran tidak berubah karena halaman ini gagal dimuat. Coba muat ulang beberapa saat lagi."
+                  ? "Nomor pesanan belum ditemukan di akunmu. Cek kembali riwayat pesanan atau pastikan nomor pesanan sudah sesuai, ya."
+                  : "Koneksi lagi ada kendala sejenak. Jangan khawatir, pesananmu tetap tersimpan aman. Coba muat ulang halaman beberapa saat lagi ya!"
               }
             />
             <div className="flex flex-col gap-3 tablet:flex-row">
@@ -170,10 +170,8 @@ export default async function OrderDetailPage({
 
           {detail.needs_reconciliation ? (
             <p className="rounded-lg border border-feedback-error/40 bg-surface-paper p-4 text-body-md text-text-primary">
-              <span className="font-semibold">Pembayaran perlu dicek.</span>{" "}
-              Customer service sedang mencocokkan pembayaran ini dengan pesanan
-              Anda. Jangan bayar ulang sebelum menghubungi kami dengan nomor
-              pesanan di atas.
+              <span className="font-semibold">Pembayaran sedang kami verifikasi.</span>{" "}
+              Tim Customer Service kami lagi mencocokkan data pembayaranmu. Nggak perlu bayar ulang ya, kamu bisa hubungi kami dengan menyebutkan nomor pesanan di atas jika butuh bantuan!
             </p>
           ) : null}
 
@@ -291,73 +289,73 @@ function describeNextStep(order: OrderDetail): NextStep {
     case "dibayar":
       return {
         waitingForPayment: false,
-        title: "Pembayaran diterima",
-        body: "Pembayaran Anda sudah tercatat dan pesanan akan disiapkan. Nomor resi muncul di halaman ini setelah paket diserahkan ke kurir. Tidak ada yang perlu Anda lakukan sekarang.",
+        title: "Pembayaran berhasil!",
+        body: "Hore! Pembayaranmu sudah kami terima dan pesanan segera disiapkan. Kamu bisa santai dulu, nomor resi bakal muncul di sini begitu paket dijemput kurir.",
       };
 
     case "diproses":
       return {
         waitingForPayment: false,
         title: "Pesanan sedang disiapkan",
-        body: "Pembayaran sudah masuk dan pesanan sedang dikemas. Nomor resi muncul di halaman ini begitu paket diserahkan ke kurir.",
+        body: "Barangmu lagi disiapkan dan dikemas dengan rapi oleh tim kami. Nomor resi bakal otomatis terupdate di sini begitu paket diserahkan ke kurir, ya.",
       };
 
     case "dikirim":
       return {
         waitingForPayment: false,
-        title: "Pesanan sudah dikirim",
-        body: "Paket sudah diserahkan ke kurir. Nomor resi, kalau sudah diisi admin, ada di bagian detail di bawah — pelacakan dilakukan di situs kurir, bukan di halaman ini.",
+        title: "Paket sedang dalam perjalanan",
+        body: "Paketmu sudah meluncur bersama kurir! Nomor resi bisa kamu cek pada detail pengiriman di bawah untuk pelacakan langsung di situs kurir.",
       };
 
     case "selesai":
       return {
         waitingForPayment: false,
         title: "Pesanan selesai",
-        body: "Pesanan ini sudah diterima dan ditutup. Simpan nomor pesanan ini kalau Anda perlu menghubungi customer service soal pesanan tersebut.",
+        body: "Paket sudah sampai di tujuan! Terima kasih sudah mempercayakan perlengkapan outdoor-mu bersama Palo Mountain Goods. Selamat bertualang!",
       };
 
     case "menunggu_pembayaran":
       return {
         waitingForPayment: true,
-        title: "Pembayaran belum selesai",
+        title: "Menunggu pembayaran",
         body: order.payment
-          ? "Instruksi pembayaran dari payment gateway ada di bagian bawah halaman ini. Pesanan diproses setelah pembayaran terkonfirmasi otomatis oleh gateway — biasanya beberapa menit setelah Anda membayar."
-          : "Payment gateway belum mengirim instruksi untuk pesanan ini. Muat ulang halaman sebentar lagi; kalau tetap kosong, hubungi customer service dengan menyebutkan nomor pesanan.",
+          ? "Yuk, selesaikan pembayaranmu sesuai panduan di bawah. Pesananmu bakal otomatis diproses begitu pembayaran terverifikasi!"
+          : "Panduan pembayaran lagi disiapkan. Yuk, coba refresh halaman sebentar lagi atau hubungi tim Customer Service kami kalau butuh bantuan!",
       };
 
     case "menunggu_konfirmasi_cs":
       return {
         waitingForPayment: true,
-        title: "Menunggu konfirmasi customer service",
-        body: "Pesanan ini dicatat lewat jalur WhatsApp, jadi pembayarannya diverifikasi manual oleh customer service — bukan otomatis oleh gateway. Status di halaman ini berubah setelah verifikasi selesai.",
+        title: "Menunggu konfirmasi CS",
+        body: "Pesananmu diproses lewat jalur WhatsApp dan sedang diverifikasi oleh Customer Service kami. Status di halaman ini bakal otomatis terupdate setelah konfirmasi selesai, ya.",
       };
 
     case "expired":
       return {
         waitingForPayment: false,
-        title: "Pesanan kedaluwarsa",
-        body: "Batas waktu pembayaran terlewat, jadi pesanan ditutup dan stoknya dilepas kembali ke katalog. Kalau Anda masih ingin barang ini, buat pesanan baru dari keranjang — pesanan lama tidak bisa dibayar lagi.",
+        title: "Waktu pembayaran berakhir",
+        body: "Batas waktu pembayaran untuk pesanan ini sudah lewat, jadi stoknya dikembalikan ke katalog. Kamu masih bisa pesan ulang barang favoritmu lewat keranjang, ya!",
       };
 
     case "dibatalkan":
       return {
         waitingForPayment: false,
         title: "Pesanan dibatalkan",
-        body: "Pesanan ini sudah dibatalkan, jadi tidak ada pembayaran yang perlu diselesaikan. Kalau pembatalan ini tidak Anda minta, hubungi customer service dengan menyebutkan nomor pesanan di atas.",
+        body: "Pesanan ini sudah dibatalkan. Kalau pembatalan ini terjadi di luar rencanamu atau butuh bantuan lebih lanjut, yuk hubungi Customer Service dengan menyebutkan nomor pesanan di atas!",
       };
 
     case "needs_reconciliation":
       return {
         waitingForPayment: false,
-        title: "Pembayaran sedang dicocokkan",
-        body: "Gateway mengirim sinyal pembayaran yang belum cocok dengan pesanan ini, jadi customer service memeriksanya manual. Jangan bayar ulang sebelum ada konfirmasi dari kami.",
+        title: "Pembayaran sedang diverifikasi",
+        body: "Tim kami sedang mencocokkan konfirmasi pembayaranmu. Nggak perlu bayar ulang ya, kami akan segera infokan status terbarunya buat kamu!",
       };
 
     default:
       return {
         waitingForPayment: false,
         title: `Status pesanan: ${labelStatusOrder(order.status)}`,
-        body: "Status ini belum punya penjelasan khusus di halaman ini. Hubungi customer service dengan menyebutkan nomor pesanan kalau ada yang perlu dipastikan.",
+        body: "Ada pertanyaan seputar pesanan ini? Yuk, langsung hubungi Customer Service kami dengan menyebutkan nomor pesanan di atas!",
       };
   }
 }

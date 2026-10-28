@@ -187,7 +187,7 @@ export function ActiveGuestOrderBanner() {
             </div>
 
             <h3 className="text-title-lg font-bold text-brand-deep">
-              Anda memiliki pesanan WhatsApp yang baru dibuat
+              Kamu punya pesanan WhatsApp yang sedang aktif
             </h3>
 
             <p className="text-body-sm text-text-secondary leading-relaxed max-w-2xl">
@@ -217,7 +217,7 @@ export function ActiveGuestOrderBanner() {
               rel="noopener noreferrer"
               className={buttonClass({ size: "md" })}
             >
-              Buka WhatsApp CS
+              Lanjut Chat ke WhatsApp
             </a>
             <button
               ref={cancelTriggerRef}
@@ -271,7 +271,7 @@ export function ActiveGuestOrderBanner() {
                 <strong className="font-mono text-text-primary">
                   {handoff.reference_code}
                 </strong>
-                ) akan dibatalkan di sistem backend dan dashboard admin, serta tidak akan diproses lebih lanjut oleh Customer Service. Tindakan ini tidak dapat diurungkan.
+                ) akan dibatalkan dan tidak akan diproses lebih lanjut. Tindakan ini tidak dapat dibatalkan, ya.
               </p>
             </div>
 
@@ -292,7 +292,7 @@ export function ActiveGuestOrderBanner() {
                 onClick={handleCloseModal}
                 className={buttonClass({ variant: "outline", size: "md" })}
               >
-                Batal / Kembali
+                Kembali
               </button>
               <button
                 type="button"

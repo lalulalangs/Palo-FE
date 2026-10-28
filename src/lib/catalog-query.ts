@@ -120,7 +120,7 @@ export function describeCatalog(
 ): string {
   const scope = categoryName ?? "Katalog";
   if (params.q) {
-    return `Hasil pencarian "${params.q}" di ${scope}. Filter dan urutan pilihan dapat dibagikan lewat URL ini.`;
+    return `Hasil pencarian "${params.q}" di ${scope}. Temukan perlengkapan outdoor terbaik sesuai kebutuhanmu.`;
   }
-  return `${scope} — telusuri produk aktif dengan filter kategori, harga, ketersediaan stok, dan pengurutan yang tersimpan di URL.`;
+  return `${scope} — temukan perlengkapan outdoor pilihan dengan kualitas terbaik untuk menemani setiap langkah petualanganmu.`;
 }

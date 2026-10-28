@@ -77,8 +77,8 @@ export function AuthForm({
       </h2>
       <p className="mt-1 text-body-sm text-text-secondary">
         {isRegister
-          ? "Akun dipakai untuk pembayaran online, riwayat pesanan, dan pelacakan status."
-          : "Masukkan kredensial akun terdaftar Anda."}
+          ? "Daftar sekarang untuk kemudahan transaksi dan pantau pesananmu kapan saja."
+          : "Yuk, masukkan email dan kata sandi akunmu."}
       </p>
 
       <form action={formAction} className="mt-6 space-y-4">
@@ -110,7 +110,7 @@ export function AuthForm({
           name="email"
           type="email"
           inputMode="email"
-          label="Alamat surel"
+          label="Email"
           autoComplete="email"
           required
           maxLength={255}
@@ -141,7 +141,7 @@ export function AuthForm({
             maxLength={255}
             disabled={isPending}
             error={fieldError(error, "password_confirmation")}
-            hint="Persyaratan panjang dan karakter mengikuti aturan backend; tidak ada angka minimum yang kami karang di sini."
+            hint="Gunakan minimal 8 karakter dengan kombinasi huruf dan angka biar makin aman."
           />
         ) : null}
 
@@ -195,8 +195,8 @@ export function AuthForm({
       */}
       <div className="mt-6 rounded-md bg-surface-sage/70 p-3">
         <p className="text-body-sm leading-relaxed text-text-secondary">
-          Ingin belanja tanpa akun? Anda tetap bisa menyelesaikan pesanan lewat
-          WhatsApp Customer Service dari halaman keranjang.
+          Mau belanja lebih praktis tanpa akun? Kamu tetap bisa pesan langsung via
+          WhatsApp Customer Service dari halaman keranjang, lho!
         </p>
         <Link
           href="/keranjang"

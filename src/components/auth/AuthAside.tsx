@@ -16,16 +16,16 @@
  */
 const KEUNGGULAN = [
   {
-    title: "Pembayaran lewat payment gateway resmi",
-    body: "Checkout online hanya tersedia untuk akun terdaftar, dan backend memakai token Sanctum untuk setiap permintaan (PRD §3.12).",
+    title: "Belanja Praktis & Aman",
+    body: "Nikmati kemudahan checkout instan dengan berbagai pilihan pembayaran resmi yang terverifikasi otomatis.",
   },
   {
-    title: "Riwayat pesanan dari snapshot",
-    body: "Detail pesanan lama tetap lengkap walau produknya sudah dihapus dari katalog, karena diambil dari snapshot, bukan referensi katalog langsung (PRD §3.5).",
+    title: "Pantau Riwayat Belanja",
+    body: "Semua daftar transaksi dan bukti pembelian tersimpan rapi di akunmu, kapan pun kamu ingin mengeceknya.",
   },
   {
-    title: "Alamat pengiriman tersimpan",
-    body: "Alamat yang pernah dipakai tidak harus diisi ulang di setiap proses checkout berikutnya.",
+    title: "Pengiriman Lebih Cepat",
+    body: "Alamat favorit tersimpan otomatis, jadi kamu nggak perlu repot mengetik ulang di pesanan berikutnya.",
   },
 ] as const;
 
@@ -40,13 +40,11 @@ export function AuthAside() {
       </p>
 
       <h1 className="mt-4 text-headline-sm text-surface-paper tablet:text-headline-md">
-        Satu akun untuk setiap jejak penjelajahan
+        Yuk, gabung dan nikmati belanja lebih mudah!
       </h1>
 
       <p className="mt-3 text-body-md leading-relaxed text-surface-paper/85">
-        Akun diperlukan untuk jalur pemesanan kedua saja. Kalau Anda lebih suka
-        menghubungi Customer Service langsung, seluruh katalog tetap bisa
-        dibaca dan keranjang tetap bisa disusun tanpa akun.
+        Punya akun bikin transaksi makin cepat dan praktis. Tapi tenang, kamu tetap bisa pesan lewat WhatsApp kalau ingin berkonsultasi langsung dengan tim kami!
       </p>
 
       <ul className="mt-8 space-y-5">
@@ -61,8 +59,7 @@ export function AuthAside() {
       </ul>
 
       <p className="mt-8 text-body-sm leading-relaxed text-surface-paper/75">
-        Password disimpan dengan hashing standar industri dan tidak pernah
-        dicatat di log (PRD §3.12). Percobaan login dibatasi 10 kali per menit.
+        Keamanan data dan privasimu selalu jadi prioritas utama kami. Belanja perlengkapan outdoor jadi lebih tenang dan nyaman!
       </p>
     </section>
   );

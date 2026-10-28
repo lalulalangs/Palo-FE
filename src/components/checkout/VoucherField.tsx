@@ -30,13 +30,13 @@ import type { AppliedVoucher, Voucher } from "@/lib/types";
 const RESULT_ID = "voucher_code-result";
 
 const HINT =
-  "Masukkan kode dari email atau pesan kami. Diskon dihitung server dari isi keranjang.";
+  "Punya kode promo? Masukkan kodenya di sini untuk dapatkan potongan harga belanjaanmu!";
 
 const RATE_LIMIT_COPY =
-  "Terlalu banyak percobaan. Tunggu sekitar satu menit, lalu coba lagi.";
+  "Eits, terlalu banyak mencoba. Tunggu sebentar sekitar satu menit, lalu coba lagi ya.";
 
 const NETWORK_COPY =
-  "Kode belum bisa diperiksa karena layanan sedang tidak dapat dihubungi. Pesanan tetap bisa dibuat tanpa diskon.";
+  "Kode voucher belum bisa dicek saat ini. Jangan khawatir, kamu tetap bisa lanjut checkout pesananmu!";
 
 export function VoucherField({
   vouchers,
@@ -259,7 +259,7 @@ function VoucherError({
             .
           </p>
           <p className="mt-1 text-body-sm text-feedback-warn">
-            Mengikuti keranjang yang terakhir dibaca server.
+            Dihitung sesuai isi keranjang belanjaanmu saat ini.
           </p>
         </>
       ) : null}
@@ -291,8 +291,7 @@ function VoucherList({
       </summary>
 
       <p className="text-body-sm leading-relaxed text-text-secondary">
-        Server memutuskan kecocokan kode dengan isi keranjang saat kode
-        diterapkan.
+        Potongan diskon akan otomatis disesuaikan dengan barang yang ada di keranjangmu.
       </p>
 
       <ul className="mt-2 divide-y divide-border-soft border-y border-border-soft">

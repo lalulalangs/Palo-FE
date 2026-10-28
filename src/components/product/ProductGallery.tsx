@@ -46,7 +46,7 @@ export function ProductGallery({
             Foto produk belum tersedia
           </p>
           <p className="mt-1 text-label-sm text-text-secondary">
-            Foto belum diunggah admin.
+            Foto produk ini akan segera kami perbarui. Pantau terus, ya!
           </p>
         </div>
       ) : (

@@ -17,7 +17,6 @@ import {
   labelStatusOrder,
 } from "@/lib/format";
 import { buildMetadata } from "@/lib/metadata";
-import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
 
 /**
  * Halaman sukses pesanan.
@@ -45,7 +44,7 @@ import { API_UNAVAILABLE_NOTICE } from "@/lib/placeholders";
 export const metadata: Metadata = buildMetadata({
   title: "Pesanan berhasil dibuat",
   description:
-    "Nomor pesanan dan instruksi pembayaran untuk pesanan Palo Mountain Goods Anda.",
+    "Nomor pesanan dan instruksi pembayaran untuk pesanan Palo Mountain Goods milikmu.",
   path: "/checkout/berhasil",
   noIndex: true,
 });
@@ -72,8 +71,8 @@ export default async function CheckoutSuccessPage({
         <Container className="py-10 tablet:py-14">
           <div className="mx-auto max-w-2xl">
             <PlaceholderNotice
-              title="Buka halaman ini lewat checkout"
-              body="Halaman ini hanya menampilkan nomor pesanan yang dibuat pada sesi berjalan. Nomor pesanan dibaca dari server berdasarkan sesi akun Anda, jadi tidak bisa dilihat dari tautan orang lain."
+              title="Pesanan tidak ditemukan"
+              body="Yuk, cek kembali riwayat belanjaanmu di akun atau lacak pesanan menggunakan nomor pesanan yang valid."
             />
             <div className="mt-6 flex flex-col gap-3 tablet:flex-row">
               <Link href="/lacak" className={buttonClass({ size: "lg" })}>
@@ -108,8 +107,8 @@ export default async function CheckoutSuccessPage({
         <Container className="py-10 tablet:py-14">
           <div className="mx-auto max-w-2xl">
             <PlaceholderNotice
-              title={`Nomor pesanan ${orderNumber} tidak dapat ditampilkan`}
-              body={`${API_UNAVAILABLE_NOTICE} Pesanan hanya bisa dibaca oleh akun yang membuatnya, jadi nomor ini mungkin milik sesi lain.`}
+              title={`Nomor pesanan ${orderNumber} tidak ditemukan`}
+              body="Pastikan kamu sudah masuk dengan akun yang sesuai atau cek kembali nomor pesanan yang kamu masukkan, ya."
               variant="paper"
             />
             <div className="mt-6 flex flex-col gap-3 tablet:flex-row">
@@ -132,15 +131,15 @@ export default async function CheckoutSuccessPage({
   const paymentUrl = paymentRedirectUrl(detail);
 
   const instructions = detail.payment_expires_at
-    ? `Selesaikan pembayaran sebelum ${formatWaktu(detail.payment_expires_at)} agar stok Anda tidak dilepas.`
-    : "Instruksi pembayaran akan tampil di sini setelah dari payment gateway.";
+    ? `Selesaikan pembayaran sebelum ${formatWaktu(detail.payment_expires_at)} agar pesananmu tetap aman, ya.`
+    : "Instruksi pembayaran akan tampil di sini setelah diverifikasi.";
 
   return (
     <>
       <PageHeader
         eyebrow="Checkout selesai"
         title="Pesanan berhasil dibuat"
-        description="Nomor pesanan dan instruksi pembayaran sudah tercatat. Status pesanan diperbarui otomatis lewat webhook dari payment gateway, bukan karena halaman ini."
+        description="Nomor pesanan dan instruksi pembayaranmu sudah tercatat rapi. Status pembayaran akan otomatis terupdate begitu transaksi selesai diverifikasi."
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Checkout", href: "/checkout" },
@@ -254,8 +253,7 @@ export default async function CheckoutSuccessPage({
               ))}
             </ul>
             <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-              Rincian ini dibaca dari snapshot pesanan, sehingga tetap lengkap
-              walau produknya nanti dihapus dari katalog (PRD §3.5).
+              Simpan bukti pesanan ini ya. Kamu juga bisa mengecek status pengiriman secara berkala di halaman Lacak Pesanan.
             </p>
           </section>
 

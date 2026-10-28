@@ -77,7 +77,7 @@ export function CartSummary({
             Total sementara
           </p>
           <p className="text-body-sm text-text-secondary">
-            Belum termasuk ongkir resmi tujuan
+            Belum termasuk ongkos kirim
           </p>
         </div>
         <p className="text-headline-sm font-semibold text-brand-forest">
@@ -98,8 +98,7 @@ export function CartSummary({
       {action ? <div className="space-y-3">{action}</div> : null}
 
       <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-body-sm leading-relaxed text-text-secondary">
-        Keranjang tidak memblokir stok. Stok dan harga divalidasi ulang oleh
-        server saat pesanan dibuat, sehingga nilai di atas bisa berubah.
+        Yuk, segera selesaikan pesananmu biar produk favorit dan harganya tetap aman!
       </p>
 
       <p className="mt-3 text-body-sm text-text-secondary">

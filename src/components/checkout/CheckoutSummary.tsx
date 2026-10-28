@@ -174,8 +174,7 @@ export function CheckoutSummary({
       </div>
 
       <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
-        Harga, stok, dan voucher divalidasi ulang oleh server saat pesanan
-        dibuat, termasuk total ini.
+        Total tagihan final sudah termasuk diskon voucher dan ongkos kirim ke tujuanmu.
       </p>
 
       {/*
@@ -187,9 +186,9 @@ export function CheckoutSummary({
       <p className="mt-4 border-t border-border-soft pt-4 text-body-sm text-text-secondary">
         Pembayaran:{" "}
         <span className="font-medium text-text-primary">
-          Online lewat DOKU
+          Pembayaran Instan &amp; Otomatis
         </span>{" "}
-        — kanal dipilih di halaman pembayaran.
+        (QRIS, VA, E-Wallet)
       </p>
 
       <p className="mt-1 text-body-sm text-text-secondary">

@@ -136,8 +136,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
 
         {state === "habis" ? (
           <p className="mt-2 rounded-md bg-surface-paper px-3 py-2 text-label-sm font-semibold text-feedback-warn">
-            Produk ini sedang tidak tersedia. Hapus dari keranjang agar tidak
-            menghambat pemesanan.
+            Yah, stok produk ini lagi habis. Yuk, hapus dulu dari keranjang biar kamu bisa lanjut checkout barang lainnya!
           </p>
         ) : null}
 
@@ -150,8 +149,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
         {state === "kurang" ? (
           <div className="mt-2 rounded-md bg-surface-paper px-3 py-2">
             <p className="text-label-sm font-semibold text-feedback-warn">
-              Jumlah di keranjang melebihi sisa stok. Kurangi dulu sebelum
-              melanjutkan.
+              Jumlah belanjaanmu melebihi sisa stok yang ada. Yuk, sesuaikan jumlahnya dulu!
             </p>
             <button
               type="button"

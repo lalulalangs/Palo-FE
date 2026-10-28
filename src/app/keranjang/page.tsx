@@ -78,10 +78,10 @@ export default async function CartPage() {
     blocked.length === 0
       ? null
       : hasKurang && hasHabis
-        ? `Checkout belum bisa dilanjutkan. Ada barang yang habis dan ada jumlah yang melebihi sisa stok: ${blockedNames}.`
+        ? `Yuk, cek lagi keranjangmu. Ada barang yang habis dan melebihi sisa stok: ${blockedNames}.`
         : hasKurang
-          ? `Checkout belum bisa dilanjutkan. Sesuaikan jumlah barang yang melebihi sisa stok: ${blockedNames}.`
-          : `Checkout belum bisa dilanjutkan. Hapus barang yang sudah habis: ${blockedNames}.`;
+          ? `Yuk, sesuaikan jumlah barang yang melebihi sisa stok: ${blockedNames}.`
+          : `Yuk, hapus barang yang sudah habis dari keranjang: ${blockedNames}.`;
 
   return (
     <>
@@ -90,7 +90,7 @@ export default async function CartPage() {
       <PageHeader
         eyebrow="Ekspedisi dari Senaru"
         title="Keranjang belanja"
-        description="Barang yang dipilih, lengkap dengan pilihan jalur pemesanan. Harga dan stok divalidasi ulang oleh server saat pesanan dibuat."
+        description="Cek kembali barang pilihanmu dan pilih cara belanja yang paling nyaman buatmu."
         breadcrumbs={crumbs}
       />
 
@@ -110,11 +110,10 @@ export default async function CartPage() {
         {items.length === 0 && !cartUnavailable ? (
           <div className="mx-auto max-w-xl py-8 text-center">
             <h2 className="text-headline-sm text-text-primary">
-              Keranjang Anda masih kosong
+              Keranjang belanjamu masih kosong, nih
             </h2>
             <p className="mt-3 text-body-md text-text-secondary">
-              Belum ada barang yang dipilih. Mulai dari katalog resmi; setiap
-              nama, harga, dan stok di sana dibaca langsung dari server.
+              Yuk, jelajahi katalog dan temukan berbagai perlengkapan outdoor idamanmu!
             </p>
             <div className="mt-6 flex flex-col gap-3 tablet:flex-row tablet:justify-center">
               <Link href="/produk" className={buttonClass({ size: "lg" })}>
@@ -142,8 +141,7 @@ export default async function CartPage() {
               </div>
 
               <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-label-sm leading-relaxed text-text-secondary">
-                Menambah atau mengubah jumlah di keranjang tidak mengunci stok.
-                Pemeriksaan stok baru terjadi saat pesanan dibuat di server.
+                Barang di keranjang belum otomatis terpesan, ya. Yuk, lanjut checkout sekarang biar stok dan harganya aman!
               </p>
             </section>
 
@@ -205,12 +203,12 @@ export default async function CartPage() {
 
               {!isLoggedIn ? (
                 <p className="mt-4 text-label-sm leading-relaxed text-text-secondary">
-                  Ingin memakai pembayaran online?{" "}
+                  Mau pembayaran otomatis (QRIS, VA, E-Wallet)? Yuk,{" "}
                   <Link
                     href="/daftar?redirect_to=/checkout"
                     className="font-semibold text-brand-forest underline underline-offset-4"
                   >
-                    Buat akun
+                    daftar akun
                   </Link>{" "}
                   atau{" "}
                   <Link
@@ -218,9 +216,8 @@ export default async function CartPage() {
                     className="font-semibold text-brand-forest underline underline-offset-4"
                   >
                     masuk
-                  </Link>
-                  . Checkout online hanya tersedia untuk akun terdaftar
-                  (PRD §3.6).
+                  </Link>{" "}
+                  terlebih dahulu!
                 </p>
               ) : null}
             </div>

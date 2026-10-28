@@ -76,13 +76,13 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
 
   // Urutan blocker = urutan S4 → S3 → S8 di ARSITEKTUR §4.
   const blockedReason: string | null = !hasSku
-    ? "Produk ini belum punya ukuran atau SKU terdaftar, jadi belum bisa dipesan daring."
+    ? "Pilihan varian atau ukuran produk ini sedang disiapkan, jadi belum bisa dipesan saat ini."
     : !hasPurchasable
-      ? "Semua ukuran untuk produk ini sedang kosong."
+      ? "Yah, semua varian untuk produk ini lagi habis terjual. Cek lagi berkala ya!"
       : product.is_placeholder
-        ? "Data produk ini belum terverifikasi, jadi belum bisa dipesan daring."
+        ? "Informasi produk ini lagi disiapkan, jadi belum bisa dipesan saat ini."
         : priceMissing
-          ? "Harga produk ini belum diatur, jadi pesanan belum bisa dibuat."
+          ? "Harga produk ini lagi disiapkan, jadi belum bisa dipesan saat ini."
           : null;
 
   const phrase = selectedVariant
@@ -166,8 +166,8 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
 
       {product.is_placeholder ? (
         <PlaceholderNotice
-          title="Detail produk belum diisi admin"
-          body="PRD §1.1A melarang memuat contoh produk sebelum katalog asli dikonfirmasi. Produk ini belum dapat dipesan karena SKU, harga, dan stoknya belum terverifikasi."
+          title="Detail produk lagi disiapkan"
+          body="Informasi lengkap dan ketersediaan produk ini sedang kami persiapkan. Cek lagi secara berkala ya!"
         />
       ) : null}
 
@@ -332,8 +332,7 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
           </p>
         ) : (
           <p className="text-label-sm leading-relaxed text-text-secondary">
-            Menambah ke keranjang tidak mengunci stok; stok diperiksa ulang saat
-            pesanan dibuat.
+            Stok terbatas! Yuk, langsung checkout biar barang incaranmu nggak kehabisan.
           </p>
         )}
 
@@ -386,25 +385,22 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
         ) : null}
       </div>
 
-      {/* S7 — rute pengiriman & pembayaran (tanpa rupiah, tanpa daftar kanal) */}
+      {/* S7 — rute pengiriman & pembayaran */}
       <div className="rounded-xl bg-surface-paper p-4">
         <p className="text-label-sm font-semibold text-brand-deep">
           Pengiriman
         </p>
         <p className="mt-1 text-label-sm leading-relaxed text-text-secondary">
-          Ongkos kirim mengikuti alamat pengiriman dan dikonfirmasi saat pesanan
-          dibuat.
+          Ongkos kirim bakal dihitung otomatis sesuai alamat pengirimanmu saat checkout, ya.
         </p>
         <p className="mt-3 text-label-sm font-semibold text-brand-deep">
-          Pembayaran
+          Metode Belanja
         </p>
         <p className="mt-1 text-label-sm leading-relaxed text-text-secondary">
-          Tanpa akun, pesanan dan ongkir dikonfirmasi lewat WhatsApp Customer
-          Service. Dengan akun, bayar online lewat DOKU dan kanal pembayaran
-          dipilih di halaman pembayaran.
+          Bebas pilih cara belanja yang paling praktis: Checkout instan &amp; bayar otomatis (QRIS, Virtual Account, E-Wallet) dengan login akun, atau pesan langsung lewat WhatsApp tanpa perlu bikin akun.
         </p>
         <Link href="/keranjang" className={CS_LINK_CLASS}>
-          Cara pesan &amp; bayar →
+          Yuk, cek keranjang belanja →
         </Link>
       </div>
     </div>

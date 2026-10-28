@@ -19,7 +19,7 @@ import { buildMetadata } from "@/lib/metadata";
 export const metadata: Metadata = buildMetadata({
   title: "Halaman tidak ditemukan",
   description:
-    "Alamat yang Anda buka tidak tersedia di Palo Mountain Goods. Kembali ke katalog atau hubungi Customer Service.",
+    "Halaman yang kamu cari belum tersedia di Palo Mountain Goods. Yuk, kembali ke katalog atau hubungi tim Customer Service kami!",
   path: "/404",
   noIndex: true,
 });
@@ -35,8 +35,7 @@ export default function NotFound() {
           Halaman tidak ditemukan
         </h1>
         <p className="mt-4 text-body-lg text-text-secondary">
-          Alamat yang Anda buka tidak tersedia. Katalog mungkin sudah dipindahkan,
-          atau tautannya salah ketik.
+          Halaman yang kamu tuju belum tersedia atau tautannya kurang tepat. Yuk, cek koleksi perlengkapan kami yang lain!
         </p>
 
         <div className="mt-8 flex flex-col gap-3 tablet:flex-row tablet:justify-center">

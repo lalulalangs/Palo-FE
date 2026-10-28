@@ -124,7 +124,7 @@ export default async function CatalogPage({
       <PageHeader
         eyebrow="Katalog resmi"
         title={activeCategoryName ?? "Koleksi & Perlengkapan"}
-        description="Semua nama, harga, dan stok di halaman ini dibaca langsung dari server. Filter dan urutan pilihan tersimpan di URL sehingga tautannya bisa dibagikan."
+        description="Jelajahi koleksi perlengkapan outdoor terbaik kami. Yuk, temukan perlengkapan yang pas buat temani petualangan serumu!"
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Katalog", href: "/produk" },
@@ -181,7 +181,7 @@ export default async function CatalogPage({
               >
                 {apiAvailable
                   ? `Menampilkan ${formatAngka(products.length)} dari ${formatAngka(meta?.total ?? 0)} produk`
-                  : "Katalog belum dapat dimuat dari server."}
+                  : "Katalog belum dapat dimuat saat ini. Yuk, coba beberapa saat lagi!"}
               </p>
 
               <Suspense fallback={null}>
@@ -205,7 +205,7 @@ export default async function CatalogPage({
                     ? API_UNAVAILABLE_NOTICE
                     : params.q
                       ? `Tidak ada produk yang cocok dengan "${params.q}". Coba kata kunci lain, atau hapus filter yang aktif.`
-                      : "Katalog resmi belum dipublikasikan. Admin harus mengisi data produk terlebih dahulu (PRD §1.1A & §6A)."
+                      : "Produk untuk kategori atau pencarian ini belum tersedia. Yuk, cek koleksi perlengkapan kami yang lain!"
                 }
               />
             </div>

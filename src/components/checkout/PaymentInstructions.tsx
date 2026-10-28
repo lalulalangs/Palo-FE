@@ -31,9 +31,7 @@ export function PaymentInstructions({ payment }: { payment: PaymentInfo }) {
   if (!hasAny) {
     return (
       <p className="text-body-md leading-relaxed text-text-secondary">
-        Instruksi pembayaran belum dikirim payment gateway. Muat ulang halaman
-        ini beberapa saat lagi; kalau tetap kosong, hubungi Customer Service
-        dengan menyebutkan nomor pesanan Anda.
+        Panduan pembayaran lagi kami siapkan. Yuk, coba muat ulang halaman sebentar lagi, atau hubungi Customer Service dengan menyebutkan nomor pesananmu kalau butuh bantuan!
       </p>
     );
   }

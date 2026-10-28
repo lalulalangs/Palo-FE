@@ -308,7 +308,7 @@ function readErrorPayload(payload: unknown): {
 } {
   if (!isRecord(payload)) {
     return {
-      message: "Permintaan gagal diproses server.",
+      message: "Permintaan belum dapat diproses. Coba lagi beberapa saat, ya!",
       errors: {},
       errorCode: null,
       priceChanges: [],
@@ -319,7 +319,7 @@ function readErrorPayload(payload: unknown): {
   const message =
     typeof payload.message === "string"
       ? payload.message
-      : "Permintaan gagal diproses server.";
+      : "Permintaan belum dapat diproses. Coba lagi beberapa saat, ya!";
 
   const newGrandTotal =
     typeof payload.new_grand_total === "number" &&
@@ -1288,7 +1288,7 @@ export async function createOrder(
   });
   const data = unwrap<Record<string, unknown>>(payload, "data");
   if (!data) {
-    throw new ApiError("Server tidak mengembalikan data pesanan.", 502);
+    throw new ApiError("Data pesanan belum berhasil dimuat. Coba lagi beberapa saat, ya!", 502);
   }
   return data as unknown as CreatedOrder;
 }
@@ -1353,7 +1353,7 @@ export async function applyVoucher(
   });
   const data = unwrap<Record<string, unknown>>(payload, "data");
   if (!data) {
-    throw new ApiError("Server tidak mengembalikan hasil perhitungan voucher.", 502);
+    throw new ApiError("Perhitungan voucher belum berhasil dimuat. Coba lagi beberapa saat, ya!", 502);
   }
   return {
     discount_amount: readNumber(data.discount_amount, 0),
@@ -1606,7 +1606,7 @@ export async function createGuestWhatsAppCheckout(
   });
   const data = unwrap<Record<string, unknown>>(payload, "data");
   if (!data || typeof data.wa_url !== "string") {
-    throw new ApiError("Server tidak mengembalikan tautan WhatsApp.", 502);
+    throw new ApiError("Tautan WhatsApp belum berhasil disiapkan. Coba lagi beberapa saat, ya!", 502);
   }
   return data as unknown as GuestWhatsAppResult;
 }
@@ -1622,7 +1622,7 @@ export async function createCustomInquiry(
   });
   const data = unwrap<Record<string, unknown>>(payload, "data");
   if (!data || typeof data.wa_url !== "string") {
-    throw new ApiError("Server tidak mengembalikan tautan WhatsApp.", 502);
+    throw new ApiError("Tautan WhatsApp belum berhasil disiapkan. Coba lagi beberapa saat, ya!", 502);
   }
   return data as unknown as GuestWhatsAppResult;
 }

@@ -55,7 +55,7 @@ export async function generateMetadata({
     return buildMetadata({
       title: "Koleksi tidak ditemukan",
       description:
-        "Koleksi yang Anda cari tidak ada atau sudah berakhir di Palo Mountain Goods.",
+        "Koleksi yang kamu cari belum tersedia atau sudah berakhir di Palo Mountain Goods.",
       path,
       noIndex: true,
     });
@@ -65,7 +65,7 @@ export async function generateMetadata({
     return buildMetadata({
       title: "Koleksi belum dapat dimuat",
       description:
-        "Daftar koleksi belum dapat dibaca dari server, jadi halaman ini tidak menampilkan koleksi apa pun.",
+        "Informasi koleksi belum dapat dimuat saat ini. Yuk, coba beberapa saat lagi!",
       path,
       noIndex: true,
     });
@@ -80,7 +80,7 @@ export async function generateMetadata({
   const description =
     collection.seo_meta?.meta_description ??
     collection.tagline ??
-    `Koleksi ${name} di Palo Mountain Goods. Jumlah produk dan ketersediaan dibaca langsung dari server.`;
+    `Koleksi ${name} di Palo Mountain Goods. Temukan perlengkapan outdoor pilihan yang siap menemani setiap petualanganmu.`;
 
   return buildMetadata({
     title,
@@ -125,7 +125,7 @@ export default async function KoleksiDetailPage({
             <PlaceholderNotice
               variant="paper"
               title="Koleksi belum dapat dimuat"
-              body="Daftar koleksi belum dapat dibaca dari server, jadi halaman ini tidak menampilkan koleksi apa pun."
+              body="Informasi koleksi ini lagi disiapkan atau belum bisa dimuat. Coba muat ulang halaman atau cek koleksi lainnya, ya!"
             />
             <Link
               href="/koleksi"
@@ -245,8 +245,8 @@ export default async function KoleksiDetailPage({
               <div className="space-y-4">
                 <PlaceholderNotice
                   variant="sage"
-                  title="Halaman ini tidak berisi produk"
-                  body="Tautan halaman yang Anda buka melewati halaman terakhir koleksi ini."
+                  title="Halaman belum tersedia"
+                  body="Halaman yang kamu cari belum tersedia atau sudah melewati batas. Yuk, kembali ke halaman awal!"
                 />
                 <Link
                   href={`/koleksi/${slug}?page=1`}
@@ -262,8 +262,8 @@ export default async function KoleksiDetailPage({
               <div className="space-y-4">
                 <PlaceholderNotice
                   variant="sage"
-                  title="Koleksi ini belum berisi produk"
-                  body="Admin belum menambahkan produk aktif ke koleksi ini."
+                  title="Produk koleksi lagi disiapkan"
+                  body="Produk untuk koleksi ini bakal segera hadir. Yuk, cek koleksi menarik lainnya!"
                 />
                 <Link href="/produk" className={buttonClass()}>
                   Lihat katalog

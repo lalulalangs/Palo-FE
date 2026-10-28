@@ -153,7 +153,7 @@ export async function searchDestinationsAction(
     return {
       ok: false,
       kind: "auth",
-      message: "Sesi Anda berakhir. Masuk kembali untuk mencari wilayah.",
+      message: "Sesi masukmu berakhir. Yuk, masuk kembali untuk mencari wilayah pengiriman.",
       fieldErrors: {},
     };
   }
@@ -174,7 +174,7 @@ export async function quoteShippingAction(
     return {
       ok: false,
       kind: "auth",
-      message: "Sesi Anda berakhir. Masuk kembali untuk menghitung ongkir.",
+      message: "Sesi masukmu berakhir. Yuk, masuk kembali untuk menghitung ongkos kirim.",
       fieldErrors: {},
     };
   }
@@ -340,7 +340,7 @@ export async function placeOrderAction(input: {
     return {
       ok: false,
       kind: "auth",
-      message: "Sesi Anda berakhir. Masuk kembali untuk membuat pesanan.",
+      message: "Sesi masukmu berakhir. Yuk, masuk kembali untuk menyelesaikan pesanan.",
       fieldErrors: {},
     };
   }

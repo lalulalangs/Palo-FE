@@ -29,7 +29,7 @@ const CARD =
   "rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6";
 
 const PREFILL_NOTE =
-  "Nama diisi dari akun Anda dan masih bisa diubah. Nomor WhatsApp belum tersimpan di akun, jadi perlu diisi.";
+  "Nama terisi otomatis dari profil akunmu dan masih bisa kamu ubah. Lengkapi nomor WhatsApp aktifmu ya!";
 
 /** Judul + isi untuk setiap kegagalan, tanpa pernah memakai `error.message`. */
 function failureCopy(error: ActionError): { title: string; body?: string } {
@@ -44,7 +44,7 @@ function failureCopy(error: ActionError): { title: string; body?: string } {
     case "network":
       return {
         title: "Layanan sedang tidak dapat dihubungi",
-        body: "Pertanyaan Anda belum terkirim — coba lagi sebentar.",
+        body: "Pertanyaanmu belum terkirim. Yuk, coba kirim lagi sebentar ya.",
       };
     default:
       // 5xx dan jenis lain: jangan bocorkan pesan mentah server.
@@ -91,7 +91,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           tabIndex={-1}
           className="text-title-md text-brand-deep focus:outline-none"
         >
-          Pertanyaan siap dikirim ke WhatsApp
+          Pertanyaanmu sudah siap dikirim!
         </h3>
 
         <p className="mt-4 text-body-sm text-text-secondary">Kode referensi</p>
@@ -99,8 +99,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           {result.reference_code}
         </p>
         <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
-          Sebutkan kode ini di awal percakapan supaya Customer Service menemukan
-          catatan Anda.
+          Sebutkan kode referensi ini saat terhubung dengan tim Customer Service kami, ya.
         </p>
 
         {/*
@@ -114,11 +113,10 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           rel="noopener noreferrer"
           className={buttonClass({ size: "lg", fullWidth: true, className: "mt-6" })}
         >
-          Buka WhatsApp dan kirim pesan
+          Lanjut Chat ke WhatsApp
         </a>
         <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-          Tautan ini membuka percakapan dengan pesan yang sudah terisi. Anda
-          tetap perlu menekan tombol kirim di WhatsApp.
+          Format pertanyaan sudah otomatis tersusun rapi. Tinggal klik tombol kirim di aplikasi WhatsApp!
         </p>
 
         {result.notice ? (
@@ -167,7 +165,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           id="inquiry-name"
           name="name"
           label="Nama lengkap (wajib)"
-          hint="Dipakai Customer Service untuk menyapa Anda."
+          hint="Membantu tim kami menyapamu lebih akrab di WhatsApp."
           autoComplete="name"
           maxLength={100}
           defaultValue={defaultName}
@@ -181,7 +179,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           type="tel"
           inputMode="tel"
           label="Nomor WhatsApp (wajib)"
-          hint="Nomor yang bisa dihubungi untuk membalas pertanyaan ini."
+          hint="Pastikan nomor WhatsApp aktif agar tim kami bisa langsung membalas."
           autoComplete="tel"
           maxLength={30}
           disabled={isPending}
@@ -197,7 +195,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           max={10000}
           step={1}
           label="Perkiraan jumlah (opsional)"
-          hint="Dalam satuan pcs, antara 1 dan 10.000. Boleh dikosongkan bila belum pasti."
+          hint="Boleh dikosongkan dulu kalau jumlahnya belum pasti."
           disabled={isPending}
           error={fieldError(error, "quantity")}
         />
@@ -206,7 +204,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           id="inquiry-note"
           name="note"
           label="Kebutuhan atau catatan (opsional)"
-          hint="Sebutkan produk, ukuran, warna, dan tenggat bila ada. Maksimal 1.000 karakter."
+          hint="Ceritakan kebutuhan produk, pilihan warna, ukuran, atau jadwal acaramu."
           maxLength={1000}
           disabled={isPending}
           error={fieldError(error, "note")}
@@ -238,12 +236,11 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           ? "Menyiapkan pesan…"
           : error?.kind === "network"
             ? "Coba kirim lagi"
-            : "Kirim pertanyaan lewat WhatsApp"}
+            : "Hubungi CS via WhatsApp"}
       </button>
 
       <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-        Tombol ini menyusun pesan WhatsApp, belum mengirim pertanyaan. Pesan baru
-        sampai ke Customer Service setelah Anda menekan kirim di WhatsApp.
+        Tombol ini akan membawamu ke aplikasi WhatsApp dengan pesan yang sudah tersusun rapi. Tim kami siap membantu menjawab pertanyaanmu!
       </p>
     </form>
   );

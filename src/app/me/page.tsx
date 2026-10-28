@@ -59,7 +59,7 @@ export default async function AccountPage() {
       <PageHeader
         eyebrow="Akun pelanggan"
         title="Akun saya"
-        description="Pesanan yang dibuat dengan akun ini, beserta status terakhirnya."
+        description="Pantau status pesanan dan kelola informasi akunmu dengan mudah."
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Akun saya", href: "/me" },
@@ -76,7 +76,7 @@ export default async function AccountPage() {
             <SectionHeading
               id="riwayat-pesanan"
               title="Riwayat pesanan"
-              description="Status diperbarui oleh server, bukan oleh halaman ini."
+              description="Pantau proses belanjaanmu mulai dari pembayaran hingga paket tiba di tujuan."
             />
 
             <div className="mt-6">
@@ -90,7 +90,7 @@ export default async function AccountPage() {
                   <PlaceholderNotice
                     variant="paper"
                     title="Riwayat pesanan belum dapat dimuat"
-                    body="Server belum bisa dihubungi. Pesanan Anda tetap tersimpan; coba muat ulang halaman ini beberapa saat lagi."
+                    body="Riwayat pesanan lagi ada kendala saat dimuat. Tenang, pesananmu tetap tersimpan aman. Coba muat ulang halaman ya!"
                   />
                   <Link
                     href="/me"
@@ -105,13 +105,12 @@ export default async function AccountPage() {
               ) : orders.length === 0 ? (
                 <div className="mx-auto max-w-xl py-8 text-center">
                   <h2 className="text-headline-sm text-text-primary">
-                    Belum ada pesanan
+                    Belum ada pesanan, nih
                   </h2>
                   {/* Di luar kartu putih: `text-secondary` di atas paper hanya
                       4,45:1, gagal AA untuk teks 16 px (spec §8). */}
                   <p className="mt-3 text-body-md text-text-primary">
-                    Pesanan yang dibuat dengan akun ini akan muncul di sini,
-                    beserta status dan totalnya.
+                    Yuk, temukan perlengkapan outdoor idamanmu dan buat pesanan pertamamu!
                   </p>
                   <div className="mt-6 flex flex-col gap-3 tablet:flex-row tablet:justify-center">
                     <Link href="/produk" className={buttonClass({ size: "lg" })}>

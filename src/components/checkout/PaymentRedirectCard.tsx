@@ -152,16 +152,16 @@ export function PaymentRedirectCard({
               {isRedirecting
                 ? "Membuka Gerbang Pembayaran DOKU…"
                 : hasReturned
-                  ? "Lanjutkan Pembayaran Anda"
+                  ? "Yuk, Lanjutkan Pembayaranmu"
                   : `Mengarahkan ke DOKU dalam ${secondsRemaining} detik`}
             </h3>
 
             <p className="text-body-sm leading-relaxed text-text-secondary">
               {isRedirecting
-                ? "Mohon tunggu sejenak, Anda sedang dialihkan ke sistem pembayaran DOKU Checkout yang aman."
+                ? "Mohon tunggu sebentar ya, kamu sedang diarahkan ke sistem pembayaran DOKU Checkout yang aman."
                 : hasReturned
-                  ? "Anda kembali dari halaman pembayaran. Klik tombol di bawah untuk melanjutkan pembayaran DOKU kapan saja."
-                  : "Anda akan dialihkan otomatis ke DOKU Checkout untuk memilih kanal pembayaran (QRIS, Virtual Account, e-wallet, atau kartu kredit)."}
+                  ? "Kamu kembali dari halaman pembayaran. Klik tombol di bawah ini kapan saja buat melanjutkan pembayaran via DOKU, ya."
+                  : "Kamu akan otomatis diarahkan ke DOKU Checkout untuk memilih metode pembayaran favoritmu (QRIS, Virtual Account, E-Wallet, atau Kartu Kredit)."}
             </p>
           </div>
 

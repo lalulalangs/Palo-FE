@@ -175,8 +175,7 @@ export function GuestCheckoutForm({
           Checkout lewat WhatsApp
         </h2>
         <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
-          Tanpa akun. Daftar belanja dan informasi pengiriman disusun otomatis ke percakapan WhatsApp
-          Customer Service untuk pengecekan fisik, rekomendasi ongkir, dan konfirmasi pembayaran.
+          Belanja praktis tanpa perlu bikin akun! Detail pesanan dan alamatmu bakal langsung disiapkan ke WhatsApp Customer Service kami.
         </p>
       </div>
 
@@ -221,7 +220,7 @@ export function GuestCheckoutForm({
             id="guest-name"
             name="guest_name"
             label="Nama lengkap (opsional)"
-            hint="Membantu Customer Service menyapa Anda di WhatsApp."
+            hint="Tulis nama lengkap penerima biar paketmu nggak salah alamat."
             autoComplete="name"
             maxLength={120}
             disabled={isPending}
@@ -234,7 +233,7 @@ export function GuestCheckoutForm({
             type="tel"
             inputMode="tel"
             label="Nomor WhatsApp (opsional)"
-            hint="Isi bila ingin nomor Anda dicantumkan di pesan."
+            hint="Pastikan nomor WhatsApp aktif ya, buat info rincian pesanan &amp; ongkir."
             autoComplete="tel"
             maxLength={32}
             disabled={isPending}
@@ -272,7 +271,7 @@ export function GuestCheckoutForm({
           maxLength={300}
           disabled={isPending}
           error={fieldError(error, "street")}
-          hint="Membantu estimasi ongkos kirim dan pengantaran kurir."
+          hint="Tulis nama jalan, nomor rumah, RT/RW, hingga patokan biar kurir gampang temukan lokasimu."
         />
       </section>
 
@@ -345,7 +344,7 @@ export function GuestCheckoutForm({
           id="guest-note"
           name="note"
           label="Catatan (opsional)"
-          placeholder="Contoh: Titipkan di pos satpam bila rumah kosong, atau butuh rekomendasi ukuran."
+          placeholder="Contoh: Tolong bungkus rapi ya, Kak."
           maxLength={500}
           disabled={isPending}
           error={fieldError(error, "note")}
@@ -385,9 +384,7 @@ export function GuestCheckoutForm({
         </button>
 
         <p className="text-body-sm leading-relaxed text-text-secondary">
-          Pesanan langsung tercatat di sistem setelah tombol ini ditekan.
-          Pembayaran (VA/QRIS) disepakati lewat WhatsApp dan baru diproses
-          setelah admin memverifikasinya.
+          Pesananmu akan langsung kami teruskan ke WhatsApp CS. Pembayaran praktis via QRIS atau Transfer Bank akan dipandu langsung oleh tim kami, ya.
         </p>
       </section>
     </form>
@@ -443,18 +440,14 @@ function GuestResultPanel({
         tabIndex={-1}
         className="text-headline-sm text-text-primary"
       >
-        Pesanan tercatat, menunggu konfirmasi
+        Pesananmu sudah siap diteruskan!
       </h2>
 
       <div className="rounded-lg border-2 border-accent-earth/50 bg-surface-paper p-4">
-        <p className="mt-2 text-title-md text-brand-deep">Pesanan sudah masuk</p>
+        <p className="mt-2 text-title-md text-brand-deep">Tinggal satu langkah lagi!</p>
         <p className="mt-2 text-body-md text-text-secondary">{handoff.notice}</p>
         <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
-          Customer Service akan menghubungi Anda lewat WhatsApp untuk memilih
-          pembayaran (VA atau QRIS). Pesanan baru diproses setelah pembayaran
-          diverifikasi admin. Bila tidak dibayar dalam 1×24 jam, pesanan
-          kedaluwarsa otomatis. Ongkos kirim dikonfirmasi CS dan belum termasuk
-          angka di bawah.
+          Tim Customer Service kami siap membantumu di WhatsApp untuk konfirmasi ongkir dan metode pembayaran (QRIS/VA). Yuk, kirim pesananmu sekarang biar langsung diproses!
         </p>
       </div>
 
@@ -476,8 +469,7 @@ function GuestResultPanel({
           {handoff.reference_code}
         </p>
         <p className="mt-1 text-body-sm text-text-secondary">
-          Sebutkan kode ini di awal percakapan supaya Customer Service bisa
-          menemukan catatan Anda.
+          Simpan kode ini ya, biar tim Customer Service kami bisa langsung mengenali pesananmu.
         </p>
       </div>
 
@@ -502,7 +494,7 @@ function GuestResultPanel({
         rel="noopener noreferrer"
         className={buttonClass({ size: "lg", fullWidth: true })}
       >
-        Buka WhatsApp dan kirim pesan
+        Lanjut Chat ke WhatsApp
       </a>
 
       {onNewOrder ? (
@@ -516,9 +508,7 @@ function GuestResultPanel({
       ) : null}
 
       <p className="text-body-sm leading-relaxed text-text-secondary">
-        Tautan ini membuka percakapan dengan pesan yang sudah terisi. Membuka
-        tautan tidak mengirim apa pun — Anda tetap menekan tombol kirim di
-        WhatsApp.
+        Tautan ini akan langsung membawamu ke aplikasi WhatsApp dengan format pesan yang sudah rapi. Tinggal tekan tombol kirim, deh!
       </p>
     </div>
   );
