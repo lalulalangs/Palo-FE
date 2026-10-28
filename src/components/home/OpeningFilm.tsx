@@ -123,6 +123,24 @@ export function OpeningFilm({ content }: { content: FilmContent }) {
   return (
     <section className="border-b border-border-soft bg-surface-paper py-14 tablet:py-20">
       <div className="mx-auto w-full max-w-[1400px] px-4 tablet:px-8">
+        <div className="mb-8 flex items-end justify-between border-b border-border-soft pb-4 tablet:mb-12">
+          <div>
+            <span className="block font-mono text-[11px] uppercase tracking-widest text-text-secondary">
+              VISUAL LOG // SENARU 601 MDPL
+            </span>
+            <h2 className="mt-1 text-base font-bold uppercase tracking-wider text-text-primary tablet:text-lg">
+              SINEMATIK RINJANI : OPENING FILM
+            </h2>
+          </div>
+
+          {spec ? (
+            <p className="hidden items-center gap-2 font-mono text-xs uppercase tracking-wider text-text-secondary sm:flex">
+              <span className="h-2 w-2 rounded-full bg-brand-forest" />
+              {spec}
+            </p>
+          ) : null}
+        </div>
+
         <div className="grid grid-cols-1 items-center gap-8 tablet:gap-14 lg:grid-cols-12">
           {/* ---------- Frame video vertikal ---------- */}
           <div className="flex justify-center lg:col-span-5">
@@ -236,9 +254,9 @@ export function OpeningFilm({ content }: { content: FilmContent }) {
               ) : null}
 
               {title ? (
-                <h2 className="font-headline text-2xl leading-tight text-text-primary tablet:text-4xl">
+                <h3 className="font-headline text-2xl leading-tight text-text-primary tablet:text-4xl">
                   {title}
-                </h2>
+                </h3>
               ) : null}
 
               {body ? (
