@@ -172,7 +172,7 @@ export default async function AccountPage() {
                           )}
                         </p>
                         <Link
-                          href={`/lacak?order=${encodeURIComponent(order.order_number)}`}
+                          href={`/orders/${encodeURIComponent(order.order_number)}`}
                           className={buttonClass({
                             variant: "outline",
                             className: "w-full tablet:w-auto",
