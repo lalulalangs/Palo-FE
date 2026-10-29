@@ -11,7 +11,7 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { Container } from "@/components/layout/Container";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { LineIcon } from "@/components/ui/LineIcon";
-import { getBrand, getCategories, getHeroSliders, getProducts } from "@/lib/api";
+import { getBanners, getBrand, getCategories, getProducts } from "@/lib/api";
 import { PER_PAGE } from "@/lib/catalog-query";
 import { resolveBrand, whatsappLink } from "@/lib/brand";
 import { HOMEPAGE } from "@/lib/homepage-static";
@@ -30,7 +30,7 @@ import { SITE_NAME } from "@/lib/site";
  * ===================================================================
  *  SUSUNAN SECTION
  * ===================================================================
- *   1. Hero carousel     -> `GET /hero-sliders`
+ *   1. Hero carousel     -> `GET /banners`
  *   2. Katalog produk    -> `GET /products`
  *   3. Lookbook split    -> statik (foto, `lib/homepage-static.ts`)
  *   4. Brand manifesto   -> statik (foto + teks)
@@ -93,8 +93,8 @@ const CATALOG_QUERY = {
 const GRID_HOME = 8;
 
 export default async function HomePage() {
-  const [sliders, brand, categories, catalog] = await Promise.all([
-    getHeroSliders(),
+  const [banners, brand, categories, catalog] = await Promise.all([
+    getBanners(),
     getBrand(),
     getCategories(),
     getProducts({ ...CATALOG_QUERY }),
@@ -103,20 +103,20 @@ export default async function HomePage() {
   const resolved = resolveBrand(brand);
 
   /*
-   * Pemetaan kontrak `/hero-sliders` -> bentuk tampilan `HeroSlide`.
+   * Pemetaan kontrak `/banners` -> bentuk tampilan `HeroSlide`.
    *
    * Dua jebakan yang wajib dipertahankan di sini:
    *
    * 1. `theme: "light"` = TEKS PUTIH + scrim gelap. `HeroFrame` menghitung
    *    `isDark = slide.theme !== "dark"`; mengirim `"dark"` justru menghasilkan
    *    teks gelap di atas scrim paper — hero jadi tidak terbaca tanpa error.
-   *    `/hero-sliders` tidak punya field tema, jadi nilainya dipatok di sini.
+   *    `/banners` tidak punya field tema, jadi nilainya dipatok di sini.
    * 2. `overlayOpacity: 100`. Default komponen adalah 45, dan 45 itulah yang
    *    membuat teks hero gagal kontras AA (1,53:1 di atas foto terang).
    *
    * `order` sengaja tidak dipakai: server sudah mengurutkan (`sort_order asc`).
    */
-  const heroSlides: HeroSlide[] = (sliders ?? []).map((item) => ({
+  const heroSlides: HeroSlide[] = (banners ?? []).map((item) => ({
     id: item.id,
     title: item.title ?? "",
     subtitle: item.description,

@@ -11,7 +11,6 @@ export { ApiError } from "@/lib/api-error";
 import type {
   AuthResponse,
   AuthUser,
-  BannerItem,
   BrandInfo,
   CancelGuestOrderRequest,
   CancelGuestOrderResult,
@@ -495,89 +494,12 @@ function normalizeCategory(value: unknown): CategoryItem | null {
   };
 }
 
-/** `GET /banners` — backend sudah memfilter tanggal tayang. */
-export async function getBanners(): Promise<BannerItem[] | null> {
+/**
+ * `GET /banners` — sumber banner hero beranda utama (menggantikan hero-sliders).
+ */
+export async function getBanners(): Promise<HeroSliderItem[] | null> {
   try {
     const payload = await apiRequest<unknown>("/banners");
-    const list = unwrap<unknown[]>(payload, "data");
-    if (!Array.isArray(list)) return null;
-    return list
-      .map(normalizeBanner)
-      .filter((item): item is BannerItem => item !== null);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Banner hero.
- *
- * Menerima DUA bentuk field karena backend dan mockup berbeda penamaan:
- *
- *   - `image` / `image_alt` / `cta_url` / `cta_label`  -> `CatalogController::banners()`
- *   - `image_url` / `image_alt` / `link_url` / `link_label` -> bentuk di mockup lama
- *
- * Kalau hanya satu yang dikenali, banner diam-diam tampil tanpa gambar —
- * dan itu sulit terdeteksi karena tidak ada error sama sekali.
- */
-function normalizeBanner(value: unknown): BannerItem | null {
-  if (!isRecord(value)) return null;
-
-  const title = readString(value, "title");
-  // `path` relatif -> URL penuh (ARSITEKTUR §3).
-  const imageUrl = mediaUrl(
-    readString(value, "image") ?? readString(value, "image_url"),
-  );
-
-  if (!title && !imageUrl) return null;
-
-  return {
-    id: typeof value.id === "number" ? value.id : null,
-    title,
-    subtitle: readString(value, "subtitle"),
-    image_url: imageUrl,
-    image_alt: readString(value, "image_alt") ?? title,
-
-    // Varian crop per orientasi. `null` kalau crop-nya belum dibuat —
-    // pemanggil wajib jatuh ke `image_url`, bukan menampilkan kotak rusak.
-    image_landscape_url: mediaUrl(readString(value, "image_landscape")),
-    image_portrait_url: mediaUrl(readString(value, "image_portrait")),
-    image_tablet_url: mediaUrl(readString(value, "image_tablet")),
-    link_url: readString(value, "cta_url") ?? readString(value, "link_url"),
-    link_label: readString(value, "cta_label") ?? readString(value, "link_label"),
-
-    // Elemen editorial lookbook. Semua opsional — komponen hero punya
-    // fallback untuk masing-masing, jadi banner yang belum diisi field
-    // baru ini tetap tampil utuh.
-    stamp_left: readString(value, "stamp_left"),
-    stamp_right: readString(value, "stamp_right"),
-    eyebrow: readString(value, "eyebrow"),
-    cta2_label: readString(value, "cta2_label"),
-    cta2_url: readString(value, "cta2_url"),
-
-    // `theme` menentukan warna teks di atas foto. Default "light" (teks
-    // terang) karena itu yang aman untuk foto gelap — kondisi paling umum.
-    theme: readString(value, "theme") === "dark" ? "dark" : "light",
-
-    // Kekuatan scrim. Default 45% supaya teks tetap terbaca walau admin
-    // belum menyetelnya.
-    overlay_opacity: readNumber(value.overlay_opacity, 45),
-  };
-}
-
-/**
- * `GET /hero-sliders` — sumber hero beranda.
- *
- * `null` = backend tidak terjangkau. `[]` = tidak ada slide aktif, dan itu
- * respons SAH (admin belum mengaktifkan slide apa pun) — beranda lalu
- * menampilkan piring teks dari nilai fallback, bukan hero kosong.
- *
- * Urutan TIDAK diubah di sini: `PublicHeroSliderController` sudah memakai
- * `active()->ordered()->limit(100)` (`sort_order asc, id asc`).
- */
-export async function getHeroSliders(): Promise<HeroSliderItem[] | null> {
-  try {
-    const payload = await apiRequest<unknown>("/hero-sliders");
     const list = unwrap<unknown[]>(payload, "data");
     if (!Array.isArray(list)) return null;
     return list
@@ -588,10 +510,15 @@ export async function getHeroSliders(): Promise<HeroSliderItem[] | null> {
   }
 }
 
+/** Alias untuk kompatibilitas ke fungsi lama getHeroSliders */
+export const getHeroSliders = getBanners;
+
 /**
- * Normalisasi satu slide `/hero-sliders` — satu pintu, seperti
- * `normalizeBanner()`. Bentuknya bersarang (`images`, `actions`), jadi
- * pembacaan field dilakukan lewat `isRecord` dulu.
+ * Normalisasi satu slide `/banners` atau `/hero-sliders` — satu pintu.
+ *
+ * Menerima bentuk bersarang (`images`, `actions`) dari controller hero-slider
+ * MAUPUN bentuk flat (`image_url` / `image`, `cta_url` / `link_url`, dsb) dari
+ * BannerController / BannerResource agar slide tidak terbuang karena perbedaan skema data.
  */
 function normalizeHeroSlider(value: unknown): HeroSliderItem | null {
   if (!isRecord(value)) return null;
@@ -601,36 +528,57 @@ function normalizeHeroSlider(value: unknown): HeroSliderItem | null {
   const primary = isRecord(actions.primary) ? actions.primary : {};
   const secondary = isRecord(actions.secondary) ? actions.secondary : {};
 
-  // `image_desktop` NOT NULL di DB: slide tanpa foto desktop bukan slide yang
-  // bisa ditampilkan, jadi dibuang di sini alih-alih menjadi kotak kosong.
-  const desktopUrl = mediaUrl(readString(images, "desktop_url"));
+  // Mendukung bentuk /hero-sliders (images.desktop_url) maupun /banners (image_url / image)
+  const desktopUrl = mediaUrl(
+    readString(images, "desktop_url") ??
+      readString(value, "image_url") ??
+      readString(value, "image"),
+  );
   if (!desktopUrl) return null;
+
+  const mobileUrl = mediaUrl(
+    readString(images, "mobile_url") ??
+      readString(value, "image_portrait") ??
+      readString(value, "mobile_url"),
+  );
 
   return {
     id: typeof value.id === "number" ? value.id : null,
-    series_tag: readString(value, "series_tag"),
-    location_tag: readString(value, "location_tag"),
-    badge: readString(value, "badge"),
+    series_tag:
+      readString(value, "series_tag") ?? readString(value, "stamp_left"),
+    location_tag:
+      readString(value, "location_tag") ?? readString(value, "stamp_right"),
+    badge: readString(value, "badge") ?? readString(value, "eyebrow"),
     title: readString(value, "title"),
-    description: readString(value, "description"),
+    description:
+      readString(value, "description") ?? readString(value, "subtitle"),
     images: {
       desktop_url: desktopUrl,
-      // `mediaUrl` meneruskan URL absolut apa adanya, jadi tetap benar kalau
-      // media pindah ke CDN.
-      mobile_url: mediaUrl(readString(images, "mobile_url")),
-      alt_text: readString(images, "alt_text"),
+      mobile_url: mobileUrl,
+      alt_text:
+        readString(images, "alt_text") ??
+        readString(value, "image_alt") ??
+        readString(value, "title"),
     },
     actions: {
       primary: {
-        label: readString(primary, "label"),
-        url: readString(primary, "url"),
+        label:
+          readString(primary, "label") ??
+          readString(value, "cta_label") ??
+          readString(value, "link_label"),
+        url:
+          readString(primary, "url") ??
+          readString(value, "cta_url") ??
+          readString(value, "link_url"),
       },
       secondary: {
-        label: readString(secondary, "label"),
-        url: readString(secondary, "url"),
+        label:
+          readString(secondary, "label") ?? readString(value, "cta2_label"),
+        url:
+          readString(secondary, "url") ?? readString(value, "cta2_url"),
       },
     },
-    order: readNumber(value.order, 0),
+    order: readNumber(value.order ?? value.sort_order, 0),
   };
 }
 
