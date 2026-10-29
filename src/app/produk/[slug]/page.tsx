@@ -7,6 +7,7 @@ import { Container } from "@/components/layout/Container";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SectionHeading } from "@/components/layout/PageHeader";
 import { ProductGallery } from "@/components/product/ProductGallery";
+import { ProductAccordion } from "@/components/product/ProductAccordion";
 import { ProductPurchasePanel } from "@/components/product/ProductPurchasePanel";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { getBrand, getProduct, getProducts } from "@/lib/api";
@@ -14,24 +15,6 @@ import { breadcrumbJsonLd, productJsonLd } from "@/lib/jsonld";
 import type { BreadcrumbItem } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/metadata";
 
-/**
- * Detail produk.
- *
- * Keputusan yang perlu dijelaskan:
- *
- * 1. **Tidak memetakan kegagalan API menjadi 404.** `getProduct`
- *    mengembalikan `null` baik saat produknya memang tidak ada maupun saat
- *    backend mati. Kalau keduanya dipetakan ke `notFound()`, satu outage
- *    singkat akan menghapus seluruh halaman produk dari indeks mesin pencari —
- *    persis kebalikan dari tujuan PRD §4.4. Karena itu `null` dirender sebagai
- *    placeholder jujur dengan status 200.
- * 2. **Tabel spesifikasi dari mockup lama dihapus.** Baris "Bahan Kain: 220
- *    GSM", "Metode Sablon: Discharge", dan "Asal Perakitan: Senaru" adalah
- *    klaim produk yang belum terverifikasi (PRD §1.1A). Yang ditampilkan hanya
- *    `description` dari backend.
- * 3. **Pickup dan garansi tukar ukuran dihapus.** OD-05 masih DITUNDA;
- *    kebijakan refund ada di OD-07.
- */
 export async function generateMetadata({
   params,
 }: {
@@ -40,9 +23,6 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await getProduct(slug);
 
-  // `getProduct` mengembalikan `null` untuk 404 maupun backend mati. Judul
-  // dan description menjelaskan keduanya secara jujur, dan `noIndex` dipakai
-  // supaya halaman yang tidak bisa dipastikan tidak ikut terindeks.
   const name = product?.name ?? "Detail produk belum dapat dimuat";
   const description =
     product?.short_description ??
@@ -51,9 +31,6 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: name,
-    // `price_display` bisa berisi `[Harga dari Admin]`. Memasukkan string itu
-    // ke meta description akan menampilkannya di hasil pencarian sebagai
-    // placeholder literal, jadi description disusun dari copy yang sudah ada.
     description: description.slice(0, 200),
     path: `/produk/${slug}`,
     image: product?.images[0]?.url,
@@ -84,9 +61,6 @@ export default async function ProductDetailPage({
   ]);
 
   if (!product) {
-    // Lihat catatan 1 di kepala file: `null` berarti "belum bisa dipastikan",
-    // bukan "pasti tidak ada". Menampilkan 404 di sini akan menghapus
-    // halaman dari indeks saat backend hanya sedang lambat.
     return (
       <Container className="py-16 tablet:py-24">
         <div className="mx-auto max-w-2xl">
@@ -120,8 +94,6 @@ export default async function ProductDetailPage({
     { name: product.name, href: `/produk/${product.slug}` },
   ];
 
-  // "Produk terkait" tidak boleh menyertakan produknya sendiri, dan tidak
-  // boleh mengarang: kalau backend tidak punya produk lain, blok ini dilewati.
   const relatedProducts = (related?.products ?? [])
     .filter((item) => item.slug !== product.slug)
     .slice(0, 4);
@@ -133,16 +105,15 @@ export default async function ProductDetailPage({
       />
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
 
-      <Container className="py-6 tablet:py-8">
+      {/* Breadcrumb container ramping */}
+      <Container className="py-3 tablet:py-4">
         <Breadcrumbs items={crumbs} />
       </Container>
 
-      <Container className="pb-12 tablet:pb-16">
-        <div className="grid gap-8 desktop:grid-cols-12 desktop:gap-12">
-          {/*
-            Penanda uji M0: `media: []` adalah fakta data, bukan gambar yang
-            gagal dimuat. Galeri merendernya sebagai blok tenang tanpa `<img>`.
-          */}
+      {/* Main PDP 2-kolom: Kiri (Galeri + Akordeon), Kanan (Sticky Purchase Card) */}
+      <Container className="pb-8 tablet:pb-12">
+        <div className="grid gap-8 desktop:grid-cols-12 desktop:gap-8 desktop:items-start">
+          {/* Kolom Kiri: Galeri Foto Kompak & Akordeon Informasi Produk */}
           <div
             className="desktop:col-span-7"
             data-pdp-media={product.images.length === 0 ? "empty" : "present"}
@@ -152,53 +123,21 @@ export default async function ProductDetailPage({
               productName={product.name}
               badge={product.badge}
             />
+            <div className="mt-8 tablet:mt-10">
+              <ProductAccordion description={product.description} />
+            </div>
           </div>
 
-          {/* Panel tanpa kartu di mobile: bingkai hanya mulai 768 px. */}
-          <div className="desktop:col-span-5">
-            <div className="tablet:rounded-xl tablet:border tablet:border-border-soft tablet:bg-surface-white tablet:p-6">
+          {/* Kolom Kanan: Sticky Purchase Panel */}
+          <div className="desktop:col-span-5 desktop:sticky desktop:top-24 desktop:self-start">
+            <div className="rounded-xl border border-border-soft bg-surface-white p-5 tablet:p-6 shadow-editorial">
               <ProductPurchasePanel product={product} />
             </div>
           </div>
         </div>
-
-        <section className="mt-8 border-t border-border-soft pt-8 tablet:mt-10">
-          <h2 className="text-headline-sm text-text-primary">
-            Deskripsi produk
-          </h2>
-          {product.description ? (
-            <div className="mt-3 max-w-3xl space-y-3 text-body-md leading-relaxed text-text-secondary">
-              {product.description
-                .split("\n")
-                .filter((line) => line.trim().length > 0)
-                .map((paragraph, index) => (
-                  <p key={index}>{paragraph.trim()}</p>
-                ))}
-            </div>
-          ) : (
-            <div className="mt-3 max-w-2xl">
-              <PlaceholderNotice
-                title="Deskripsi produk lagi disiapkan"
-                body="Detail spesifikasi dan keunggulan bahan untuk produk ini sedang kami siapkan. Yuk, hubungi Customer Service kami jika ada pertanyaan!"
-              />
-            </div>
-          )}
-          {/*
-            Jalan keluar satu-satunya untuk pertanyaan ukuran/ketersediaan.
-            Tautan teks, bukan tombol sekunder: CTA primer tetap satu.
-          */}
-          <p className="mt-4 max-w-3xl text-body-md text-text-secondary">
-            Butuh rekomendasi ukuran atau info ketersediaan produk?
-          </p>
-          <Link
-            href="/kontak"
-            className="mt-1 inline-flex min-h-11 items-center text-label-md font-semibold text-brand-forest underline underline-offset-4 transition-colors hover:text-brand-deep"
-          >
-            Yuk, tanya Customer Service →
-          </Link>
-        </section>
       </Container>
 
+      {/* Rekomendasi Produk Lain */}
       {relatedProducts.length > 0 ? (
         <section className="border-t border-border-soft bg-surface-white py-12 tablet:py-16">
           <Container>

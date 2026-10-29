@@ -8,20 +8,10 @@ import type { ProductImageItem } from "@/lib/types";
 /**
  * Galeri produk.
  *
- * Kenapa Client Component: mockup lama menukar gambar utama lewat
- * `onclick` inline + `document.getElementById`, sehingga tombol thumbnail-nya
- * tidak punya state React dan tidak bisa dioperasikan dengan keyboard tanpa
- * `onclick` inline. Di sini state thumbnail hidup di React, dan setiap
- * thumbnail adalah `<button>` dengan `aria-pressed` sehingga pembaca layar
- * tahu gambar mana yang sedang tampil.
- *
- * Rasio: 1:1 di mobile (390 px: 358×358) karena foto 4:5 setinggi ±487 px
- * mendorong harga keluar layar pertama; 4:5 dari 768 px, dibatasi 512 px di
- * tablet supaya panel tidak terdorong. Foto tetap di atas judul.
- *
- * Media kosong (`media: []`) bukan "gambar yang gagal dimuat": itu fakta
- * tentang data. Karena itu tidak ada `<img>` sama sekali dan tidak ada
- * placeholder bergambar — blok tenang dengan dua baris teks.
+ * Diperbarui untuk layout compact desktop:
+ * - Ketinggian foto utama dibatasi maksimal 520px pada desktop dengan rasio 4:3
+ *   agar foto tidak mendominasi layar laptop dan panel pembelian tetap terlihat utuh.
+ * - Thumbnail kompak baris horizontal dengan active ring indicator.
  */
 export function ProductGallery({
   images,
@@ -36,7 +26,7 @@ export function ProductGallery({
   const active = images[Math.min(activeIndex, images.length - 1)];
 
   return (
-    <div className="flex flex-col gap-4 tablet:max-w-lg desktop:max-w-none">
+    <div className="flex flex-col gap-3 tablet:gap-4 tablet:max-w-lg desktop:max-w-none">
       {images.length === 0 ? (
         <div
           data-pdp-gallery="empty"
@@ -50,7 +40,7 @@ export function ProductGallery({
           </p>
         </div>
       ) : (
-        <div className="relative aspect-square overflow-hidden rounded-xl border border-border-soft bg-surface-sage tablet:aspect-4/5">
+        <div className="relative aspect-square tablet:aspect-4/3 desktop:aspect-4/3 max-h-[480px] desktop:max-h-[520px] w-full overflow-hidden rounded-xl border border-border-soft bg-surface-sage">
           <ImageWithFallback
             src={active.url}
             alt={active.alt ?? `${productName} — foto 1`}
@@ -68,20 +58,24 @@ export function ProductGallery({
       )}
 
       {images.length > 1 ? (
-        <ul className="grid grid-cols-4 gap-3">
+        <ul
+          className="flex items-center gap-3 overflow-x-auto pb-1 pt-1"
+          role="tablist"
+          aria-label="Pilihan thumbnail foto produk"
+        >
           {images.map((image, index) => {
             const isActive = index === activeIndex;
             return (
-              <li key={image.url}>
+              <li key={image.url} className="shrink-0">
                 <button
                   type="button"
                   onClick={() => setActiveIndex(index)}
                   aria-pressed={isActive}
                   aria-label={`Tampilkan foto ${index + 1} dari ${images.length}`}
                   className={[
-                    "relative block aspect-square w-full overflow-hidden rounded-md border-2 bg-surface-sage transition-colors",
+                    "relative block h-16 w-16 tablet:h-20 tablet:w-20 overflow-hidden rounded-lg border-2 bg-surface-sage transition-all",
                     isActive
-                      ? "border-brand-forest"
+                      ? "border-brand-forest ring-2 ring-brand-forest/20"
                       : "border-border-soft hover:border-brand-pine",
                   ].join(" ")}
                 >
@@ -89,7 +83,7 @@ export function ProductGallery({
                     src={image.url}
                     alt={image.alt ?? `${productName} — foto ${index + 1}`}
                     fill
-                    sizes="8rem"
+                    sizes="5rem"
                     className="object-cover object-center"
                   />
                 </button>

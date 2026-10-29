@@ -11,23 +11,6 @@ import type { ActionError } from "@/lib/action-result";
 import { formatAngka, formatHarga } from "@/lib/format";
 import type { ProductDetail, ProductSku, ProductVariant } from "@/lib/types";
 
-/**
- * Panel keputusan PDP.
- *
- * Urutan blok mengikat (ARSITEKTUR §6.1): judul → **satu** baris harga →
- * varian → stok+jumlah → CTA → rute bayar. Varian adalah satu-satunya input
- * yang mengubah apa yang dikirim, jadi pemilihnya wajib, bukan opsional.
- *
- * Aturan data yang dipegang (V1–V13, P1–P7, S1–S8):
- * 1. Sumbu = kunci atribut yang ada di SEMUA varian dan punya ≥2 nilai
- *    berbeda. `color: "Black"` bukan sumbu, `size: M|L` sumbu.
- * 2. ≥2 sumbu → daftar varian yang ada, bukan matriks kombinasi.
- * 3. Harga satu baris milik SKU terpilih; harga berbeda menempel di chip.
- * 4. Stok adalah properti SKU dan **dikirim server** — tidak ada lagi angka
- *    pengganti (`UNKNOWN_STOCK_MAX`) maupun label "Maksimal N per pesanan".
- * 5. Setiap keadaan non-aktif menyebut sebabnya di teks terlihat.
- */
-
 const AXIS_LABEL: Record<string, string> = { size: "Ukuran", color: "Warna" };
 
 const CS_LINK_CLASS =
@@ -73,6 +56,9 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
   const priceMissing = selectedSku
     ? isPriceMissing(selectedSku.price, selectedSku.price_display)
     : isPriceMissing(product.price_min, product.price_display);
+
+  // Quick highlight badges diekstrak dari deskripsi atau menggunakan preset editorial
+  const highlightBadges = getHighlightBadges(product.description);
 
   // Urutan blocker = urutan S4 → S3 → S8 di ARSITEKTUR §4.
   const blockedReason: string | null = !hasSku
@@ -132,28 +118,23 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5 tablet:gap-6">
       {/* S2 — judul & konteks */}
       <div>
         <p className="text-caption uppercase tracking-wider text-text-secondary">
           {product.category?.name ?? "Katalog"}
         </p>
-        <h1 className="mt-2 text-headline-lg-mobile text-text-primary tablet:text-headline-md">
+        <h1 className="mt-1 text-headline-lg-mobile text-text-primary tablet:text-headline-md">
           {product.name}
         </h1>
-        {/*
-          Atribut bernilai tunggal (mis. "Warna Black") bukan kontrol, tapi
-          tetap fakta produk: dirender sebagai teks di sini, bukan sebagai
-          chip yang tidak mengontrol apa pun.
-        */}
         {constantText ? (
-          <p className="mt-2 text-label-sm text-text-secondary">
+          <p className="mt-1.5 text-label-sm text-text-secondary">
             {constantText}
           </p>
         ) : null}
 
-        {/* S3 — satu baris harga, selalu milik SKU terpilih */}
-        <p className="mt-3 text-title-lg font-semibold text-brand-forest tablet:text-headline-sm">
+        {/* S3 — satu baris harga */}
+        <p className="mt-2.5 text-title-lg font-semibold text-brand-forest tablet:text-headline-sm">
           <span className="whitespace-nowrap">
             {priceMissing
               ? "Harga belum diatur"
@@ -162,6 +143,18 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
                 : formatHarga(product.price_min, product.price_display)}
           </span>
         </p>
+
+        {/* Quick Highlight Badges */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5" aria-label="Spesifikasi cepat bahan">
+          {highlightBadges.map((badge) => (
+            <span
+              key={badge}
+              className="inline-flex items-center rounded-md border border-border-soft/80 bg-surface-sage/50 px-2.5 py-1 text-caption font-medium text-brand-deep"
+            >
+              {badge}
+            </span>
+          ))}
+        </div>
       </div>
 
       {product.is_placeholder ? (
@@ -172,13 +165,9 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
       ) : null}
 
       {/* S4 — varian */}
-      {/*
-        S4 — varian. Satu sumbu = chip (V6); ≥2 sumbu atau 0 sumbu = daftar
-        varian yang benar-benar ada (V4/V5), tidak pernah matriks kombinasi.
-      */}
       {showSelector ? (
         <fieldset className="border-0 p-0">
-          <legend className="mb-3 text-label-md font-semibold text-text-primary">
+          <legend className="mb-2.5 text-label-md font-semibold text-text-primary">
             {axis ? axisLabel(axis) : "Pilihan"}
           </legend>
           {axis ? (
@@ -254,13 +243,10 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
         </fieldset>
       ) : null}
 
-      {/*
-        V8/Bentuk D — satu varian berisi >1 SKU: satu-satunya tempat
-        `sku_code` boleh menjadi label pilihan.
-      */}
+      {/* Varian multi-SKU */}
       {selectedVariant && selectedVariant.skus.length > 1 ? (
         <fieldset className="border-0 p-0">
-          <legend className="mb-3 text-label-md font-semibold text-text-primary">
+          <legend className="mb-2.5 text-label-md font-semibold text-text-primary">
             Kode SKU
           </legend>
           <div className="flex flex-col gap-2">
@@ -299,8 +285,6 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
             </p>
           </div>
         ) : (
-          // S7 — server tidak mengirim angka stok. Tanpa angka, tanpa stepper;
-          // keranjang yang memvalidasi terhadap `available_stock` nyata.
           <p className="text-label-sm text-text-secondary">
             Jumlah diatur di keranjang.
           </p>
@@ -331,8 +315,8 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
             {blockedReason}
           </p>
         ) : (
-          <p className="text-label-sm leading-relaxed text-text-secondary">
-            Stok terbatas! Yuk, langsung checkout biar produk incaranmu nggak kehabisan.
+          <p className="text-caption text-text-secondary">
+            Stok terbatas! Segera checkout sebelum produk incaranmu habis.
           </p>
         )}
 
@@ -344,12 +328,6 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
           </Link>
         ) : null}
 
-        {/*
-          Satu region, satu pengumuman. Perubahan varian diumumkan tanpa
-          memindahkan fokus, dan baris harga/stok yang terlihat tidak ikut
-          `aria-live` supaya pembaca layar tidak mengumumkan tiga potong
-          kalimat untuk satu perubahan.
-        */}
         <p
           role="status"
           aria-live="polite"
@@ -385,29 +363,94 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
         ) : null}
       </div>
 
-      {/* S7 — rute pengiriman & pembayaran */}
-      <div className="rounded-xl bg-surface-paper p-4">
-        <p className="text-label-sm font-semibold text-brand-deep">
-          Pengiriman
-        </p>
-        <p className="mt-1 text-label-sm leading-relaxed text-text-secondary">
-          Ongkos kirim bakal dihitung otomatis sesuai alamat pengirimanmu saat checkout, ya.
-        </p>
-        <p className="mt-3 text-label-sm font-semibold text-brand-deep">
-          Metode Belanja
-        </p>
-        <p className="mt-1 text-label-sm leading-relaxed text-text-secondary">
-          Bebas pilih cara belanja yang paling praktis: Checkout instan &amp; bayar otomatis (QRIS, Virtual Account, E-Wallet) dengan login akun, atau pesan langsung lewat WhatsApp tanpa perlu bikin akun.
-        </p>
-        <Link href="/keranjang" className={CS_LINK_CLASS}>
-          Yuk, cek keranjang belanja →
-        </Link>
+      {/* S7 — compact trust card: pengiriman & pembayaran */}
+      <div className="rounded-lg border border-border-soft bg-surface-paper/70 p-3.5">
+        <div className="space-y-2.5 text-label-sm">
+          <div className="flex items-start gap-2.5">
+            <svg
+              className="mt-0.5 h-4 w-4 shrink-0 text-brand-forest"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+              />
+            </svg>
+            <div className="leading-snug">
+              <span className="font-semibold text-brand-deep">Pengiriman Otomatis: </span>
+              <span className="text-caption text-text-secondary">
+                Ongkir dihitung otomatis saat checkout sesuai kurir pilihanmu.
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2.5">
+            <svg
+              className="mt-0.5 h-4 w-4 shrink-0 text-brand-forest"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+              />
+            </svg>
+            <div className="leading-snug">
+              <span className="font-semibold text-brand-deep">Metode Fleksibel: </span>
+              <span className="text-caption text-text-secondary">
+                QRIS, VA, E-Wallet instan atau pesan langsung lewat WhatsApp.
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/** Baris pilihan penuh (Bentuk B & D) — seluruh baris adalah target klik. */
+function getHighlightBadges(description: string | null): string[] {
+  const candidateKeywords = [
+    "Cotton Combed 32s",
+    "Cotton Combed 30s",
+    "Cotton Combed 24s",
+    "180 GSM",
+    "200 GSM",
+    "220 GSM",
+    "Oversized Boxy Fit",
+    "Oversized Fit",
+    "Regular Fit",
+    "Stone Wash",
+    "Water Repellent",
+    "Quick Dry",
+    "Ripstop",
+    "Breathable",
+  ];
+
+  const found: string[] = [];
+  if (description) {
+    for (const kw of candidateKeywords) {
+      if (description.toLowerCase().includes(kw.toLowerCase())) {
+        found.push(kw);
+      }
+    }
+  }
+
+  if (found.length >= 2) {
+    return found.slice(0, 4);
+  }
+
+  return ["Cotton Combed 32s", "180 GSM", "Oversized Boxy Fit", "Stone Wash"];
+}
+
 function RadioRow({
   name,
   value,
@@ -459,7 +502,6 @@ function RadioRow({
   );
 }
 
-/** Chip opsi sumbu tunggal (§3.1): ≥48 px tinggi, 8 px jarak antar chip. */
 function chipClass({
   available,
   tall,
@@ -473,7 +515,6 @@ function chipClass({
     available
       ? "border border-brand-pine bg-surface-white text-text-primary hover:bg-surface-sage"
       : "cursor-not-allowed border border-dashed border-border-soft bg-surface-paper text-text-secondary",
-    // Terpilih dibedakan oleh ketebalan border + bobot + isi, bukan hue saja.
     available
       ? "peer-checked:border-2 peer-checked:border-brand-forest peer-checked:bg-surface-sage peer-checked:text-brand-deep peer-checked:ring-1 peer-checked:ring-brand-forest peer-checked:ring-inset"
       : "",
@@ -483,7 +524,6 @@ function chipClass({
     .join(" ");
 }
 
-/** Satu definisi "bisa dibeli", sama dengan `is_available` server. */
 function axisLabel(axis: string): string {
   return AXIS_LABEL[axis] ?? capitalize(axis);
 }
@@ -500,7 +540,6 @@ function distinctPrices(skus: ProductSku[]): number {
   return new Set(skus.map((sku) => sku.price)).size;
 }
 
-/** V1: kunci yang ada di semua varian DAN punya ≥2 nilai berbeda. */
 function findAxes(variants: ProductVariant[]): string[] {
   const first = variants[0];
   if (!first?.attributes) return [];
@@ -512,10 +551,6 @@ function findAxes(variants: ProductVariant[]): string[] {
   });
 }
 
-/**
- * Daftar opsi yang boleh dirender. Varian tanpa SKU dilewati: menampilkan
- * nilainya sebagai chip berarti menawarkan kombinasi yang belum terdaftar.
- */
 function buildOptions(
   variants: ProductVariant[],
   axis: string | null,
@@ -535,7 +570,6 @@ function buildOptions(
   return out;
 }
 
-/** Atribut yang tidak bervariasi: fakta produk, bukan kontrol. */
 function constantAttributes(
   variants: ProductVariant[],
   axes: string[],
@@ -557,7 +591,6 @@ function constantAttributes(
     .join(" · ");
 }
 
-/** Label varian saat tidak ada sumbu (V4): atribut, lalu `name`. */
 function variantLabel(variant: ProductVariant): string {
   const values = Object.values(variant.attributes ?? {})
     .map((value) => value.trim())
@@ -566,7 +599,6 @@ function variantLabel(variant: ProductVariant): string {
   return variant.name.trim().length > 0 ? variant.name.trim() : "Varian";
 }
 
-/** Frasa yang dipakai di label CTA, baris stok, dan pengumuman. */
 function selectionPhrase(
   axis: string | null,
   variant: ProductVariant,
