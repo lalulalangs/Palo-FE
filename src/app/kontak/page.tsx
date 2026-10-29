@@ -68,7 +68,10 @@ export default async function ContactPage() {
   const hasAnyContact =
     resolved.whatsapp !== null ||
     resolved.email !== null ||
-    resolved.instagramUrl !== null;
+    resolved.instagramUrl !== null ||
+    resolved.tiktokUrl !== null ||
+    resolved.threadsUrl !== null ||
+    resolved.facebookUrl !== null;
 
   return (
     <>
@@ -242,6 +245,57 @@ export default async function ContactPage() {
                   </div>
                 )}
               </div>
+
+              {resolved.tiktokUrl ? (
+                <div className="rounded-lg border border-border-soft bg-surface-white p-5">
+                  <h3 className="text-title-md text-brand-deep">TikTok</h3>
+                  <p className="mt-2 text-body-md text-text-primary">
+                    {resolved.tiktokUrl}
+                  </p>
+                  <a
+                    href={resolved.tiktokUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={buttonClass({ variant: "outline", className: "mt-4" })}
+                  >
+                    Buka TikTok
+                  </a>
+                </div>
+              ) : null}
+
+              {resolved.threadsUrl ? (
+                <div className="rounded-lg border border-border-soft bg-surface-white p-5">
+                  <h3 className="text-title-md text-brand-deep">Threads</h3>
+                  <p className="mt-2 text-body-md text-text-primary">
+                    {resolved.threadsHandle ?? resolved.threadsUrl}
+                  </p>
+                  <a
+                    href={resolved.threadsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={buttonClass({ variant: "outline", className: "mt-4" })}
+                  >
+                    Buka Threads
+                  </a>
+                </div>
+              ) : null}
+
+              {resolved.facebookUrl ? (
+                <div className="rounded-lg border border-border-soft bg-surface-white p-5">
+                  <h3 className="text-title-md text-brand-deep">Facebook</h3>
+                  <p className="mt-2 text-body-md text-text-primary">
+                    {resolved.facebookUrl}
+                  </p>
+                  <a
+                    href={resolved.facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={buttonClass({ variant: "outline", className: "mt-4" })}
+                  >
+                    Buka Facebook
+                  </a>
+                </div>
+              ) : null}
             </div>
 
             {!hasAnyContact ? (

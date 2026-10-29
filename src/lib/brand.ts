@@ -34,6 +34,8 @@ export interface ResolvedBrand {
   instagramHandle: string | null;
   facebookUrl: string | null;
   tiktokUrl: string | null;
+  threadsUrl: string | null;
+  threadsHandle: string | null;
   logoUrl: string;
   /** `true` kalau API menyediakannya — dipakai untuk catatan "belum diisi". */
   isApiBacked: boolean;
@@ -58,10 +60,15 @@ export function resolveBrand(brand: BrandInfo | null): ResolvedBrand {
     instagramHandle: brand?.instagram_handle ?? null,
     facebookUrl: brand?.facebook_url ?? null,
     tiktokUrl: brand?.tiktok_url ?? null,
+    threadsUrl: brand?.threads_url ?? null,
+    threadsHandle: brand?.threads_handle ?? null,
     logoUrl: brand?.logo_url ?? PLACEHOLDER_BRAND.logo,
     isApiBacked: brand !== null,
   };
 }
+
+export type BrandContact = ResolvedBrand;
+export const resolveBrandContact = resolveBrand;
 
 /** `https://wa.me/<nomor>?text=<pesan>` dengan pesan ter-encode. */
 export function whatsappLink(brand: ResolvedBrand, message: string): string | null {

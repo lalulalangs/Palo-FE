@@ -30,7 +30,12 @@
  * akunnya hilang, dan `href="#"` yang diklik hanya memuat ulang halaman.
  */
 
-export type SocialNetwork = "instagram" | "facebook" | "tiktok" | "whatsapp";
+export type SocialNetwork =
+  | "instagram"
+  | "facebook"
+  | "tiktok"
+  | "threads"
+  | "whatsapp";
 
 export interface SocialLink {
   network: SocialNetwork;
@@ -51,6 +56,7 @@ export function socialLinks(brand: {
   instagramUrl: string | null;
   facebookUrl: string | null;
   tiktokUrl: string | null;
+  threadsUrl?: string | null;
   whatsappLink: string | null;
 }): SocialLink[] {
   const links: SocialLink[] = [];
@@ -76,6 +82,14 @@ export function socialLinks(brand: {
       network: "tiktok",
       label: "TikTok",
       href: brand.tiktokUrl,
+    });
+  }
+
+  if (brand.threadsUrl) {
+    links.push({
+      network: "threads",
+      label: "Threads",
+      href: brand.threadsUrl,
     });
   }
 
@@ -140,6 +154,18 @@ export function SocialIcon({
           fill="currentColor"
         >
           <path d="M12.53.02C13.84 0 15.14.01 16.44 0c.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07Z" />
+        </svg>
+      );
+
+    case "threads":
+      return (
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          className={cls}
+          fill="currentColor"
+        >
+          <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098c1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015c-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 9.166 3.59 12c.026 2.833.717 5.494 2.071 7.168c1.43 1.782 3.63 2.695 6.54 2.717c3.955-.028 6.471-1.465 7.427-4.485c.348-1.087.525-2.31.525-3.643v-1.399c-1.044.33-2.221.503-3.51.517c-4.455.048-7.575-1.507-7.575-4.757c0-2.483 1.956-4.14 5.06-4.14c2.148 0 3.754.764 4.636 2.208c.801 1.306 1.135 3.109 1.135 5.568v1.46c0 1.637-.258 3.098-.788 4.347c-1.218 2.87-4.095 4.368-8.146 4.398m-.104-14.502c1.783-.012 2.923.957 2.923 2.502c0 1.492-1.222 2.455-2.986 2.441c-1.745-.013-2.909-.972-2.909-2.454c0-1.528 1.185-2.476 2.972-2.489" />
         </svg>
       );
 

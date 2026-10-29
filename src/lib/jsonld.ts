@@ -22,6 +22,7 @@ export interface OrganizationOptions {
   instagramUrl: string | null;
   facebookUrl: string | null;
   tiktokUrl: string | null;
+  threadsUrl?: string | null;
   whatsapp: string | null;
 }
 
@@ -69,7 +70,12 @@ export function organizationJsonLd(options: OrganizationOptions): JsonLdObject {
   // yang benar-benar terisi yang dimasukkan — nilai `null` akan muncul
   // sebagai `"sameAs": [null]` dan membingungkan crawler.
   const sameAs: string[] = [];
-  for (const url of [options.instagramUrl, options.facebookUrl, options.tiktokUrl]) {
+  for (const url of [
+    options.instagramUrl,
+    options.facebookUrl,
+    options.tiktokUrl,
+    options.threadsUrl,
+  ]) {
     if (url) sameAs.push(url);
   }
   if (sameAs.length > 0) node.sameAs = sameAs;

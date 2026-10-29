@@ -45,8 +45,33 @@ export const PLACEHOLDER_BRAND = {
   email: null,
   instagramUrl: null,
   instagramHandle: null,
+  facebookUrl: null,
+  tiktokUrl: null,
+  threadsUrl: null,
+  threadsHandle: null,
   logo: "/placeholder-brand.svg",
 } as const;
+
+export const EMPTY_BRAND_CONTACT = {
+  brandName: PLACEHOLDER_BRAND.brandName,
+  tagline: PLACEHOLDER_BRAND.tagline,
+  about: null,
+  address: PLACEHOLDER_BRAND.address,
+  mapsUrl: null,
+  coordinates: PLACEHOLDER_BRAND.coordinates,
+  openingHours: PLACEHOLDER_BRAND.openingHours,
+  whatsapp: null,
+  whatsappLink: null,
+  email: null,
+  instagramUrl: null,
+  instagramHandle: null,
+  facebookUrl: null,
+  tiktokUrl: null,
+  threadsUrl: null,
+  threadsHandle: null,
+  logoUrl: PLACEHOLDER_BRAND.logo,
+  isApiBacked: false,
+};
 
 /** Label yang dipakai untuk menjelaskan kenapa data belum tampil. */
 export const PLACEHOLDER_NOTICE_TITLE = "Koleksi produk lagi disiapkan";

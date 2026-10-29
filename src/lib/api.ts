@@ -436,6 +436,8 @@ function normalizeBrand(
     instagram_handle: readFirstString(source, ["instagram_handle"]),
     facebook_url: safeExternalUrl(readFirstString(source, ["facebook_url"])),
     tiktok_url: safeExternalUrl(readFirstString(source, ["tiktok_url"])),
+    threads_url: safeExternalUrl(readFirstString(source, ["threads_url"])),
+    threads_handle: readFirstString(source, ["threads_handle"]),
     store_name: readFirstString(source, ["store_name"]),
     store_address: address && city ? `${address}, ${city}` : (address ?? city),
     store_maps_url: readFirstString(source, ["store_maps_url"]),

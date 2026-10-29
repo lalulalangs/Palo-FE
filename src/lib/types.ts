@@ -185,6 +185,8 @@ export interface BrandInfo {
   instagram_handle: string | null;
   facebook_url: string | null;
   tiktok_url: string | null;
+  threads_url?: string | null;
+  threads_handle?: string | null;
 
   store_name: string | null;
   store_address: string | null;
@@ -200,6 +202,8 @@ export interface BrandInfo {
   store_opening_hours: string | null;
   site_url: string | null;
 }
+
+export type BrandSettings = BrandInfo;
 
 export interface CategoryItem {
   id: number | null;

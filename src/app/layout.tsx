@@ -173,6 +173,7 @@ export default async function RootLayout({
             instagramUrl: brand?.instagram_url ?? null,
             facebookUrl: brand?.facebook_url ?? null,
             tiktokUrl: brand?.tiktok_url ?? null,
+            threadsUrl: brand?.threads_url ?? null,
             whatsapp: brand?.whatsapp_cs ?? null,
           })}
         />

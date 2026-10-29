@@ -41,6 +41,7 @@ export function SiteFooter({ brand }: { brand: ResolvedBrand | null }) {
         instagramUrl: brand.instagramUrl,
         facebookUrl: brand.facebookUrl,
         tiktokUrl: brand.tiktokUrl,
+        threadsUrl: brand.threadsUrl,
         whatsappLink: brand.whatsappLink,
       })
     : [];
