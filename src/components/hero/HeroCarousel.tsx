@@ -687,7 +687,7 @@ function HeroFrame({
       */}
       {slide?.stampLeft ? (
         <p
-          className={`absolute left-4 top-24 z-10 max-w-[40%] font-mono text-xs uppercase tracking-widest tablet:left-10 tablet:text-sm ${stampColor}`}
+          className={`hidden tablet:block absolute left-4 top-24 z-10 max-w-[40%] font-mono text-xs uppercase tracking-widest tablet:left-10 tablet:text-sm ${stampColor}`}
         >
           {slide.stampLeft}
         </p>
@@ -695,7 +695,7 @@ function HeroFrame({
 
       {slide?.stampRight ? (
         <p
-          className={`absolute right-4 top-24 z-10 max-w-[40%] text-right font-mono text-xs uppercase tracking-widest tablet:right-10 tablet:text-sm ${stampColor}`}
+          className={`hidden tablet:block absolute right-4 top-24 z-10 max-w-[40%] text-right font-mono text-xs uppercase tracking-widest tablet:right-10 tablet:text-sm ${stampColor}`}
         >
           {slide.stampRight}
         </p>

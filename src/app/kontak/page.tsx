@@ -155,8 +155,8 @@ export default async function ContactPage() {
           <section className="tablet:col-span-6">
             <SectionHeading
               eyebrow="Koneksi langsung"
-              title="Kanal kontak"
-              description="Pilih kanal yang paling nyaman buatmu. Tim kami siap membantu menjawab pertanyaan seputar produk dan pesanan."
+              title="kontak"
+              description="Pilih kontak yang paling nyaman buatmu. Tim kami siap membantu menjawab pertanyaan seputar produk dan pesanan."
             />
 
             <div className="mt-4 space-y-4">

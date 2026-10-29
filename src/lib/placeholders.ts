@@ -38,7 +38,7 @@ export const PLACEHOLDER_BRAND = {
   tagline: "Merchandise penjelajahan dari Senaru, kaki Gunung Rinjani.",
   address: "Jl. Pariwisata Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat",
   mapsUrl: null,
-  coordinates: "8°18'42.1\"S 116°24'26.7\"E",
+  coordinates: "8°18'05.2\"S 116°24'28.6\"E",
   openingHours: "Senin – Minggu: 08.00 – 21.00 WITA",
   phone: null,
   whatsapp: null,
