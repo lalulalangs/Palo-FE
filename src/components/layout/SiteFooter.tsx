@@ -156,7 +156,7 @@ export function SiteFooter({ brand }: { brand: ResolvedBrand | null }) {
 
               <p>
                 Jam operasional:{" "}
-                {brand?.openingHours ?? "Senin – Minggu: 08.00 – 21.00 WITA"}
+                {brand?.openingHours ?? "Senin – Minggu: 08.00 – 20.00 WITA"}
               </p>
 
               {brand?.whatsapp ? (
