@@ -12,6 +12,7 @@ const TOTAL_DURATION_MS = 3000;
 const TICK_INTERVAL_MS = 100;
 
 function subscribeStorage(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
   window.addEventListener("storage", onStoreChange);
   return () => window.removeEventListener("storage", onStoreChange);
 }

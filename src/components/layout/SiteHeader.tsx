@@ -25,11 +25,13 @@ const SCROLL_THRESHOLD = 8;
 export const HEADER_HEIGHT_CLASS = "h-20";
 
 function subscribeScroll(onStoreChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
   window.addEventListener("scroll", onStoreChange, { passive: true });
   return () => window.removeEventListener("scroll", onStoreChange);
 }
 
 function scrollSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
   return window.scrollY > SCROLL_THRESHOLD;
 }
 
