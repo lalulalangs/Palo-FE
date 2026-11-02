@@ -129,11 +129,10 @@ export default async function CheckoutSuccessPage({
 
   if (isCod) {
     if (isAwaitingCodConfirmation) {
-      headerEyebrow = "Menunggu Konfirmasi WhatsApp";
-      headerTitle =
-        "Yeay, pesananmu sudah tercatat! Yuk, selesaikan 1 langkah terakhir.";
+      headerEyebrow = "Checkout selesai";
+      headerTitle = "Pesanan berhasil tercatat!";
       headerDescription =
-        "Klik tombol WhatsApp di bawah untuk kirim pesan konfirmasi otomatis ke admin. Begitu terkirim, pesananmu langsung kami kemas dari gudang Senaru!";
+        "Satu langkah terakhir! Silakan kirim konfirmasi WhatsApp di bawah agar pesananmu dapat langsung disiapkan dari gudang Senaru.";
     } else {
       headerEyebrow = "Pesanan COD";
       headerTitle = `Status Pesanan: ${labelStatusOrder(detail.status)}`;

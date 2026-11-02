@@ -33,8 +33,8 @@ async function copyToClipboard(text: string): Promise<boolean> {
   }
 
   if (typeof document !== "undefined") {
+    const textArea = document.createElement("textarea");
     try {
-      const textArea = document.createElement("textarea");
       textArea.value = text;
       textArea.style.position = "fixed";
       textArea.style.top = "0";
@@ -53,10 +53,13 @@ async function copyToClipboard(text: string): Promise<boolean> {
       textArea.setSelectionRange(0, text.length);
 
       const successful = document.execCommand("copy");
-      document.body.removeChild(textArea);
       if (successful) return true;
     } catch {
       // execCommand gagal atau tidak didukung di environment
+    } finally {
+      if (textArea.parentNode) {
+        textArea.parentNode.removeChild(textArea);
+      }
     }
   }
 
@@ -150,11 +153,23 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
   }
 
   // Hanya buat tautan WhatsApp jika sanitizedWhatsappUrl valid ATAU nomor CS tersedia
-  const finalWhatsappUrl =
-    sanitizedWhatsappUrl ||
-    (extractedPhone
+  const finalWhatsappUrl = (() => {
+    if (sanitizedWhatsappUrl) {
+      try {
+        const url = new URL(sanitizedWhatsappUrl);
+        if (!url.searchParams.has("text") && extractedMessage) {
+          url.searchParams.set("text", extractedMessage);
+          return url.toString();
+        }
+        return sanitizedWhatsappUrl;
+      } catch {
+        return sanitizedWhatsappUrl;
+      }
+    }
+    return extractedPhone
       ? `https://wa.me/${extractedPhone}?text=${encodeURIComponent(extractedMessage)}`
-      : null);
+      : null;
+  })();
 
   const whatsappWebUrl = extractedPhone
     ? `https://web.whatsapp.com/send?phone=${extractedPhone}&text=${encodeURIComponent(
