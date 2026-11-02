@@ -130,7 +130,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
         mengirim objek `payment` — untuk pesanan yang sudah dibayar biasanya
         kosong, dan itu memang benar.
       */}
-      {order.payment ? (
+      {order.payment && order.payment_method !== "cod" ? (
         <section
           aria-labelledby="instruksi-pembayaran"
           className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"

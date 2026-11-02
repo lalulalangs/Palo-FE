@@ -1430,6 +1430,13 @@ function normalizeOrder(source: Record<string, unknown>): OrderDetail | null {
     // `OrderDetailResource` mengirim `payment_method` dan objek `payment`
     // (metode, jumlah, status, plus instruksi gateway di `instructions`).
     payment_method: readString(source, "payment_method"),
+    is_cod:
+      source.is_cod === true || readString(source, "payment_method") === "cod",
+    cod_reference_code: readString(source, "cod_reference_code"),
+    whatsapp_url: readString(source, "whatsapp_url"),
+    whatsapp_message: readString(source, "whatsapp_message"),
+    confirmed_at: readString(source, "confirmed_at"),
+    refund_status: readString(source, "refund_status"),
     payment: normalizePayment(source.payment),
   };
 }
@@ -1455,6 +1462,12 @@ function normalizePayment(value: unknown): PaymentInfo | null {
     // yang tersedia supaya tidak bergantung pada satu bentuk saja.
     payment_url:
       readString(value, "payment_url") ?? instructions?.payment_url ?? null,
+    whatsapp_url:
+      readString(value, "whatsapp_url") ?? instructions?.whatsapp_url ?? null,
+    whatsapp_message:
+      readString(value, "whatsapp_message") ??
+      instructions?.whatsapp_message ??
+      null,
   };
 }
 
@@ -1468,6 +1481,9 @@ function normalizePaymentInstruction(value: unknown): PaymentInstruction | null 
     expires_at: readString(value, "expires_at"),
     method: readString(value, "method"),
     payment_url: readString(value, "payment_url"),
+    whatsapp_url: readString(value, "whatsapp_url"),
+    whatsapp_message: readString(value, "whatsapp_message"),
+    cod_reference_code: readString(value, "cod_reference_code"),
   };
 }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatHarga } from "@/lib/format";
 import type { OrderDetail } from "@/lib/types";
+import { safeExternalUrl } from "@/lib/url";
 
 /**
  * Format nomor telepon 628xxx / 08xxx menjadi format tampilan Indonesia yang ramah (08xx-xxxx-xxxx).
@@ -27,6 +28,8 @@ export function CodConfirmationCard({ order }: { order: OrderDetail }) {
     order.payment?.instructions?.whatsapp_url ||
     null;
 
+  const sanitizedWhatsappUrl = safeExternalUrl(rawWhatsappUrl);
+
   let extractedMessage =
     order.whatsapp_message ||
     order.payment?.whatsapp_message ||
@@ -35,9 +38,9 @@ export function CodConfirmationCard({ order }: { order: OrderDetail }) {
 
   let extractedPhone = "";
 
-  if (rawWhatsappUrl) {
+  if (sanitizedWhatsappUrl) {
     try {
-      const parsed = new URL(rawWhatsappUrl);
+      const parsed = new URL(sanitizedWhatsappUrl);
       if (!extractedMessage) {
         extractedMessage = parsed.searchParams.get("text");
       }
@@ -101,7 +104,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
   }
 
   const finalWhatsappUrl =
-    rawWhatsappUrl ||
+    sanitizedWhatsappUrl ||
     `https://wa.me/${extractedPhone}?text=${encodeURIComponent(extractedMessage)}`;
 
   const whatsappWebUrl = `https://web.whatsapp.com/send?phone=${extractedPhone}&text=${encodeURIComponent(
@@ -113,9 +116,11 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
 
   const handleCopyMessage = async () => {
     try {
-      await navigator.clipboard.writeText(extractedMessage);
-      setCopiedMessage(true);
-      setTimeout(() => setCopiedMessage(false), 2000);
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(extractedMessage);
+        setCopiedMessage(true);
+        setTimeout(() => setCopiedMessage(false), 2000);
+      }
     } catch {
       // Fallback manual bila clipboard API diblokir
     }
@@ -123,9 +128,11 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
 
   const handleCopyPhone = async () => {
     try {
-      await navigator.clipboard.writeText(displayPhone);
-      setCopiedPhone(true);
-      setTimeout(() => setCopiedPhone(false), 2000);
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(displayPhone);
+        setCopiedPhone(true);
+        setTimeout(() => setCopiedPhone(false), 2000);
+      }
     } catch {
       // Fallback manual bila clipboard API diblokir
     }

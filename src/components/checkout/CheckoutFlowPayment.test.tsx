@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
 import { CheckoutFlow } from "./CheckoutFlow";
+import { placeOrderAction } from "@/actions/checkout";
 import type { CartItem, Voucher } from "@/lib/types";
 import type { AddressInput } from "@/lib/checkout-form";
 
@@ -211,5 +212,26 @@ describe("CheckoutFlow Payment Step", () => {
     expect(
       screen.getByRole("button", { name: "Lanjut ke Pembayaran" }),
     ).toBeInTheDocument();
+  });
+
+  it("mengirimkan order dengan metode paymentMethod 'cod' saat tombol Buat Pesanan ditekan", async () => {
+    await advanceToPaymentStep();
+
+    const codRadio = screen.getByRole("radio", {
+      name: /Bayar di Tempat/i,
+    });
+    fireEvent.click(codRadio);
+
+    const submitBtn = screen.getByRole("button", { name: "Buat Pesanan" });
+    fireEvent.click(submitBtn);
+
+    await vi.waitFor(() => {
+      expect(placeOrderAction).toHaveBeenCalledWith(
+        expect.objectContaining({ paymentMethod: "cod" }),
+      );
+      expect(mockReplace).toHaveBeenCalledWith(
+        expect.stringContaining("/checkout/berhasil?order=ORD-COD-12345"),
+      );
+    });
   });
 });
