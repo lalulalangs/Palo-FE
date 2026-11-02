@@ -812,7 +812,7 @@ export interface GuestWhatsAppRequest {
 export interface GuestWhatsAppResult {
   reference_code: string;
   /**
-   * Nomor pesanan `PLR-...` untuk alur WhatsApp tamu.
+   * Nomor pesanan `PRJ-...` untuk alur WhatsApp tamu.
    *
    * `null` pada `POST /guest/custom-inquiry`, karena inquiry partai memang
    * BUKAN pesanan (tidak membuat order).
