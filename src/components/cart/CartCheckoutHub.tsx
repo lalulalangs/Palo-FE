@@ -132,7 +132,6 @@ export function CartCheckoutHub({
               : "text-text-secondary hover:text-text-primary",
           ].join(" ")}
         >
-          <span aria-hidden="true">⚡</span>
           <span>Lewat WhatsApp</span>
         </button>
 
@@ -152,7 +151,6 @@ export function CartCheckoutHub({
               : "text-text-secondary hover:text-text-primary",
           ].join(" ")}
         >
-          <span aria-hidden="true">💳</span>
           <span>Bayar Online</span>
         </button>
       </div>
@@ -187,9 +185,6 @@ export function CartCheckoutHub({
           {/* Kartu kelebihan checkout online */}
           <div className="space-y-2.5 rounded-lg border border-border-soft bg-surface-paper/70 p-4">
             <h3 className="flex items-center gap-1.5 text-label-md font-semibold text-text-primary">
-              <span className="text-brand-forest" aria-hidden="true">
-                ✨
-              </span>
               <span>Keuntungan Bayar Online</span>
             </h3>
             <ul className="space-y-2 text-body-sm text-text-secondary">
@@ -198,7 +193,7 @@ export function CartCheckoutHub({
                   ✓
                 </span>
                 <span>
-                  Pembayaran instan otomatis via QRIS, Virtual Account (BCA, Mandiri, BRI, BNI), &amp; E-Wallet.
+                  Pembayaran praktis dan otomatis via Transfer Virtual Account (VA).
                 </span>
               </li>
               <li className="flex items-start gap-2">

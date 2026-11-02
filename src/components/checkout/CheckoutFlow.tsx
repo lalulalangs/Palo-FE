@@ -380,7 +380,7 @@ export function CheckoutFlow({
                           Pembayaran Online Otomatis
                         </span>
                         <span className="block text-body-sm leading-relaxed text-text-secondary">
-                          Praktis dan langsung diproses melalui QRIS, Virtual Account BCA, Mandiri, BRI, atau E-Wallet.
+                          Praktis dan langsung terverifikasi otomatis via Transfer Virtual Account (VA).
                         </span>
                       </div>
                     </div>

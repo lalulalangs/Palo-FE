@@ -407,7 +407,7 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
             <div className="leading-snug">
               <span className="font-semibold text-brand-deep">Metode Fleksibel: </span>
               <span className="text-caption text-text-secondary">
-                QRIS, VA, E-Wallet instan atau pesan langsung lewat WhatsApp.
+                Transfer Virtual Account praktis atau pesan langsung lewat WhatsApp.
               </span>
             </div>
           </div>

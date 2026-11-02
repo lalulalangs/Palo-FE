@@ -214,7 +214,7 @@ export default async function CheckoutSuccessPage({
                 ) : (
                   <PlaceholderNotice
                     title="Instruksi pembayaran belum tersedia"
-                    body="Nomor Virtual Account, string QRIS, dan detail bank berasal langsung dari payment gateway. Kalau belum tampil, muat ulang halaman ini sebentar lagi atau hubungi Customer Service dengan menyebutkan nomor pesanan."
+                    body="Nomor Virtual Account dan detail bank berasal langsung dari payment gateway. Kalau belum tampil, muat ulang halaman ini sebentar lagi atau hubungi Customer Service dengan menyebutkan nomor pesanan."
                   />
                 )}
               </div>

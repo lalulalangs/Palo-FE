@@ -190,7 +190,7 @@ export function CheckoutSummary({
         <span className="font-medium text-text-primary">
           {paymentMethod === "cod"
             ? "Bayar di Tempat — Tunai saat kurir tiba"
-            : "Pembayaran Online Otomatis — QRIS, Virtual Account, E-Wallet"}
+            : "Pembayaran Online Otomatis — Transfer Virtual Account (VA)"}
         </span>
       </p>
 
