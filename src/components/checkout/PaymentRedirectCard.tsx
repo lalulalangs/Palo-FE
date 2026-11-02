@@ -162,7 +162,7 @@ export function PaymentRedirectCard({
                 ? "Mohon tunggu sebentar ya, kamu sedang diarahkan ke sistem pembayaran DOKU Checkout yang aman."
                 : hasReturned
                   ? "Kamu kembali dari halaman pembayaran. Klik tombol di bawah ini kapan saja buat melanjutkan pembayaran via DOKU, ya."
-                  : "Kamu akan otomatis diarahkan ke DOKU Checkout untuk memilih metode pembayaran favoritmu (QRIS, Virtual Account, E-Wallet, atau Kartu Kredit)."}
+                  : "Kamu akan otomatis diarahkan ke DOKU Checkout untuk menyelesaikan pembayaran via Transfer Virtual Account (VA)."}
             </p>
           </div>
 

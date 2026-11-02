@@ -123,7 +123,7 @@ describe("CheckoutFlow Payment Step", () => {
     ).toBeGreaterThanOrEqual(1);
     expect(
       screen.getByText(
-        "Praktis dan langsung diproses melalui QRIS, Virtual Account BCA, Mandiri, BRI, atau E-Wallet.",
+        "Praktis dan langsung terverifikasi otomatis via Transfer Virtual Account (VA).",
       ),
     ).toBeInTheDocument();
 
