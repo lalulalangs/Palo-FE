@@ -1,19 +1,66 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { formatHarga } from "@/lib/format";
 import type { OrderDetail } from "@/lib/types";
-import { safeExternalUrl } from "@/lib/url";
+import { safeWhatsappUrl } from "@/lib/url";
 
 /**
  * Format nomor telepon 628xxx / 08xxx menjadi format tampilan Indonesia yang ramah (08xx-xxxx-xxxx).
+ * Tidak lagi menggunakan fallback dummy hardcode.
  */
 function formatPhoneDisplay(phone: string): string {
   const digits = phone.replace(/[^\d]/g, "");
-  if (!digits) return "0812-3456-7890";
+  if (!digits) return "";
   const local = digits.startsWith("62") ? `0${digits.slice(2)}` : digits;
   if (local.length <= 8) return local;
   return local.replace(/(\d{4})(\d{4})(\d+)/, "$1-$2-$3");
+}
+
+/**
+ * Helper salin teks ke clipboard dengan dukungan API modern dan fallback execCommand.
+ * Bekerja dengan andal di in-app browser (WebView), konteks aman/non-aman, dan mobile.
+ */
+async function copyToClipboard(text: string): Promise<boolean> {
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Gagal (misal: permission denied / WebView pembatasan), coba fallback legacy
+    }
+  }
+
+  if (typeof document !== "undefined") {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.width = "2em";
+      textArea.style.height = "2em";
+      textArea.style.padding = "0";
+      textArea.style.border = "none";
+      textArea.style.outline = "none";
+      textArea.style.boxShadow = "none";
+      textArea.style.background = "transparent";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      textArea.setSelectionRange(0, text.length);
+
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+      if (successful) return true;
+    } catch {
+      // execCommand gagal atau tidak didukung di environment
+    }
+  }
+
+  return false;
 }
 
 export function CodConfirmationCard({ order }: { order: OrderDetail }) {
@@ -28,7 +75,8 @@ export function CodConfirmationCard({ order }: { order: OrderDetail }) {
     order.payment?.instructions?.whatsapp_url ||
     null;
 
-  const sanitizedWhatsappUrl = safeExternalUrl(rawWhatsappUrl);
+  // Validasi URL hanya dari domain resmi WhatsApp (wa.me, api.whatsapp.com, web.whatsapp.com)
+  const sanitizedWhatsappUrl = safeWhatsappUrl(rawWhatsappUrl);
 
   let extractedMessage =
     order.whatsapp_message ||
@@ -55,11 +103,9 @@ export function CodConfirmationCard({ order }: { order: OrderDetail }) {
     }
   }
 
-  if (!extractedPhone) {
-    extractedPhone = "6281234567890";
-  }
-
-  const displayPhone = formatPhoneDisplay(extractedPhone);
+  // Fallback dummy "6281234567890" DIHAPUS TOTAL.
+  // Jika tidak ada nomor CS resmi, extractedPhone tetap kosong.
+  const displayPhone = extractedPhone ? formatPhoneDisplay(extractedPhone) : "";
 
   if (!extractedMessage) {
     const itemsList =
@@ -103,38 +149,47 @@ Alamat: ${addressStr}
 Mohon diproses untuk pengiriman. Terima kasih!`;
   }
 
+  // Hanya buat tautan WhatsApp jika sanitizedWhatsappUrl valid ATAU nomor CS tersedia
   const finalWhatsappUrl =
     sanitizedWhatsappUrl ||
-    `https://wa.me/${extractedPhone}?text=${encodeURIComponent(extractedMessage)}`;
+    (extractedPhone
+      ? `https://wa.me/${extractedPhone}?text=${encodeURIComponent(extractedMessage)}`
+      : null);
 
-  const whatsappWebUrl = `https://web.whatsapp.com/send?phone=${extractedPhone}&text=${encodeURIComponent(
-    extractedMessage,
-  )}`;
+  const whatsappWebUrl = extractedPhone
+    ? `https://web.whatsapp.com/send?phone=${extractedPhone}&text=${encodeURIComponent(
+        extractedMessage,
+      )}`
+    : null;
 
   const [copiedMessage, setCopiedMessage] = useState(false);
+  const [copyMessageError, setCopyMessageError] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copyPhoneError, setCopyPhoneError] = useState(false);
 
   const handleCopyMessage = async () => {
-    try {
-      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(extractedMessage);
-        setCopiedMessage(true);
-        setTimeout(() => setCopiedMessage(false), 2000);
-      }
-    } catch {
-      // Fallback manual bila clipboard API diblokir
+    if (!extractedMessage) return;
+    const ok = await copyToClipboard(extractedMessage);
+    if (ok) {
+      setCopiedMessage(true);
+      setCopyMessageError(false);
+      setTimeout(() => setCopiedMessage(false), 2000);
+    } else {
+      setCopyMessageError(true);
+      setTimeout(() => setCopyMessageError(false), 3000);
     }
   };
 
   const handleCopyPhone = async () => {
-    try {
-      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(displayPhone);
-        setCopiedPhone(true);
-        setTimeout(() => setCopiedPhone(false), 2000);
-      }
-    } catch {
-      // Fallback manual bila clipboard API diblokir
+    if (!displayPhone) return;
+    const ok = await copyToClipboard(displayPhone);
+    if (ok) {
+      setCopiedPhone(true);
+      setCopyPhoneError(false);
+      setTimeout(() => setCopiedPhone(false), 2000);
+    } else {
+      setCopyPhoneError(true);
+      setTimeout(() => setCopyPhoneError(false), 3000);
     }
   };
 
@@ -170,17 +225,36 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
           </p>
         </div>
 
-        {/* Tombol Utama WhatsApp (Warna Primary Sistem, min-height 52px) */}
-        <div>
-          <a
-            href={finalWhatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-brand-forest px-6 py-3.5 text-center text-title-md font-bold text-surface-white shadow-sm transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest focus:ring-offset-2 active:scale-[0.99]"
-          >
-            <span>Konfirmasi Pesanan via WhatsApp 1-Klik</span>
-          </a>
-        </div>
+        {/* Tombol Utama WhatsApp atau Fallback Kontak CS Resmi */}
+        {finalWhatsappUrl ? (
+          <div>
+            <a
+              href={finalWhatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-brand-forest px-6 py-3.5 text-center text-title-md font-bold text-surface-white shadow-sm transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest focus:ring-offset-2 active:scale-[0.99]"
+            >
+              <span>Konfirmasi Pesanan via WhatsApp 1-Klik</span>
+            </a>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-border-soft bg-surface-paper p-5 text-body-md text-text-secondary">
+            <p className="font-semibold text-text-primary">
+              Nomor WhatsApp konfirmasi belum tersedia otomatis.
+            </p>
+            <p className="mt-1">
+              Jangan khawatir, pesananmu tetap tersimpan aman. Silakan hubungi tim Customer Service resmi kami melalui halaman kontak untuk mengonfirmasi pesanan ini.
+            </p>
+            <div className="mt-3">
+              <Link
+                href="/kontak"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-forest px-5 py-2.5 text-label-md font-semibold text-surface-white transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest"
+              >
+                Hubungi Customer Service di Halaman Kontak
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Info Penenang Timer 24 Jam */}
         <div className="rounded-lg border border-border-soft border-l-4 border-l-brand-forest bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
@@ -229,13 +303,24 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
               <pre className="max-h-40 overflow-y-auto rounded-md border border-border-soft bg-surface-paper p-3 text-caption font-mono leading-relaxed text-text-secondary whitespace-pre-wrap">
                 {extractedMessage}
               </pre>
-              <button
-                type="button"
-                onClick={handleCopyMessage}
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
-              >
-                {copiedMessage ? "Tersalin" : "Salin Teks Pesanan"}
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopyMessage}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
+                >
+                  {copiedMessage
+                    ? "Tersalin"
+                    : copyMessageError
+                    ? "Gagal Menyalin Teks"
+                    : "Salin Teks Pesanan"}
+                </button>
+                {copyMessageError ? (
+                  <span className="text-caption text-feedback-error" role="alert">
+                    Silakan blok dan salin teks di kotak atas secara manual.
+                  </span>
+                ) : null}
+              </div>
             </div>
 
             {/* Lapis 2 & 3: Salin Nomor CS & WhatsApp Web */}
@@ -243,26 +328,51 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
               <span className="block font-medium text-text-primary">
                 2. Kirim pesan ke Customer Service kami:
               </span>
-              <div className="flex flex-wrap gap-2.5">
-                <button
-                  type="button"
-                  onClick={handleCopyPhone}
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
-                >
-                  {copiedPhone
-                    ? "Tersalin"
-                    : `Salin Nomor CS: ${displayPhone}`}
-                </button>
+              {extractedPhone ? (
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={handleCopyPhone}
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
+                  >
+                    {copiedPhone
+                      ? "Tersalin"
+                      : copyPhoneError
+                      ? "Gagal Menyalin Nomor"
+                      : `Salin Nomor CS: ${displayPhone}`}
+                  </button>
 
-                <a
-                  href={whatsappWebUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-text-primary hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
-                >
-                  Buka WhatsApp Web
-                </a>
-              </div>
+                  {whatsappWebUrl ? (
+                    <a
+                      href={whatsappWebUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-text-primary hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
+                    >
+                      Buka WhatsApp Web
+                    </a>
+                  ) : null}
+
+                  {copyPhoneError ? (
+                    <span className="text-caption text-feedback-error" role="alert">
+                      Silakan catat nomor: {displayPhone}
+                    </span>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="rounded-md border border-border-soft bg-surface-paper p-3 text-body-sm text-text-secondary">
+                  <p>
+                    Nomor WhatsApp CS tidak terlampir pada detail pesanan ini. Silakan kunjungi{" "}
+                    <Link
+                      href="/kontak"
+                      className="font-semibold text-brand-forest underline hover:text-brand-deep"
+                    >
+                      Halaman Kontak Resmi Toko
+                    </Link>{" "}
+                    untuk terhubung langsung dengan tim kami.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </details>

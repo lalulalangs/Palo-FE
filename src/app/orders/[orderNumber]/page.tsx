@@ -7,6 +7,7 @@ import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { OrderTimeline } from "@/components/lacak/OrderTimeline";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
+import { CodConfirmationCard } from "@/components/checkout/CodConfirmationCard";
 import { buttonClass } from "@/components/ui/Button";
 import { getToken, lookupOrder } from "@/lib/api";
 import {
@@ -19,35 +20,6 @@ import {
 import { buildMetadata } from "@/lib/metadata";
 import type { OrderDetail } from "@/lib/types";
 
-/**
- * Detail pesanan — halaman yang dituju pembeli setelah kembali dari DOKU.
- *
- * **Kenapa route-nya `/orders/{nomor}`, bukan `/doku`?**
- * `DokuCheckoutClient::callbackUrl()` mengirim `FRONTEND_URL.'/orders/'.$order->order_number`
- * ke DOKU sebagai `callback_url`. Jadi path inilah yang benar-benar dibuka
- * gateway saat pembeli selesai (atau membatalkan) pembayaran; `/doku` hanya
- * jaring kalau Back Office DOKU diisi path lain (lihat `src/app/doku/route.ts`).
- *
- * **Guard login, bukan lookup anonim.** `GET /orders/{nomor}` dilindungi
- * `auth:sanctum` dan `OrderController::show` memfilter `user_id`, jadi tamu
- * tidak punya cara melihat pesanan dan nomor pesanan tidak pernah dikonfirmasi
- * ada atau tidak. Karena itu tamu diarahkan ke `/masuk` dengan `redirect_to`
- * (satu-satunya key yang dibaca `AuthForm`/`safeRedirect`) kembali ke halaman
- * ini. Token 401 juga diarahkan ke sana: cookie yang ada tidak berarti sesi
- * masih sah.
- *
- * **Isi halaman.** Bagian pentingnya bukan sekadar mengulang data pesanan,
- * tetapi menjawab satu pertanyaan: *pembayaran saya sudah masuk atau belum,
- * dan apa yang harus saya lakukan sekarang?* Jawaban itu disusun di
- * `describeNextStep()` dari `status` yang dikirim server. Rincian teknis
- * (instruksi VA/QRIS, linimasa status, alamat kirim, resi, item) dirender
- * `OrderTimeline` yang sudah dipakai `/lacak` — tidak ada komponen kedua.
- *
- * **Yang tidak ditampilkan.** Hitung mundur pembayaran (selalu salah begitu tab
- * tidak aktif), nomor rekening karangan, dan tautan pelacakan kurir tanpa resi.
- *
- * `noIndex` wajib: isinya personal, tidak boleh masuk indeks maupun sitemap.
- */
 export async function generateMetadata({
   params,
 }: {
@@ -135,6 +107,16 @@ export default async function OrderDetailPage({
     .filter(Boolean)
     .join(" ");
 
+  const isCod =
+    detail.is_cod === true ||
+    detail.payment_method === "cod" ||
+    detail.payment?.method === "cod";
+
+  const isAwaitingCodConfirmation =
+    isCod &&
+    (detail.status === "awaiting_confirmation" ||
+      detail.status === "menunggu_konfirmasi_cs");
+
   return (
     <>
       <PageHeader
@@ -156,6 +138,11 @@ export default async function OrderDetailPage({
 
       <Container className="py-8 tablet:py-12">
         <div className="mx-auto max-w-3xl space-y-6">
+          {/* Tampilkan kartu konfirmasi COD jika pesanan COD masih menunggu konfirmasi CS */}
+          {isAwaitingCodConfirmation ? (
+            <CodConfirmationCard order={detail} />
+          ) : null}
+
           {/*
             Tenggat pembayaran hanya bermakna selama pesanan masih menunggu
             pembayaran. Sumbernya `payment_expires_at` (stock lock), bukan
@@ -269,18 +256,9 @@ export default async function OrderDetailPage({
   );
 }
 
-/**
- * Apa yang terjadi setelah pembayaran — satu blok, ditentukan `status` dari
- * server (bukan ditebak dari `payment.status` atau jam browser).
- *
- * `OrderStatusBadge` hanya memberi warna; blok ini memberi kalimat. Keduanya
- * dibutuhkan: warna saja gagal untuk pembaca layar dan untuk pembeli yang
- * tidak hafal arti "Perlu Rekonsiliasi".
- */
 type NextStep = {
   title: string;
   body: string;
-  /** Masih ada pembayaran yang harus diselesaikan. */
   waitingForPayment: boolean;
 };
 

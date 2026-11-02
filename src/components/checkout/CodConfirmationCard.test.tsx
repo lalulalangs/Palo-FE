@@ -129,7 +129,7 @@ describe("CodConfirmationCard Component", () => {
     expect(whatsappBtn).toHaveAttribute("rel", "noopener noreferrer");
     expect(whatsappBtn.getAttribute("href")).toContain("wa.me/6281234567890");
 
-    // Info penenang 24 jam (tanpa emoji, dengan border kiri aksen)
+    // Info penenang 24 jam
     expect(
       screen.getByText(/Stok produkmu aman selama/i),
     ).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe("CodConfirmationCard Component", () => {
       screen.getByText(/24 jam/i),
     ).toBeInTheDocument();
 
-    // Kotak info uang tunai (tanpa emoji 💵)
+    // Kotak info uang tunai
     expect(
       screen.getByText(/Siapkan Uang Tunai Pas Saat Kurir Tiba:/i),
     ).toBeInTheDocument();
@@ -159,7 +159,7 @@ describe("CodConfirmationCard Component", () => {
       ),
     ).toBeInTheDocument();
 
-    // Lapis 1: Salin teks pesanan (tanpa emoji 📋)
+    // Lapis 1: Salin teks pesanan
     const copyMessageBtn = screen.getByRole("button", {
       name: /Salin Teks Pesanan/i,
     });
@@ -177,7 +177,7 @@ describe("CodConfirmationCard Component", () => {
     });
     expect(screen.getByText("Salin Teks Pesanan")).toBeInTheDocument();
 
-    // Lapis 2: Salin nomor CS (tanpa emoji 📞 dan tanpa kurung)
+    // Lapis 2: Salin nomor CS
     const copyPhoneBtn = screen.getByRole("button", {
       name: /Salin Nomor CS/i,
     });
@@ -193,13 +193,61 @@ describe("CodConfirmationCard Component", () => {
     });
     expect(screen.getByText(/Salin Nomor CS: 0812-3456-7890/i)).toBeInTheDocument();
 
-    // Lapis 3: Tautan WhatsApp Web (tanpa emoji 💬)
+    // Lapis 3: Tautan WhatsApp Web
     const webBtn = screen.getByRole("link", { name: /Buka WhatsApp Web/i });
     expect(webBtn).toHaveAttribute("target", "_blank");
     expect(webBtn.getAttribute("href")).toContain("web.whatsapp.com/send");
   });
 
-  it("menangani fallback otomatis bila URL WhatsApp tidak ada dari server", () => {
+  it("menolak URL phishing berbahaya dan beralih ke instruksi kontak resmi tanpa nomor dummy", () => {
+    const maliciousOrder: OrderDetail = {
+      ...mockOrder,
+      whatsapp_url: "https://phishing-scam.com/wa.me/evil",
+      payment: null,
+    };
+
+    render(<CodConfirmationCard order={maliciousOrder} />);
+
+    // Tombol 1-klik WA berbahaya TIDAK dirender
+    expect(
+      screen.queryByRole("link", {
+        name: /Konfirmasi Pesanan via WhatsApp 1-Klik/i,
+      }),
+    ).not.toBeInTheDocument();
+
+    // Menampilkan fallback instruksi ramah dengan link ke /kontak
+    expect(
+      screen.getByText(/Nomor WhatsApp konfirmasi belum tersedia otomatis/i),
+    ).toBeInTheDocument();
+    const contactLink = screen.getByRole("link", {
+      name: /Hubungi Customer Service di Halaman Kontak/i,
+    });
+    expect(contactLink).toHaveAttribute("href", "/kontak");
+
+    // Tidak ada nomor dummy yang bocor
+    expect(screen.queryByText(/0812-3456-7890/i)).not.toBeInTheDocument();
+  });
+
+  it("menerima URL resmi WhatsApp api.whatsapp.com dan web.whatsapp.com", () => {
+    const apiOrder: OrderDetail = {
+      ...mockOrder,
+      whatsapp_url: "https://api.whatsapp.com/send?phone=628999888777&text=Halo",
+      payment: null,
+    };
+
+    render(<CodConfirmationCard order={apiOrder} />);
+
+    const whatsappBtn = screen.getByRole("link", {
+      name: /Konfirmasi Pesanan via WhatsApp 1-Klik/i,
+    });
+    expect(whatsappBtn).toHaveAttribute(
+      "href",
+      "https://api.whatsapp.com/send?phone=628999888777&text=Halo",
+    );
+    expect(screen.getByText(/Salin Nomor CS: 0899-9888-777/i)).toBeInTheDocument();
+  });
+
+  it("menangani skenario ketiadaan nomor CS dari server secara ramah tanpa nomor dummy", () => {
     const minimalOrder: OrderDetail = {
       ...mockOrder,
       cod_reference_code: null,
@@ -210,12 +258,80 @@ describe("CodConfirmationCard Component", () => {
 
     render(<CodConfirmationCard order={minimalOrder} />);
 
-    const whatsappBtn = screen.getByRole("link", {
-      name: /Konfirmasi Pesanan via WhatsApp 1-Klik/i,
-    });
-    expect(whatsappBtn.getAttribute("href")).toContain("wa.me");
-    expect(whatsappBtn.getAttribute("href")).toContain(
-      encodeURIComponent("ORD-20261102-0001"),
+    // Tombol 1-klik WA disembunyikan
+    expect(
+      screen.queryByRole("link", {
+        name: /Konfirmasi Pesanan via WhatsApp 1-Klik/i,
+      }),
+    ).not.toBeInTheDocument();
+
+    // Link ke halaman kontak resmi tersedia
+    expect(
+      screen.getByText(/Nomor WhatsApp konfirmasi belum tersedia otomatis/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", {
+        name: /Hubungi Customer Service di Halaman Kontak/i,
+      }),
+    ).toHaveAttribute("href", "/kontak");
+
+    // Di dalam akordeon: Menampilkan info link /kontak dan tidak ada tombol nomor dummy
+    expect(screen.queryByText(/0812-3456-7890/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Nomor WhatsApp CS tidak terlampir/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Halaman Kontak Resmi Toko/i })).toHaveAttribute(
+      "href",
+      "/kontak",
     );
+  });
+
+  it("menangani kegagalan Clipboard API dengan fallback execCommand dan feedback yang ramah", async () => {
+    writeTextMock.mockRejectedValue(new Error("Clipboard write permission denied"));
+
+    const execCommandMock = vi.fn().mockReturnValue(true);
+    Object.defineProperty(document, "execCommand", {
+      value: execCommandMock,
+      writable: true,
+      configurable: true,
+    });
+
+    render(<CodConfirmationCard order={mockOrder} />);
+
+    const copyBtn = screen.getByRole("button", {
+      name: /Salin Teks Pesanan/i,
+    });
+
+    await act(async () => {
+      fireEvent.click(copyBtn);
+    });
+
+    expect(execCommandMock).toHaveBeenCalledWith("copy");
+    expect(screen.getByText("Tersalin")).toBeInTheDocument();
+  });
+
+  it("menampilkan pesan error ramah jika kedua Clipboard API dan execCommand gagal", async () => {
+    writeTextMock.mockRejectedValue(new Error("Permission denied"));
+
+    Object.defineProperty(document, "execCommand", {
+      value: vi.fn().mockImplementation(() => {
+        throw new Error("execCommand not supported");
+      }),
+      writable: true,
+      configurable: true,
+    });
+
+    render(<CodConfirmationCard order={mockOrder} />);
+
+    const copyBtn = screen.getByRole("button", {
+      name: /Salin Teks Pesanan/i,
+    });
+
+    await act(async () => {
+      fireEvent.click(copyBtn);
+    });
+
+    expect(screen.getByText("Gagal Menyalin Teks")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Silakan blok dan salin teks di kotak atas secara manual/i),
+    ).toBeInTheDocument();
   });
 });

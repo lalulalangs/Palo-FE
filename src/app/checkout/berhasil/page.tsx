@@ -19,29 +19,6 @@ import {
 } from "@/lib/format";
 import { buildMetadata } from "@/lib/metadata";
 
-/**
- * Halaman sukses pesanan.
- *
- * **Halaman ini tidak ada di 15 mockup** — jadi seluruh strukturnya dibangun
- * dari kontrak API, bukan dari disain visual yang ada.
- *
- * Yang ditampilkan apa adanya dari `GET /orders/{orderNumber}`:
- * - nomor pesanan,
- * - status beserta label Bahasa Indonesianya,
- * - instruksi pembayaran dari `payment.instructions` (nomor VA, QRIS, atau teks),
- * - batas pembayaran `payment_expires_at`.
- *
- * Yang TIDAK ditampilkan:
- * - hitung mundur "23:44:52" seperti di mockup status pembayaran. Hitung
- *   mundur di client selalu salah begitu tab tidak aktif atau jam device
- *   berubah; batas waktu yang benar selalu datang dari `payment_expires_at`
- *   milik gateway (PRD §3.7).
- * - nama bank dan nomor rekening yang tidak ada di respons API. Mengarang
- *   nomor transfer adalah bahaya yang nyata, bukan sekadar masalah tampilan.
- * - Status "Lacak Paket di JNE" — `tracking_number` baru diisi admin saat
- *   status menjadi "Dikirim" (PRD §3.9), jadi untuk pesanan yang baru dibuat
- *   tautan itu tidak boleh ada.
- */
 export const metadata: Metadata = buildMetadata({
   title: "Pesanan berhasil dibuat",
   description:
@@ -134,26 +111,47 @@ export default async function CheckoutSuccessPage({
     detail.payment_method === "cod" ||
     detail.payment?.method === "cod";
 
+  const isAwaitingCodConfirmation =
+    isCod &&
+    (detail.status === "awaiting_confirmation" ||
+      detail.status === "menunggu_konfirmasi_cs");
+
   const paymentUrl = isCod ? null : paymentRedirectUrl(detail);
 
   const instructions = detail.payment_expires_at
     ? `Selesaikan pembayaran sebelum ${formatWaktu(detail.payment_expires_at)} agar pesananmu tetap aman, ya.`
     : "Instruksi pembayaran akan tampil di sini setelah diverifikasi.";
 
+  let headerEyebrow = "Checkout selesai";
+  let headerTitle = "Pesanan berhasil dibuat";
+  let headerDescription =
+    "Nomor pesanan dan instruksi pembayaranmu sudah tercatat rapi. Status pembayaran akan otomatis terupdate begitu transaksi selesai diverifikasi.";
+
+  if (isCod) {
+    if (isAwaitingCodConfirmation) {
+      headerEyebrow = "Menunggu Konfirmasi WhatsApp";
+      headerTitle =
+        "Yeay, pesananmu sudah tercatat! Yuk, selesaikan 1 langkah terakhir.";
+      headerDescription =
+        "Klik tombol WhatsApp di bawah untuk kirim pesan konfirmasi otomatis ke admin. Begitu terkirim, pesananmu langsung kami kemas dari gudang Senaru!";
+    } else {
+      headerEyebrow = "Pesanan COD";
+      headerTitle = `Status Pesanan: ${labelStatusOrder(detail.status)}`;
+      headerDescription =
+        detail.status === "dibatalkan"
+          ? "Pesanan COD ini telah dibatalkan. Hubungi Customer Service jika butuh bantuan lebih lanjut."
+          : detail.status === "expired"
+          ? "Waktu konfirmasi pesanan COD telah berakhir."
+          : "Konfirmasi WhatsApp untuk pesanan COD ini telah selesai diverifikasi. Pesananmu sedang diproses oleh tim kami.";
+    }
+  }
+
   return (
     <>
       <PageHeader
-        eyebrow={isCod ? "Menunggu Konfirmasi WhatsApp" : "Checkout selesai"}
-        title={
-          isCod
-            ? "Yeay, pesananmu sudah tercatat! Yuk, selesaikan 1 langkah terakhir."
-            : "Pesanan berhasil dibuat"
-        }
-        description={
-          isCod
-            ? "Klik tombol WhatsApp di bawah untuk kirim pesan konfirmasi otomatis ke admin. Begitu terkirim, pesananmu langsung kami kemas dari gudang Senaru!"
-            : "Nomor pesanan dan instruksi pembayaranmu sudah tercatat rapi. Status pembayaran akan otomatis terupdate begitu transaksi selesai diverifikasi."
-        }
+        eyebrow={headerEyebrow}
+        title={headerTitle}
+        description={headerDescription}
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Checkout", href: "/checkout" },
@@ -168,7 +166,7 @@ export default async function CheckoutSuccessPage({
 
       <Container className="py-8 tablet:py-12">
         <div className="mx-auto max-w-3xl space-y-6">
-          {isCod ? (
+          {isAwaitingCodConfirmation ? (
             <CodConfirmationCard order={detail} />
           ) : paymentUrl ? (
             <PaymentRedirectCard
@@ -211,12 +209,6 @@ export default async function CheckoutSuccessPage({
                 </p>
               ) : null}
 
-              {/*
-                Instruksi dirender apa adanya dari `payment.instructions`
-                (`payments.raw_response`). Kalau gateway belum mengirim apa pun,
-                `PaymentInstructions` menyatakannya terus terang — bukan
-                menampilkan nomor rekening karangan.
-              */}
               <div className="mt-4">
                 {detail.payment ? (
                   <PaymentInstructions payment={detail.payment} />

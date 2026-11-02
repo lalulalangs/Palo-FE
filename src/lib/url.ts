@@ -32,6 +32,13 @@
 /** Skema yang boleh muncul di tautan luar. */
 const SKEMA_BOLOEH = new Set(["http:", "https:"]);
 
+/** Hostname resmi WhatsApp yang diizinkan untuk deep-link / web redirect. */
+const WHATSAPP_HOSTS = new Set([
+  "wa.me",
+  "api.whatsapp.com",
+  "web.whatsapp.com",
+]);
+
 /**
  * Ubah input mentah dari API menjadi URL yang aman untuk `href`.
  *
@@ -57,6 +64,28 @@ export function safeExternalUrl(raw: string | null | undefined): string | null {
   if (!SKEMA_BOLOEH.has(url.protocol)) return null;
 
   return url.toString();
+}
+
+/**
+ * Validasi apakah URL mengarah ke domain resmi WhatsApp.
+ * Menolak skema non-http(s) dan domain selain wa.me, api.whatsapp.com, web.whatsapp.com (case-insensitive).
+ *
+ * Mengembalikan string URL yang valid atau `null` bila input tidak valid / domain berbahaya.
+ */
+export function safeWhatsappUrl(raw: string | null | undefined): string | null {
+  const safe = safeExternalUrl(raw);
+  if (!safe) return null;
+
+  try {
+    const url = new URL(safe);
+    const host = url.hostname.toLowerCase();
+    if (!WHATSAPP_HOSTS.has(host)) {
+      return null;
+    }
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 /**

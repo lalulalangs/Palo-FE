@@ -373,6 +373,7 @@ export async function placeOrderAction(input: {
     revalidatePath("/keranjang");
     revalidatePath("/");
     revalidatePath("/lacak");
+    revalidatePath("/me");
 
     // `payment_url` ada di dua tempat pada respons backend; `paymentRedirectUrl`
     // memilih yang pertama tersedia dan menolak skema selain http(s).
