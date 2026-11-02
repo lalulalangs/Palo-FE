@@ -323,9 +323,10 @@ function describeNextStep(order: OrderDetail): NextStep {
           : "Panduan pembayaran lagi disiapkan. Yuk, coba refresh halaman sebentar lagi atau hubungi tim Customer Service kami kalau butuh bantuan!",
       };
 
+    case "awaiting_confirmation":
     case "menunggu_konfirmasi_cs":
       return {
-        waitingForPayment: true,
+        waitingForPayment: false,
         title: "Menunggu konfirmasi CS",
         body: "Pesananmu diproses lewat jalur WhatsApp dan sedang diverifikasi oleh Customer Service kami. Status di halaman ini bakal otomatis terupdate setelah konfirmasi selesai, ya.",
       };

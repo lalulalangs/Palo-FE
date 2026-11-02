@@ -29,6 +29,7 @@ export function CheckoutSummary({
   address,
   service,
   voucher,
+  paymentMethod = "online",
 }: {
   cart: CartItem[];
   accountName: string;
@@ -36,6 +37,7 @@ export function CheckoutSummary({
   address: AddressInput | null;
   service: ShippingService | null;
   voucher: AppliedVoucher | null;
+  paymentMethod?: string | null;
 }) {
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
   const cartSubtotal = cart.reduce((total, item) => total + item.subtotal, 0);
@@ -134,7 +136,7 @@ export function CheckoutSummary({
         {voucher ? (
           <div className="flex items-start justify-between gap-3">
             <dt className="text-text-secondary">
-              Diskon voucher ({voucher.code})
+              Diskon voucher — {voucher.code}
             </dt>
             <dd className="text-right font-medium text-brand-forest">
               −
@@ -186,9 +188,10 @@ export function CheckoutSummary({
       <p className="mt-4 border-t border-border-soft pt-4 text-body-sm text-text-secondary">
         Pembayaran:{" "}
         <span className="font-medium text-text-primary">
-          Pembayaran Instan &amp; Otomatis
-        </span>{" "}
-        (QRIS, VA, E-Wallet)
+          {paymentMethod === "cod"
+            ? "Bayar di Tempat — Tunai saat kurir tiba"
+            : "Pembayaran Online Otomatis — QRIS, Virtual Account, E-Wallet"}
+        </span>
       </p>
 
       <p className="mt-1 text-body-sm text-text-secondary">

@@ -86,11 +86,11 @@ export function CheckoutFlow({
   const [destinationCity, setDestinationCity] = useState("");
 
   /*
-   * Tidak ada lagi pemilihan kanal pembayaran di sini: DOKU Checkout
-   * menampilkannya di halamannya sendiri (QRIS/VA/e-wallet/kartu). Yang
-   * dikirim ke backend satu nilai tetap supaya kontraknya tidak berubah.
+   * Pilihan metode pembayaran:
+   * 1. 'online' -> DOKU Checkout (QRIS, VA, E-Wallet)
+   * 2. 'cod'    -> Bayar di Tempat dengan verifikasi WhatsApp
    */
-  const paymentMethod: PaymentMethod = DEFAULT_PAYMENT_METHOD;
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(DEFAULT_PAYMENT_METHOD);
   // Satu sumber kebenaran: yang tampil di ringkasan = yang diterapkan server.
   const [voucher, setVoucher] = useState<AppliedVoucher | null>(null);
 
@@ -350,16 +350,82 @@ export function CheckoutFlow({
                 </button>
               </div>
 
-              {/*
-                Metode pembayaran tidak ditanyakan di sini. Pembeli memilih
-                kanal (QRIS, Virtual Account, e-wallet, kartu) di halaman DOKU
-                yang dibuka tepat setelah pesanan dibuat, jadi daftar kanal di
-                checkout hanya menduplikasi keputusan yang tetap bisa diubah
-                di sana.
-              */}
-              <p className="mt-4 rounded-md border border-border-soft bg-surface-paper p-4 text-label-sm leading-relaxed text-text-secondary">
-                Tersedia berbagai metode pembayaran aman dan praktis (QRIS, Virtual Account, E-Wallet, atau Kartu Kredit) yang bisa kamu pilih di halaman pembayaran selanjutnya.
-              </p>
+              {/* Pilihan Metode Pembayaran */}
+              <div className="mt-4 space-y-3">
+                <label className="block text-title-sm font-semibold text-text-primary">
+                  Pilih Metode Pembayaran
+                </label>
+
+                <div className="grid gap-3 tablet:grid-cols-2">
+                  {/* Opsi 1: Online */}
+                  <label
+                    className={`relative flex cursor-pointer flex-col justify-between rounded-lg border p-4 transition-all ${
+                      paymentMethod === "online"
+                        ? "border-brand-forest bg-surface-sage/30 ring-1 ring-brand-forest"
+                        : "border-border-soft bg-surface-white hover:border-brand-forest/40"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        value="online"
+                        checked={paymentMethod === "online"}
+                        onChange={() => setPaymentMethod("online")}
+                        disabled={busy}
+                        className="mt-1 h-4 w-4 text-brand-forest focus:ring-brand-forest"
+                      />
+                      <div className="space-y-1">
+                        <span className="block text-title-sm font-semibold text-text-primary">
+                          Pembayaran Online Otomatis
+                        </span>
+                        <span className="block text-body-sm leading-relaxed text-text-secondary">
+                          Praktis dan langsung diproses melalui QRIS, Virtual Account BCA, Mandiri, BRI, atau E-Wallet.
+                        </span>
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* Opsi 2: COD */}
+                  <label
+                    className={`relative flex cursor-pointer flex-col justify-between rounded-lg border p-4 transition-all ${
+                      paymentMethod === "cod"
+                        ? "border-brand-forest bg-surface-sage/30 ring-1 ring-brand-forest"
+                        : "border-border-soft bg-surface-white hover:border-brand-forest/40"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="payment_method"
+                        value="cod"
+                        checked={paymentMethod === "cod"}
+                        onChange={() => setPaymentMethod("cod")}
+                        disabled={busy}
+                        className="mt-1 h-4 w-4 text-brand-forest focus:ring-brand-forest"
+                      />
+                      <div className="space-y-1">
+                        <span className="block text-title-sm font-semibold text-text-primary">
+                          Bayar di Tempat
+                        </span>
+                        <span className="block text-body-sm leading-relaxed text-text-secondary">
+                          Bayar tunai langsung ke kurir saat paket tiba di alamatmu.
+                        </span>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Kotak Info COD (Callout) */}
+                {paymentMethod === "cod" ? (
+                  <div className="mt-3 rounded-lg border border-accent-earth/40 bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
+                    <span className="font-semibold text-text-primary">
+                      Konfirmasi Cepat 1-Klik via WhatsApp
+                    </span>{" "}
+                    — Tanpa uang muka atau DP. Setelah membuat pesanan, kirim pesan konfirmasi ke Customer Service agar pesananmu segera disiapkan dari gudang Senaru.
+                  </div>
+                ) : null}
+              </div>
 
               <div className="mt-6">
                 <VoucherField
@@ -474,18 +540,22 @@ export function CheckoutFlow({
                     ? "Membuat pesanan…"
                     : isRedirecting
                       ? "Membuka halaman pesanan…"
-                      : "Buat Pesanan"}
+                      : paymentMethod === "cod"
+                        ? "Buat Pesanan"
+                        : "Lanjut ke Pembayaran"}
                 </button>
                 <Link
                   href="/keranjang"
-                  className={buttonClass({ variant: "ghost", size: "lg" })}
+                  className="inline-flex min-h-12 items-center justify-center rounded-lg border border-brand-forest/25 bg-surface-sage px-6 font-semibold tracking-wide text-brand-forest shadow-xs transition-colors duration-150 hover:border-brand-forest/40 hover:bg-surface-sage/70 hover:text-brand-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
                 >
-                  Kembali ke keranjang
+                  Kembali
                 </Link>
               </div>
 
               <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
-                Dengan menekan tombol Buat Pesanan, kamu akan diarahkan ke halaman pembayaran yang aman untuk menyelesaikan transaksi.
+                {paymentMethod === "cod"
+                  ? "Dengan menekan tombol Buat Pesanan, kamu akan diarahkan ke halaman konfirmasi WhatsApp untuk verifikasi pesananmu."
+                  : "Dengan menekan tombol Lanjut ke Pembayaran, kamu akan diarahkan ke halaman pembayaran yang aman untuk menyelesaikan transaksi."}
               </p>
             </section>
           ) : null}
@@ -500,6 +570,7 @@ export function CheckoutFlow({
             address={step >= 1 ? address : null}
             service={selectedService}
             voucher={voucher}
+            paymentMethod={paymentMethod}
           />
         </div>
       </div>

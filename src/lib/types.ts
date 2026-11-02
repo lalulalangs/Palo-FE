@@ -444,6 +444,9 @@ export interface PaymentInstruction {
    * `raw_response`; dipakai untuk memilih cara render (QR vs nomor VA).
    */
   method?: string | null;
+  whatsapp_url?: string | null;
+  whatsapp_message?: string | null;
+  cod_reference_code?: string | null;
 }
 
 /**
@@ -460,10 +463,13 @@ export interface PaymentInfo {
   instructions: PaymentInstruction | null;
   /** Salinan `payment_url` di level `payment`, selain di `instructions`. */
   payment_url?: string | null;
+  whatsapp_url?: string | null;
+  whatsapp_message?: string | null;
 }
 
 export type OrderStatus =
   | "menunggu_pembayaran"
+  | "awaiting_confirmation"
   /** Pool WhatsApp tamu: pesanan ada, pembayaran menunggu verifikasi CS. */
   | "menunggu_konfirmasi_cs"
   | "dibayar"
@@ -476,6 +482,9 @@ export type OrderStatus =
 
 export interface CreatedOrder {
   order_number: string;
+  cod_reference_code?: string | null;
+  whatsapp_url?: string | null;
+  whatsapp_message?: string | null;
   /**
    * URL halaman pembayaran gateway (DOKU Checkout), `null` untuk metode yang
    * tidak memakai gateway (COD/WhatsApp tamu).
@@ -491,6 +500,8 @@ export interface CreatedOrder {
   payment: {
     method: string;
     instructions: PaymentInstruction | null;
+    whatsapp_url?: string | null;
+    whatsapp_message?: string | null;
   } | null;
 }
 
@@ -574,6 +585,7 @@ export interface CheckoutRequest {
  */
 export const PAYMENT_METHODS = [
   { value: "online", label: "Online (kanal dipilih di DOKU)" },
+  { value: "cod", label: "Bayar di Tempat (COD)" },
   { value: "qris", label: "QRIS" },
   { value: "virtual_account", label: "Virtual Account Bank" },
   { value: "ewallet", label: "E-Wallet" },
@@ -748,6 +760,12 @@ export interface OrderDetail extends OrderSummary {
   shipping_etd: string | null;
   tracking_number: string | null;
   payment_method: string | null;
+  is_cod?: boolean;
+  cod_reference_code?: string | null;
+  whatsapp_url?: string | null;
+  whatsapp_message?: string | null;
+  confirmed_at?: string | null;
+  refund_status?: string | null;
   /** Detail pembayaran dari `OrderDetailResource.payment`. */
   payment: PaymentInfo | null;
 }

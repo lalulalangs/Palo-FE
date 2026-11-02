@@ -28,6 +28,8 @@ import type { OrderDetail } from "@/lib/types";
  */
 const STATUS_TONE: Record<string, string> = {
   menunggu_pembayaran: "bg-surface-sage text-brand-forest",
+  awaiting_confirmation: "bg-surface-paper text-feedback-warn",
+  menunggu_konfirmasi_cs: "bg-surface-paper text-feedback-warn",
   dibayar: "bg-surface-sage text-brand-forest",
   diproses: "bg-surface-sage text-brand-forest",
   dikirim: "bg-surface-sage text-brand-forest",
@@ -128,7 +130,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
         mengirim objek `payment` — untuk pesanan yang sudah dibayar biasanya
         kosong, dan itu memang benar.
       */}
-      {order.payment ? (
+      {order.payment && order.payment_method !== "cod" ? (
         <section
           aria-labelledby="instruksi-pembayaran"
           className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
