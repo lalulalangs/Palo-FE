@@ -116,4 +116,30 @@ describe("CartCheckoutHub", () => {
     });
     expect(onlineBtn).toBeDisabled();
   });
+
+  it("supports keyboard navigation with ArrowRight and ArrowLeft", () => {
+    render(
+      <CartCheckoutHub
+        items={mockItems}
+        summary={mockSummary}
+        isLoggedIn={false}
+        blockedLength={0}
+      />,
+    );
+
+    const waTab = screen.getByRole("tab", { name: /Lewat WhatsApp/i });
+    const onlineTab = screen.getByRole("tab", { name: /Bayar Online/i });
+
+    expect(waTab).toHaveAttribute("aria-selected", "true");
+
+    // Navigate to online tab via ArrowRight
+    fireEvent.keyDown(waTab, { key: "ArrowRight" });
+    expect(onlineTab).toHaveAttribute("aria-selected", "true");
+    expect(waTab).toHaveAttribute("aria-selected", "false");
+
+    // Navigate back to wa tab via ArrowLeft
+    fireEvent.keyDown(onlineTab, { key: "ArrowLeft" });
+    expect(waTab).toHaveAttribute("aria-selected", "true");
+    expect(onlineTab).toHaveAttribute("aria-selected", "false");
+  });
 });

@@ -272,7 +272,7 @@ export function GuestCheckoutForm({
               <label
                 key={option.id}
                 className={[
-                  "relative flex min-h-11 cursor-pointer select-none items-center justify-between rounded-md border px-3 py-2 text-label-sm transition-all",
+                  "relative flex min-h-11 cursor-pointer select-none items-center justify-between rounded-md border px-3 py-2 text-label-sm transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-forest",
                   isSelected
                     ? "border-brand-forest bg-surface-sage/60 font-semibold text-brand-forest ring-1 ring-brand-forest"
                     : "border-border-soft bg-surface-white text-text-primary hover:border-brand-forest/50 hover:bg-surface-paper",
