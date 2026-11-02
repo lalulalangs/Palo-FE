@@ -193,7 +193,7 @@ export function CartCheckoutHub({
                   ✓
                 </span>
                 <span>
-                  Pembayaran praktis dan otomatis via Transfer Virtual Account (VA).
+                  Pembayaran praktis dan otomatis.
                 </span>
               </li>
               <li className="flex items-start gap-2">

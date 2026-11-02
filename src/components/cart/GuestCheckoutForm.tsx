@@ -376,7 +376,7 @@ export function GuestCheckoutForm({
         </button>
 
         <p className="text-center text-caption leading-relaxed text-text-secondary">
-          Tim CS kami akan mengonfirmasi ketersediaan stok dan ongkir resmi sebelum kamu melakukan pembayaran transfer.
+          Tim CS kami akan mengonfirmasi ketersediaan stok dan ongkir sebelum kamu melakukan pembayaran.
         </p>
       </div>
     </form>
@@ -439,7 +439,7 @@ function GuestResultPanel({
         <p className="mt-2 text-title-md text-brand-deep">Tinggal satu langkah lagi!</p>
         <p className="mt-2 text-body-md text-text-secondary">{handoff.notice}</p>
         <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
-          Tim Customer Service kami siap membantumu di WhatsApp untuk konfirmasi ongkir dan metode pembayaran (Transfer Virtual Account). Yuk, kirim pesananmu sekarang biar langsung diproses!
+          Tim Customer Service kami siap membantumu di WhatsApp untuk konfirmasi ongkir dan metode pembayaran Transfer Virtual Account. Yuk, kirim pesananmu sekarang biar langsung diproses!
         </p>
       </div>
 
