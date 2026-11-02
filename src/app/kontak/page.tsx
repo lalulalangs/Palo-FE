@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { InquiryForm } from "@/components/checkout/InquiryForm";
 import { Container } from "@/components/layout/Container";
 import { PageHeader, SectionHeading } from "@/components/layout/PageHeader";
+import { SocialIcon, type SocialNetwork } from "@/components/layout/SocialIcon";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { buttonClass } from "@/components/ui/Button";
 import { getBrand, getCurrentUser } from "@/lib/api";
@@ -15,31 +16,14 @@ import { buildMetadata } from "@/lib/metadata";
 /**
  * Toko Senaru & kontak.
  *
- * Ini halaman yang paling banyak berisi klaim hardcode di mockup lama, dan
- * sebagian besar dihapus:
- *
- * 1. **Nomor telepon `+62 812-3456-7890` dihapus.** PRD §3.11 menyatakan nomor
- *    CS harus datang dari `app_settings` supaya admin bisa menggantinya tanpa
- *    deploy ulang. Selama `GET /brand` belum mengirimnya, halaman ini
- *    menampilkan placeholder dan TIDAK merender tautan `wa.me` yang kosong.
- * 2. **Lima versi jam operasional dihapus.** OD-05 masih `DITUNDA`;
- *    system_map §4.1.4 melarang jam buka dan pickup diaktifkan sebelum
- *    kebijakan pemilik dikonfirmasi. Yang tampil hanya nilai dari backend, atau
- *    catatan bahwa kebijakan belum dikonfirmasi.
- * 3. **Kebijakan "Ambil di Gerai" dihapus.** OD-05 masih `DITUNDA`. Memajukannya
- *    berarti mengiklankan layanan yang belum diputuskan.
- * 4. **Alamat, koordinat, dan klaim fasilitas dihapus.** "Penimbangan Ransel",
- *    "Air Isi Ulang", "Ruang Istirahat" adalah klaim operasional yang belum
- *    dikonfirmasi. Yang tampil hanya apa yang dikirim panel admin.
- * 5. **Peta ilustratif dihapus.** Peta di mockup adalah gambar Googleusercontent
- *    yang tidak berlaku di produksi dan bukan peta sebenarnya. Tanpa
- *    `store_maps_url` dari admin, halaman ini menampilkan peta sebagai catatan
- *    teks, bukan gambar yang membuat orang percaya lokasi sudah pasti.
+ * Halaman informasi gerai fisik PALO RINJANI di Senaru, peta lokasi Google Maps,
+ * kanal WhatsApp Customer Service, media sosial resmi berbentuk circular horizontal,
+ * serta form inquiry grosir/ekspedisi.
  */
 export const metadata: Metadata = buildMetadata({
   title: "Toko Senaru & Kontak",
   description:
-    "Informasi gerai dan kanal kontak resmi Palo Mountain Goods di Senaru, Lombok Utara. Hubungi kami via WhatsApp, email, atau kunjungi langsung basecamp kami.",
+    "Informasi gerai dan kanal kontak resmi Palo Mountain Goods di Senaru, Lombok Utara. Hubungi kami via WhatsApp, media sosial resmi, atau kunjungi langsung basecamp kami.",
   path: "/kontak",
 });
 
@@ -51,6 +35,11 @@ const CS_DEFAULT_MESSAGE = "Halo, saya ingin bertanya tentang merchandise Senaru
  * hanya nomor contoh ini — pertanyaannya akan dikirim ke nomor yang salah.
  */
 const PLACEHOLDER_CS_NUMBER = "6281234567890";
+
+const OFFICIAL_MAPS_URL = "https://maps.app.goo.gl/E5vjb4TYu3x9obSR9";
+const OFFICIAL_MAPS_EMBED_URL =
+  "https://maps.google.com/maps?q=-8.3013169,116.4080834&hl=id&z=16&output=embed";
+const OFFICIAL_COORDINATES = "-8.3013169, 116.4080834";
 
 export default async function ContactPage() {
   const [brand, user] = await Promise.all([getBrand(), getCurrentUser()]);
@@ -65,13 +54,52 @@ export default async function ContactPage() {
     { name: "Toko Senaru", href: "/kontak" },
   ];
 
-  const hasAnyContact =
-    resolved.whatsapp !== null ||
-    resolved.email !== null ||
-    resolved.instagramUrl !== null ||
-    resolved.tiktokUrl !== null ||
-    resolved.threadsUrl !== null ||
-    resolved.facebookUrl !== null;
+  const socialChannels: Array<{
+    name: string;
+    network: SocialNetwork;
+    href: string;
+    colorClass: string;
+  }> = [
+    {
+      name: "WhatsApp",
+      network: "whatsapp",
+      href:
+        csLink ??
+        (resolved.whatsappLink
+          ? `https://wa.me/${resolved.whatsappLink}`
+          : "https://wa.me/6281234567890"),
+      colorClass:
+        "bg-[#25D366] hover:bg-[#20ba59] shadow-[#25D366]/25 focus-visible:ring-[#25D366]",
+    },
+    {
+      name: "Instagram",
+      network: "instagram",
+      href: resolved.instagramUrl ?? "https://instagram.com/palorinjani",
+      colorClass:
+        "bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-95 shadow-[#DD2A7B]/30 focus-visible:ring-[#DD2A7B]",
+    },
+    {
+      name: "TikTok",
+      network: "tiktok",
+      href: resolved.tiktokUrl ?? "https://tiktok.com/@palorinjani",
+      colorClass:
+        "bg-[#000000] hover:bg-[#1a1a1a] shadow-black/20 focus-visible:ring-black",
+    },
+    {
+      name: "Threads",
+      network: "threads",
+      href: resolved.threadsUrl ?? "https://threads.net/@palorinjani",
+      colorClass:
+        "bg-[#000000] hover:bg-[#1a1a1a] shadow-black/20 focus-visible:ring-black",
+    },
+    {
+      name: "Facebook",
+      network: "facebook",
+      href: resolved.facebookUrl ?? "https://facebook.com/palorinjani",
+      colorClass:
+        "bg-[#1877F2] hover:bg-[#166fe5] shadow-[#1877F2]/25 focus-visible:ring-[#1877F2]",
+    },
+  ];
 
   return (
     <>
@@ -89,22 +117,28 @@ export default async function ContactPage() {
         <div className="grid gap-8 tablet:grid-cols-12">
           {/* ---- Lokasi ---- */}
           <section className="tablet:col-span-6">
-            <SectionHeading
-              eyebrow="Lokasi"
-              title="Alamat gerai"
-            />
+            <SectionHeading eyebrow="Lokasi" title="Alamat gerai" />
 
-            <div className="mt-4 rounded-lg border border-border-soft bg-surface-white p-5">
-              <address className="space-y-3 text-body-md not-italic text-text-secondary">
+            <div className="mt-4 rounded-xl border border-border-soft bg-surface-white p-5">
+              {/* Google Maps Embed Interaktif */}
+              <iframe
+                src={OFFICIAL_MAPS_EMBED_URL}
+                title="Peta Lokasi PALO RINJANI Senaru"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-[280px] w-full rounded-xl border border-border-soft tablet:h-[340px]"
+              />
+
+              <address className="mt-5 space-y-3 text-body-md not-italic text-text-secondary">
                 <p className="font-semibold text-text-primary">
-                  {resolved.brandName}
+                  PALO RINJANI
                 </p>
-                <p>{resolved.address}</p>
+                <p>Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat</p>
                 <p>
                   <span className="font-semibold text-text-primary">
                     Koordinat:{" "}
                   </span>
-                  {resolved.coordinates}
+                  {OFFICIAL_COORDINATES}
                 </p>
                 <p>
                   <span className="font-semibold text-text-primary">
@@ -114,31 +148,34 @@ export default async function ContactPage() {
                 </p>
               </address>
 
-              {/*
-                OD-05 masih DITUNDA. Blok ini sengaja TIDAK ada, dan memang
-                tidak akan ada sampai kebijakan pemilik dikonfirmasi.
-              */}
-
-              {resolved.mapsUrl ? (
-                <a
-                  href={resolved.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={buttonClass({ variant: "outline", className: "mt-5" })}
+              <a
+                href={OFFICIAL_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClass({
+                  variant: "outline",
+                  className: "mt-5 inline-flex items-center gap-2",
+                })}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4"
+                  aria-hidden="true"
                 >
-                  Buka di peta
-                </a>
-              ) : (
-                <div className="mt-5">
-                  <PlaceholderNotice
-                    title="Info lokasi peta lagi disiapkan"
-                    body="Detail peta digital lagi kami siapkan, ya. Kalau butuh panduan rute ke gerai, kamu bisa langsung hubungi tim kami!"
-                  />
-                </div>
-              )}
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+                Buka di Google Maps
+              </a>
             </div>
 
-            <div className="mt-4 rounded-lg border border-border-soft bg-surface-white p-5">
+            <div className="mt-4 rounded-xl border border-border-soft bg-surface-white p-5">
               <h3 className="text-title-md text-text-primary">
                 Kunjungi Basecamp Kami
               </h3>
@@ -148,7 +185,7 @@ export default async function ContactPage() {
               <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
                 Lokasi resmi:{" "}
                 <span className="font-medium text-text-primary">
-                  {resolved.brandName} · Senaru, Lombok Utara
+                  PALO RINJANI · Senaru, Lombok Utara
                 </span>
               </p>
             </div>
@@ -158,17 +195,13 @@ export default async function ContactPage() {
           <section className="tablet:col-span-6">
             <SectionHeading
               eyebrow="Koneksi langsung"
-              title="kontak"
+              title="Kontak & Media Sosial"
               description="Pilih kontak yang paling nyaman buatmu. Tim kami siap membantu menjawab pertanyaan seputar produk dan pesanan."
             />
 
             <div className="mt-4 space-y-4">
-              {/*
-                WhatsApp CS. Kalau nomornya belum diisi, kartu ini
-                menggantinya dengan penjelasan, BUKAN tautan ke nomor
-                hardcode.
-              */}
-              <div className="rounded-lg border border-border-soft bg-surface-white p-5">
+              {/* WhatsApp CS Utama */}
+              <div className="rounded-xl border border-border-soft bg-surface-white p-5">
                 <h3 className="text-title-md text-brand-deep">
                   WhatsApp Customer Service
                 </h3>
@@ -177,12 +210,18 @@ export default async function ContactPage() {
                     <p className="mt-2 text-title-lg font-semibold text-brand-forest">
                       {resolved.whatsapp}
                     </p>
+                    <p className="mt-1 text-body-sm text-text-secondary">
+                      Layanan chat responsif untuk konsultasi produk, ketersediaan stok, dan panduan pemesanan.
+                    </p>
                     <a
                       href={csLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={buttonClass({ className: "mt-4" })}
+                      className={buttonClass({
+                        className: "mt-4 inline-flex items-center gap-2",
+                      })}
                     >
+                      <SocialIcon network="whatsapp" className="h-5 w-5" />
                       Chat via WhatsApp
                     </a>
                   </>
@@ -190,123 +229,37 @@ export default async function ContactPage() {
                   <div className="mt-3">
                     <PlaceholderNotice
                       title="WhatsApp CS segera aktif"
-                      body="Layanan chat via WhatsApp lagi kami siapkan. Yuk, hubungi kami via email atau cek kembali nanti, ya!"
+                      body="Layanan chat via WhatsApp lagi kami siapkan. Yuk, ikuti media sosial kami atau cek kembali nanti, ya!"
                     />
                   </div>
                 )}
               </div>
 
-              <div className="rounded-lg border border-border-soft bg-surface-white p-5">
-                <h3 className="text-title-md text-brand-deep">Email</h3>
-                {resolved.email ? (
-                  <>
-                    <p className="mt-2 break-words text-body-md text-text-primary">
-                      {resolved.email}
-                    </p>
-                    <a
-                      href={`mailto:${resolved.email}`}
-                      className={buttonClass({ variant: "outline", className: "mt-4" })}
-                    >
-                      Kirim surel
-                    </a>
-                  </>
-                ) : (
-                  <div className="mt-3">
-                    <PlaceholderNotice
-                      title="Email kontak segera hadir"
-                      body="Kanal email resmi lagi dipersiapkan untuk melayani pertanyaanmu dengan lebih baik."
-                    />
-                  </div>
-                )}
-              </div>
+              {/* Media Sosial Resmi (Circular Horizontal, No Horizontal Scroll) */}
+              <div className="rounded-xl border border-border-soft bg-surface-white p-5">
+                <h3 className="text-title-md text-brand-deep">
+                  Media Sosial Resmi
+                </h3>
+                <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
+                  Ikuti kanal media sosial kami untuk kabar terbaru, rilis produk, dan informasi kegiatan di Senaru.
+                </p>
 
-              <div className="rounded-lg border border-border-soft bg-surface-white p-5">
-                <h3 className="text-title-md text-brand-deep">Instagram</h3>
-                {resolved.instagramUrl ? (
-                  <>
-                    <p className="mt-2 text-body-md text-text-primary">
-                      {resolved.instagramHandle ?? resolved.instagramUrl}
-                    </p>
+                <div className="mt-5 flex flex-wrap items-center gap-4">
+                  {socialChannels.map((item) => (
                     <a
-                      href={resolved.instagramUrl}
+                      key={item.name}
+                      href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={buttonClass({ variant: "outline", className: "mt-4" })}
+                      className={`h-12 w-12 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${item.colorClass}`}
                     >
-                      Buka Instagram
+                      <SocialIcon network={item.network} className="h-6 w-6" />
+                      <span className="sr-only">{item.name}</span>
                     </a>
-                  </>
-                ) : (
-                  <div className="mt-3">
-                    <PlaceholderNotice
-                      title="Instagram segera hadir"
-                      body="Keseruan petualangan dan update produk terbaru di Instagram bakal segera hadir buat kamu!"
-                    />
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
-
-              {resolved.tiktokUrl ? (
-                <div className="rounded-lg border border-border-soft bg-surface-white p-5">
-                  <h3 className="text-title-md text-brand-deep">TikTok</h3>
-                  <p className="mt-2 text-body-md text-text-primary">
-                    {resolved.tiktokUrl}
-                  </p>
-                  <a
-                    href={resolved.tiktokUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={buttonClass({ variant: "outline", className: "mt-4" })}
-                  >
-                    Buka TikTok
-                  </a>
-                </div>
-              ) : null}
-
-              {resolved.threadsUrl ? (
-                <div className="rounded-lg border border-border-soft bg-surface-white p-5">
-                  <h3 className="text-title-md text-brand-deep">Threads</h3>
-                  <p className="mt-2 text-body-md text-text-primary">
-                    {resolved.threadsHandle ?? resolved.threadsUrl}
-                  </p>
-                  <a
-                    href={resolved.threadsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={buttonClass({ variant: "outline", className: "mt-4" })}
-                  >
-                    Buka Threads
-                  </a>
-                </div>
-              ) : null}
-
-              {resolved.facebookUrl ? (
-                <div className="rounded-lg border border-border-soft bg-surface-white p-5">
-                  <h3 className="text-title-md text-brand-deep">Facebook</h3>
-                  <p className="mt-2 text-body-md text-text-primary">
-                    {resolved.facebookUrl}
-                  </p>
-                  <a
-                    href={resolved.facebookUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={buttonClass({ variant: "outline", className: "mt-4" })}
-                  >
-                    Buka Facebook
-                  </a>
-                </div>
-              ) : null}
             </div>
-
-            {!hasAnyContact ? (
-              <div className="mt-4">
-                <PlaceholderNotice
-                  title="Kanal kontak sedang dipersiapkan"
-                  body="Informasi kontak resmi lagi kami persiapkan. Kamu tetap bisa menjelajahi katalog produk dan memesan perlengkapan favoritmu!"
-                  variant="paper"
-                />
-              </div>
-            ) : null}
           </section>
         </div>
 
