@@ -143,7 +143,7 @@ export default async function CheckoutSuccessPage({
   return (
     <>
       <PageHeader
-        eyebrow={isCod ? "⏳ Menunggu Konfirmasi WhatsApp" : "Checkout selesai"}
+        eyebrow={isCod ? "Menunggu Konfirmasi WhatsApp" : "Checkout selesai"}
         title={
           isCod
             ? "Yeay, pesananmu sudah tercatat! Yuk, selesaikan 1 langkah terakhir."

@@ -136,7 +136,7 @@ export function CheckoutSummary({
         {voucher ? (
           <div className="flex items-start justify-between gap-3">
             <dt className="text-text-secondary">
-              Diskon voucher ({voucher.code})
+              Diskon voucher — {voucher.code}
             </dt>
             <dd className="text-right font-medium text-brand-forest">
               −
@@ -189,12 +189,9 @@ export function CheckoutSummary({
         Pembayaran:{" "}
         <span className="font-medium text-text-primary">
           {paymentMethod === "cod"
-            ? "Bayar di Tempat (COD)"
-            : "Pembayaran Online Otomatis"}
-        </span>{" "}
-        {paymentMethod === "cod"
-          ? "(Bayar tunai saat kurir tiba)"
-          : "(QRIS, VA, E-Wallet)"}
+            ? "Bayar di Tempat — Tunai saat kurir tiba"
+            : "Pembayaran Online Otomatis — QRIS, Virtual Account, E-Wallet"}
+        </span>
       </p>
 
       <p className="mt-1 text-body-sm text-text-secondary">

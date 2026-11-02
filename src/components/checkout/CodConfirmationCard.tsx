@@ -141,7 +141,11 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
       {/* Banner Status Atas */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-soft bg-surface-paper px-5 py-3.5 text-body-sm">
         <span className="flex items-center gap-2 font-semibold text-feedback-warn">
-          ⏳ Menunggu Konfirmasi WhatsApp
+          <span
+            className="inline-block h-2 w-2 rounded-full bg-feedback-warn"
+            aria-hidden="true"
+          />
+          Menunggu Konfirmasi WhatsApp
         </span>
         <span className="font-mono text-caption text-text-secondary">
           Ref: <strong className="font-semibold text-text-primary">{refCode}</strong>
@@ -159,32 +163,29 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
           </p>
         </div>
 
-        {/* Tombol Utama Hijau WhatsApp (min-height 52px) */}
+        {/* Tombol Utama WhatsApp (Warna Primary Sistem, min-height 52px) */}
         <div>
           <a
             href={finalWhatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-6 py-3.5 text-center text-title-md font-bold text-white shadow-sm transition hover:bg-[#1ebd5b] focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2 active:scale-[0.99]"
+            className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-brand-forest px-6 py-3.5 text-center text-title-md font-bold text-surface-white shadow-sm transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest focus:ring-offset-2 active:scale-[0.99]"
           >
-            <span>🟢 Konfirmasi Pesanan via WhatsApp (1-Klik)</span>
+            <span>Konfirmasi Pesanan via WhatsApp 1-Klik</span>
           </a>
         </div>
 
         {/* Info Penenang Timer 24 Jam */}
-        <div className="flex items-start gap-3 rounded-lg border border-border-soft bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
-          <span className="text-title-md" aria-hidden="true">
-            🔒
-          </span>
+        <div className="rounded-lg border border-border-soft border-l-4 border-l-brand-forest bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
           <p>
-            Stok produkmu kami amankan selama <strong className="font-semibold text-text-primary">24 jam</strong> ke depan. Yuk, segera konfirmasi agar tidak kehabisan!
+            Stok produkmu aman selama <strong className="font-semibold text-text-primary">24 jam</strong> ke depan. Silakan kirim konfirmasi agar pesananmu segera disiapkan.
           </p>
         </div>
 
         {/* Kotak Info Uang Tunai */}
         <div className="rounded-lg border border-accent-earth/40 bg-surface-sage/20 p-4 text-body-sm leading-relaxed text-text-secondary">
           <p className="font-semibold text-title-sm text-text-primary">
-            💵 Siapkan Uang Tunai Pas Saat Kurir Tiba:{" "}
+            Siapkan Uang Tunai Pas Saat Kurir Tiba:{" "}
             <span className="font-bold text-brand-forest">{totalFormatted}</span>.
           </p>
           <p className="mt-1">
@@ -196,12 +197,16 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
         <details className="group rounded-lg border border-border-soft bg-surface-white transition">
           <summary className="flex cursor-pointer list-none items-center justify-between p-4 text-body-sm font-semibold text-brand-forest hover:text-brand-deep">
             <span>Kendala membuka WhatsApp otomatis? Klik di sini untuk bantuan manual</span>
-            <span
-              className="text-title-sm text-text-secondary transition duration-200 group-open:rotate-180"
+            <svg
+              className="h-5 w-5 text-text-secondary transition-transform duration-200 group-open:rotate-180"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
               aria-hidden="true"
             >
-              ▾
-            </span>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
           </summary>
 
           <div className="space-y-4 border-t border-border-soft p-4 text-body-sm text-text-secondary">
@@ -222,7 +227,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
                 onClick={handleCopyMessage}
                 className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
               >
-                {copiedMessage ? "✓ Tersalin!" : "📋 Salin Teks Pesanan"}
+                {copiedMessage ? "Tersalin" : "Salin Teks Pesanan"}
               </button>
             </div>
 
@@ -238,8 +243,8 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
                   className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
                 >
                   {copiedPhone
-                    ? "✓ Tersalin!"
-                    : `📞 Salin Nomor CS (${displayPhone})`}
+                    ? "Tersalin"
+                    : `Salin Nomor CS: ${displayPhone}`}
                 </button>
 
                 <a
@@ -248,7 +253,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
                   rel="noopener noreferrer"
                   className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-text-primary hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
                 >
-                  💬 Buka WhatsApp Web
+                  Buka WhatsApp Web
                 </a>
               </div>
             </div>

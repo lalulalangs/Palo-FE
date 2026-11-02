@@ -380,7 +380,7 @@ export function CheckoutFlow({
                           Pembayaran Online Otomatis
                         </span>
                         <span className="block text-body-sm leading-relaxed text-text-secondary">
-                          Praktis &amp; langsung diproses! Bisa pakai QRIS, Virtual Account (BCA, Mandiri, BRI), atau E-Wallet.
+                          Praktis dan langsung diproses melalui QRIS, Virtual Account BCA, Mandiri, BRI, atau E-Wallet.
                         </span>
                       </div>
                     </div>
@@ -405,14 +405,9 @@ export function CheckoutFlow({
                         className="mt-1 h-4 w-4 text-brand-forest focus:ring-brand-forest"
                       />
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="block text-title-sm font-semibold text-text-primary">
-                            Bayar di Tempat (COD)
-                          </span>
-                          <span className="inline-flex items-center rounded-full bg-accent-earth/20 px-2 py-0.5 text-caption font-semibold tracking-wide text-brand-deep uppercase">
-                            POPULER
-                          </span>
-                        </div>
+                        <span className="block text-title-sm font-semibold text-text-primary">
+                          Bayar di Tempat
+                        </span>
                         <span className="block text-body-sm leading-relaxed text-text-secondary">
                           Bayar tunai langsung ke kurir saat paket tiba di alamatmu.
                         </span>
@@ -425,9 +420,9 @@ export function CheckoutFlow({
                 {paymentMethod === "cod" ? (
                   <div className="mt-3 rounded-lg border border-accent-earth/40 bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
                     <span className="font-semibold text-text-primary">
-                      💡 Konfirmasi Cepat 1-Klik via WhatsApp
+                      Konfirmasi Cepat 1-Klik via WhatsApp
                     </span>{" "}
-                    — Tenang, tanpa uang muka (DP) kok! Setelah klik buat pesanan, kamu cukup kirim chat otomatis ke CS kami supaya paketmu langsung disiapkan gudang.
+                    — Tanpa uang muka atau DP. Setelah membuat pesanan, kirim pesan konfirmasi ke Customer Service agar pesananmu segera disiapkan dari gudang Senaru.
                   </div>
                 ) : null}
               </div>
@@ -546,20 +541,20 @@ export function CheckoutFlow({
                     : isRedirecting
                       ? "Membuka halaman pesanan…"
                       : paymentMethod === "cod"
-                        ? "Buat Pesanan (Bayar di Tempat)"
+                        ? "Buat Pesanan"
                         : "Lanjut ke Pembayaran"}
                 </button>
                 <Link
                   href="/keranjang"
-                  className={buttonClass({ variant: "ghost", size: "lg" })}
+                  className="inline-flex min-h-12 items-center justify-center rounded-lg border border-brand-forest/25 bg-surface-sage px-6 font-semibold tracking-wide text-brand-forest shadow-xs transition-colors duration-150 hover:border-brand-forest/40 hover:bg-surface-sage/70 hover:text-brand-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
                 >
-                  Kembali ke keranjang
+                  Kembali
                 </Link>
               </div>
 
               <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">
                 {paymentMethod === "cod"
-                  ? "Dengan menekan tombol Buat Pesanan (Bayar di Tempat), kamu akan diarahkan ke halaman konfirmasi WhatsApp untuk verifikasi pesananmu."
+                  ? "Dengan menekan tombol Buat Pesanan, kamu akan diarahkan ke halaman konfirmasi WhatsApp untuk verifikasi pesananmu."
                   : "Dengan menekan tombol Lanjut ke Pembayaran, kamu akan diarahkan ke halaman pembayaran yang aman untuk menyelesaikan transaksi."}
               </p>
             </section>

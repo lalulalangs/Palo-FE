@@ -116,21 +116,21 @@ describe("CheckoutFlow Payment Step", () => {
   it("merender kartu pilihan pembayaran Online dan COD dengan standar microcopy Tokopedia", async () => {
     await advanceToPaymentStep();
 
-    // Radio Opsi 1: Online (muncul di kartu pilihan & ringkasan)
+    // Radio Opsi 1: Online
     expect(
       screen.getAllByText("Pembayaran Online Otomatis").length,
     ).toBeGreaterThanOrEqual(1);
     expect(
       screen.getByText(
-        /Praktis & langsung diproses! Bisa pakai QRIS, Virtual Account \(BCA, Mandiri, BRI\), atau E-Wallet\./i,
+        "Praktis dan langsung diproses melalui QRIS, Virtual Account BCA, Mandiri, BRI, atau E-Wallet.",
       ),
     ).toBeInTheDocument();
 
-    // Radio Opsi 2: COD dengan badge POPULER
+    // Radio Opsi 2: COD (tanpa badge POPULER dan tanpa (COD))
     expect(
-      screen.getAllByText("Bayar di Tempat (COD)").length,
+      screen.getAllByText("Bayar di Tempat").length,
     ).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("POPULER")).toBeInTheDocument();
+    expect(screen.queryByText("POPULER")).not.toBeInTheDocument();
     expect(
       screen.getByText(
         "Bayar tunai langsung ke kurir saat paket tiba di alamatmu.",
@@ -141,41 +141,46 @@ describe("CheckoutFlow Payment Step", () => {
     expect(
       screen.getByRole("button", { name: "Lanjut ke Pembayaran" }),
     ).toBeInTheDocument();
+
+    // Tombol Kembali
+    expect(
+      screen.getByRole("link", { name: "Kembali" }),
+    ).toBeInTheDocument();
   });
 
   it("menampilkan callout COD dan memperbarui label tombol ketika metode COD dipilih", async () => {
     await advanceToPaymentStep();
 
     const codRadio = screen.getByRole("radio", {
-      name: /Bayar di Tempat \(COD\)/i,
+      name: /Bayar di Tempat/i,
     });
     fireEvent.click(codRadio);
 
-    // Kotak Info COD (Callout) muncul
+    // Kotak Info COD (Callout) muncul tanpa emoji 💡 dan tanpa (DP)
     expect(
-      screen.getByText(/💡 Konfirmasi Cepat 1-Klik via WhatsApp/i),
+      screen.getByText("Konfirmasi Cepat 1-Klik via WhatsApp"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Tenang, tanpa uang muka \(DP\) kok! Setelah klik buat pesanan, kamu cukup kirim chat otomatis ke CS kami supaya paketmu langsung disiapkan gudang\./i,
+        /Tanpa uang muka atau DP\. Setelah membuat pesanan, kirim pesan konfirmasi ke Customer Service agar pesananmu segera disiapkan dari gudang Senaru\./i,
       ),
     ).toBeInTheDocument();
 
-    // Tombol utama berubah ke COD
+    // Tombol utama berubah ke COD: "Buat Pesanan"
     expect(
-      screen.getByRole("button", { name: "Buat Pesanan (Bayar di Tempat)" }),
+      screen.getByRole("button", { name: "Buat Pesanan" }),
     ).toBeInTheDocument();
 
     // Teks penenang di bawah tombol utama
     expect(
       screen.getByText(
-        /Dengan menekan tombol Buat Pesanan \(Bayar di Tempat\), kamu akan diarahkan ke halaman konfirmasi WhatsApp untuk verifikasi pesananmu\./i,
+        /Dengan menekan tombol Buat Pesanan, kamu akan diarahkan ke halaman konfirmasi WhatsApp untuk verifikasi pesananmu\./i,
       ),
     ).toBeInTheDocument();
 
     // CheckoutSummary memperbarui info pembayaran
     expect(
-      screen.getByText(/Bayar tunai saat kurir tiba/),
+      screen.getByText(/Bayar di Tempat — Tunai saat kurir tiba/),
     ).toBeInTheDocument();
   });
 
@@ -184,11 +189,11 @@ describe("CheckoutFlow Payment Step", () => {
 
     // Pilih COD
     const codRadio = screen.getByRole("radio", {
-      name: /Bayar di Tempat \(COD\)/i,
+      name: /Bayar di Tempat/i,
     });
     fireEvent.click(codRadio);
     expect(
-      screen.getByRole("button", { name: "Buat Pesanan (Bayar di Tempat)" }),
+      screen.getByRole("button", { name: "Buat Pesanan" }),
     ).toBeInTheDocument();
 
     // Kembalikan ke Online
@@ -199,7 +204,7 @@ describe("CheckoutFlow Payment Step", () => {
 
     // Callout COD hilang
     expect(
-      screen.queryByText(/💡 Konfirmasi Cepat 1-Klik via WhatsApp/i),
+      screen.queryByText("Konfirmasi Cepat 1-Klik via WhatsApp"),
     ).not.toBeInTheDocument();
 
     // Tombol utama kembali ke Online

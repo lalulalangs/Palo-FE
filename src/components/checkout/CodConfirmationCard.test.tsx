@@ -120,24 +120,24 @@ describe("CodConfirmationCard Component", () => {
       ),
     ).toBeInTheDocument();
 
-    // Tombol utama WhatsApp
+    // Tombol utama WhatsApp (tanpa emoji, tanpa kurung)
     const whatsappBtn = screen.getByRole("link", {
-      name: /Konfirmasi Pesanan via WhatsApp \(1-Klik\)/i,
+      name: /Konfirmasi Pesanan via WhatsApp 1-Klik/i,
     });
     expect(whatsappBtn).toBeInTheDocument();
     expect(whatsappBtn).toHaveAttribute("target", "_blank");
     expect(whatsappBtn).toHaveAttribute("rel", "noopener noreferrer");
     expect(whatsappBtn.getAttribute("href")).toContain("wa.me/6281234567890");
 
-    // Info penenang 24 jam
+    // Info penenang 24 jam (tanpa emoji, dengan border kiri aksen)
     expect(
-      screen.getByText(/Stok produkmu kami amankan selama/i),
+      screen.getByText(/Stok produkmu aman selama/i),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/24 jam/i),
     ).toBeInTheDocument();
 
-    // Kotak info uang tunai
+    // Kotak info uang tunai (tanpa emoji 💵)
     expect(
       screen.getByText(/Siapkan Uang Tunai Pas Saat Kurir Tiba:/i),
     ).toBeInTheDocument();
@@ -159,7 +159,7 @@ describe("CodConfirmationCard Component", () => {
       ),
     ).toBeInTheDocument();
 
-    // Lapis 1: Salin teks pesanan
+    // Lapis 1: Salin teks pesanan (tanpa emoji 📋)
     const copyMessageBtn = screen.getByRole("button", {
       name: /Salin Teks Pesanan/i,
     });
@@ -170,14 +170,14 @@ describe("CodConfirmationCard Component", () => {
     expect(writeTextMock).toHaveBeenCalledWith(
       expect.stringContaining("COD-20261102-7A9B2"),
     );
-    expect(screen.getByText("✓ Tersalin!")).toBeInTheDocument();
+    expect(screen.getByText("Tersalin")).toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(2100);
     });
-    expect(screen.getByText("📋 Salin Teks Pesanan")).toBeInTheDocument();
+    expect(screen.getByText("Salin Teks Pesanan")).toBeInTheDocument();
 
-    // Lapis 2: Salin nomor CS
+    // Lapis 2: Salin nomor CS (tanpa emoji 📞 dan tanpa kurung)
     const copyPhoneBtn = screen.getByRole("button", {
       name: /Salin Nomor CS/i,
     });
@@ -186,14 +186,14 @@ describe("CodConfirmationCard Component", () => {
     });
 
     expect(writeTextMock).toHaveBeenCalledWith("0812-3456-7890");
-    expect(screen.getByText("✓ Tersalin!")).toBeInTheDocument();
+    expect(screen.getByText("Tersalin")).toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(2100);
     });
-    expect(screen.getByText(/Salin Nomor CS \(0812-3456-7890\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Salin Nomor CS: 0812-3456-7890/i)).toBeInTheDocument();
 
-    // Lapis 3: Tautan WhatsApp Web
+    // Lapis 3: Tautan WhatsApp Web (tanpa emoji 💬)
     const webBtn = screen.getByRole("link", { name: /Buka WhatsApp Web/i });
     expect(webBtn).toHaveAttribute("target", "_blank");
     expect(webBtn.getAttribute("href")).toContain("web.whatsapp.com/send");
@@ -211,7 +211,7 @@ describe("CodConfirmationCard Component", () => {
     render(<CodConfirmationCard order={minimalOrder} />);
 
     const whatsappBtn = screen.getByRole("link", {
-      name: /Konfirmasi Pesanan via WhatsApp \(1-Klik\)/i,
+      name: /Konfirmasi Pesanan via WhatsApp 1-Klik/i,
     });
     expect(whatsappBtn.getAttribute("href")).toContain("wa.me");
     expect(whatsappBtn.getAttribute("href")).toContain(

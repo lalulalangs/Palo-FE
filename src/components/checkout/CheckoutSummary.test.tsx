@@ -124,7 +124,7 @@ describe('CheckoutSummary component', () => {
     // Final subtotal: 1.000.000 + Ongkir: 45.000 = 1.045.000
     const totalElement = screen.getByText(/1\.045\.000/);
     expect(totalElement).toBeInTheDocument();
-    expect(screen.getByText(/RINJANI50/)).toBeInTheDocument();
+    expect(screen.getByText(/Diskon voucher — RINJANI50/)).toBeInTheDocument();
   });
 
   it('renders COD payment method label correctly when selected', () => {
@@ -140,7 +140,8 @@ describe('CheckoutSummary component', () => {
       />,
     );
 
-    expect(screen.getByText('Bayar di Tempat (COD)')).toBeInTheDocument();
-    expect(screen.getByText(/Bayar tunai saat kurir tiba/)).toBeInTheDocument();
+    expect(
+      screen.getByText('Bayar di Tempat — Tunai saat kurir tiba'),
+    ).toBeInTheDocument();
   });
 });
