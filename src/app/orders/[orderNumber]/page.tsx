@@ -323,6 +323,7 @@ function describeNextStep(order: OrderDetail): NextStep {
           : "Panduan pembayaran lagi disiapkan. Yuk, coba refresh halaman sebentar lagi atau hubungi tim Customer Service kami kalau butuh bantuan!",
       };
 
+    case "awaiting_confirmation":
     case "menunggu_konfirmasi_cs":
       return {
         waitingForPayment: true,

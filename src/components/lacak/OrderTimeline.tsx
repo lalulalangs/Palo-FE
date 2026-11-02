@@ -28,6 +28,8 @@ import type { OrderDetail } from "@/lib/types";
  */
 const STATUS_TONE: Record<string, string> = {
   menunggu_pembayaran: "bg-surface-sage text-brand-forest",
+  awaiting_confirmation: "bg-surface-paper text-feedback-warn",
+  menunggu_konfirmasi_cs: "bg-surface-paper text-feedback-warn",
   dibayar: "bg-surface-sage text-brand-forest",
   diproses: "bg-surface-sage text-brand-forest",
   dikirim: "bg-surface-sage text-brand-forest",

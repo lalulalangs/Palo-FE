@@ -29,6 +29,7 @@ export function CheckoutSummary({
   address,
   service,
   voucher,
+  paymentMethod = "online",
 }: {
   cart: CartItem[];
   accountName: string;
@@ -36,6 +37,7 @@ export function CheckoutSummary({
   address: AddressInput | null;
   service: ShippingService | null;
   voucher: AppliedVoucher | null;
+  paymentMethod?: string | null;
 }) {
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
   const cartSubtotal = cart.reduce((total, item) => total + item.subtotal, 0);
@@ -186,9 +188,13 @@ export function CheckoutSummary({
       <p className="mt-4 border-t border-border-soft pt-4 text-body-sm text-text-secondary">
         Pembayaran:{" "}
         <span className="font-medium text-text-primary">
-          Pembayaran Instan &amp; Otomatis
+          {paymentMethod === "cod"
+            ? "Bayar di Tempat (COD)"
+            : "Pembayaran Online Otomatis"}
         </span>{" "}
-        (QRIS, VA, E-Wallet)
+        {paymentMethod === "cod"
+          ? "(Bayar tunai saat kurir tiba)"
+          : "(QRIS, VA, E-Wallet)"}
       </p>
 
       <p className="mt-1 text-body-sm text-text-secondary">

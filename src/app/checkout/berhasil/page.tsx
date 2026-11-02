@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
+import { CodConfirmationCard } from "@/components/checkout/CodConfirmationCard";
 import { PaymentInstructions } from "@/components/checkout/PaymentInstructions";
 import { PaymentRedirectCard } from "@/components/checkout/PaymentRedirectCard";
 import { buttonClass } from "@/components/ui/Button";
@@ -128,7 +129,12 @@ export default async function CheckoutSuccessPage({
     );
   }
 
-  const paymentUrl = paymentRedirectUrl(detail);
+  const isCod =
+    detail.is_cod === true ||
+    detail.payment_method === "cod" ||
+    detail.payment?.method === "cod";
+
+  const paymentUrl = isCod ? null : paymentRedirectUrl(detail);
 
   const instructions = detail.payment_expires_at
     ? `Selesaikan pembayaran sebelum ${formatWaktu(detail.payment_expires_at)} agar pesananmu tetap aman, ya.`
@@ -137,9 +143,17 @@ export default async function CheckoutSuccessPage({
   return (
     <>
       <PageHeader
-        eyebrow="Checkout selesai"
-        title="Pesanan berhasil dibuat"
-        description="Nomor pesanan dan instruksi pembayaranmu sudah tercatat rapi. Status pembayaran akan otomatis terupdate begitu transaksi selesai diverifikasi."
+        eyebrow={isCod ? "⏳ Menunggu Konfirmasi WhatsApp" : "Checkout selesai"}
+        title={
+          isCod
+            ? "Yeay, pesananmu sudah tercatat! Yuk, selesaikan 1 langkah terakhir."
+            : "Pesanan berhasil dibuat"
+        }
+        description={
+          isCod
+            ? "Klik tombol WhatsApp di bawah untuk kirim pesan konfirmasi otomatis ke admin. Begitu terkirim, pesananmu langsung kami kemas dari gudang Senaru!"
+            : "Nomor pesanan dan instruksi pembayaranmu sudah tercatat rapi. Status pembayaran akan otomatis terupdate begitu transaksi selesai diverifikasi."
+        }
         breadcrumbs={[
           { name: "Beranda", href: "/" },
           { name: "Checkout", href: "/checkout" },
@@ -154,7 +168,9 @@ export default async function CheckoutSuccessPage({
 
       <Container className="py-8 tablet:py-12">
         <div className="mx-auto max-w-3xl space-y-6">
-          {paymentUrl ? (
+          {isCod ? (
+            <CodConfirmationCard order={detail} />
+          ) : paymentUrl ? (
             <PaymentRedirectCard
               paymentUrl={paymentUrl}
               orderNumber={detail.order_number}
@@ -177,49 +193,51 @@ export default async function CheckoutSuccessPage({
             </p>
           </section>
 
-          <section
-            aria-labelledby="instruksi-pembayaran"
-            className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
-          >
-            <h2
-              id="instruksi-pembayaran"
-              className="text-headline-sm text-brand-deep"
+          {!isCod ? (
+            <section
+              aria-labelledby="instruksi-pembayaran"
+              className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
             >
-              Instruksi pembayaran
-            </h2>
+              <h2
+                id="instruksi-pembayaran"
+                className="text-headline-sm text-brand-deep"
+              >
+                Instruksi pembayaran
+              </h2>
 
-            {detail.payment_method ? (
-              <p className="mt-1 text-body-sm text-text-secondary">
-                Metode: {detail.payment_method}
+              {detail.payment_method ? (
+                <p className="mt-1 text-body-sm text-text-secondary">
+                  Metode: {detail.payment_method}
+                </p>
+              ) : null}
+
+              {/*
+                Instruksi dirender apa adanya dari `payment.instructions`
+                (`payments.raw_response`). Kalau gateway belum mengirim apa pun,
+                `PaymentInstructions` menyatakannya terus terang — bukan
+                menampilkan nomor rekening karangan.
+              */}
+              <div className="mt-4">
+                {detail.payment ? (
+                  <PaymentInstructions payment={detail.payment} />
+                ) : (
+                  <PlaceholderNotice
+                    title="Instruksi pembayaran belum tersedia"
+                    body="Nomor Virtual Account, string QRIS, dan detail bank berasal langsung dari payment gateway. Kalau belum tampil, muat ulang halaman ini sebentar lagi atau hubungi Customer Service dengan menyebutkan nomor pesanan."
+                  />
+                )}
+              </div>
+
+              <p className="mt-4 text-body-md text-text-secondary">
+                {instructions}
               </p>
-            ) : null}
-
-            {/*
-              Instruksi dirender apa adanya dari `payment.instructions`
-              (`payments.raw_response`). Kalau gateway belum mengirim apa pun,
-              `PaymentInstructions` menyatakannya terus terang — bukan
-              menampilkan nomor rekening karangan.
-            */}
-            <div className="mt-4">
-              {detail.payment ? (
-                <PaymentInstructions payment={detail.payment} />
-              ) : (
-                <PlaceholderNotice
-                  title="Instruksi pembayaran belum tersedia"
-                  body="Nomor Virtual Account, string QRIS, dan detail bank berasal langsung dari payment gateway. Kalau belum tampil, muat ulang halaman ini sebentar lagi atau hubungi Customer Service dengan menyebutkan nomor pesanan."
-                />
-              )}
-            </div>
-
-            <p className="mt-4 text-body-md text-text-secondary">
-              {instructions}
-            </p>
-            {detail.payment_expires_at ? (
-              <p className="mt-1 text-body-sm text-text-secondary">
-                Batas akhir: {formatWaktu(detail.payment_expires_at)}
-              </p>
-            ) : null}
-          </section>
+              {detail.payment_expires_at ? (
+                <p className="mt-1 text-body-sm text-text-secondary">
+                  Batas akhir: {formatWaktu(detail.payment_expires_at)}
+                </p>
+              ) : null}
+            </section>
+          ) : null}
 
           <section
             aria-labelledby="ringkasan-item"

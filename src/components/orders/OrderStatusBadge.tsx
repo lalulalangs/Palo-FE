@@ -19,6 +19,8 @@ import type { OrderStatus } from "@/lib/types";
 const STATUS_TONE: Record<string, string> = {
   menunggu_pembayaran:
     "border-accent-earth/50 bg-surface-paper text-feedback-warn",
+  awaiting_confirmation:
+    "border-accent-earth/50 bg-surface-paper text-feedback-warn",
   // Pesanan WhatsApp tamu: sudah tercatat, menunggu verifikasi pembayaran CS.
   menunggu_konfirmasi_cs:
     "border-accent-earth/50 bg-surface-paper text-feedback-warn",
