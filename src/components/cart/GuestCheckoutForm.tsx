@@ -78,18 +78,17 @@ function getActiveOrderServerSnapshot(): string | null {
 
 /**
  * Formulir checkout tamu via WhatsApp (PRD §3.11).
- * Dilengkapi dengan 4 seksi logis:
- * 1. Data Pemesan (nama & no. WhatsApp)
- * 2. Alamat Pengiriman (DestinationPicker & Detail Jalan)
- * 3. Pilihan Ekspedisi (Segmented Radio Cards)
- * 4. Catatan & Selesai (Catatan & CTA Primer dengan spinner)
+ * Dioptimalkan untuk Unified Checkout Hub dengan layout ramping:
+ * 1. Data Pemesan (Nama & No. WhatsApp berdampingan 2 kolom)
+ * 2. Alamat Pengiriman (DestinationPicker & Detail Jalan tanpa hint berulang)
+ * 3. Pilihan Ekspedisi (Inline Radio Pills)
+ * 4. Catatan Pesanan (Progressive Disclosure) & CTA dengan Microcopy Ringkas
  */
 export function GuestCheckoutForm({
   items,
   variant = "primary",
 }: {
   items: CartItem[];
-  /** Hanya satu CTA primer per tampilan; diisi oleh halaman induk. */
   variant?: "primary" | "outline";
 }) {
   const [state, formAction, isPending] = useActionState<
@@ -104,6 +103,9 @@ export function GuestCheckoutForm({
 
   // State pilihan kurir (default: jne)
   const [selectedCourier, setSelectedCourier] = useState<string>("jne");
+
+  // State progressive disclosure untuk catatan pesanan
+  const [showNote, setShowNote] = useState(false);
 
   // Baca sessionStorage secara reaktif via useSyncExternalStore
   const storedHandoffJson = useSyncExternalStore(
@@ -155,8 +157,7 @@ export function GuestCheckoutForm({
 
   const activeHandoff = handoff ?? (isDismissed ? null : savedHandoff);
 
-  // Gerbang yang sama dipakai baris keranjang dan ringkasan: stok basi
-  // (jumlah > sisa stok) juga memblokir jalur tamu, bukan hanya stok habis.
+  // Gerbang stok: jumlah > sisa stok juga memblokir jalur tamu
   const hasBlockingItem = items.some((item) => stockStateOf(item) !== "cukup");
 
   if (activeHandoff) {
@@ -169,16 +170,7 @@ export function GuestCheckoutForm({
   }
 
   return (
-    <form action={formAction} className="space-y-6">
-      <div>
-        <h2 className="text-headline-sm text-text-primary">
-          Checkout lewat WhatsApp
-        </h2>
-        <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
-          Belanja praktis tanpa perlu bikin akun! Detail pesanan dan alamatmu bakal langsung disiapkan ke WhatsApp Customer Service kami.
-        </p>
-      </div>
-
+    <form action={formAction} className="space-y-3.5">
       {/* Item diserialisasi dari cart yang dirender server */}
       <input type="hidden" name="items" value={serializeItems(items)} />
 
@@ -203,24 +195,19 @@ export function GuestCheckoutForm({
       <input type="hidden" name="postal_code" value={destination.postal_code ?? ""} />
 
       {/* =========================================================================
-          SEKSI 1: Data Pemesan
+          SEKSI 1: Data Pemesan (Grid 2 Kolom, Placeholder Deskriptif)
       ========================================================================= */}
-      <section aria-labelledby="section-buyer-title" className="space-y-3">
-        <div className="border-b border-border-soft pb-2">
-          <h3 id="section-buyer-title" className="text-label-md font-semibold text-text-primary">
-            1. Data Pemesan
-          </h3>
-          <p className="text-body-sm text-text-secondary">
-            Nama dan nomor kontak untuk percakapan dengan Customer Service.
-          </p>
-        </div>
-
-        <div className="grid gap-3 tablet:grid-cols-2">
+      <div className="space-y-1">
+        <label className="block text-label-sm font-semibold text-text-primary">
+          Data Pemesan (opsional)
+        </label>
+        <div className="grid grid-cols-2 gap-2.5">
           <Input
             id="guest-name"
             name="guest_name"
-            label="Nama lengkap (opsional)"
-            hint="Tulis nama lengkap penerima biar paketmu nggak salah alamat."
+            label="Nama penerima"
+            hideLabel
+            placeholder="Nama penerima"
             autoComplete="name"
             maxLength={120}
             disabled={isPending}
@@ -232,29 +219,21 @@ export function GuestCheckoutForm({
             name="guest_phone"
             type="tel"
             inputMode="tel"
-            label="Nomor WhatsApp (opsional)"
-            hint="Pastikan nomor WhatsApp aktif ya, buat info rincian pesanan &amp; ongkir."
+            label="Nomor WhatsApp"
+            hideLabel
+            placeholder="No. WhatsApp (08xx)"
             autoComplete="tel"
             maxLength={32}
             disabled={isPending}
             error={fieldError(error, "guest_phone")}
           />
         </div>
-      </section>
+      </div>
 
       {/* =========================================================================
           SEKSI 2: Alamat Pengiriman
       ========================================================================= */}
-      <section aria-labelledby="section-shipping-title" className="space-y-3">
-        <div className="border-b border-border-soft pb-2">
-          <h3 id="section-shipping-title" className="text-label-md font-semibold text-text-primary">
-            2. Alamat Pengiriman
-          </h3>
-          <p className="text-body-sm text-text-secondary">
-            Pilih wilayah tujuan dan detail jalan untuk memudahkan CS menghitung ongkir resmi.
-          </p>
-        </div>
-
+      <div className="space-y-2">
         <DestinationPicker
           picked={destination}
           disabled={isPending}
@@ -265,33 +244,27 @@ export function GuestCheckoutForm({
         <Input
           id="guest-street"
           name="street"
-          label="Detail alamat jalan (opsional)"
-          placeholder="Nama jalan, nomor rumah, RT/RW, atau patokan"
+          label="Alamat jalan"
+          hideLabel
+          placeholder="Nama jalan, nomor rumah, RT/RW, atau patokan (opsional)"
           autoComplete="street-address"
           maxLength={300}
           disabled={isPending}
           error={fieldError(error, "street")}
-          hint="Tulis nama jalan, nomor rumah, RT/RW, hingga patokan biar kurir gampang temukan lokasimu."
         />
-      </section>
+      </div>
 
       {/* =========================================================================
-          SEKSI 3: Pilihan Ekspedisi
+          SEKSI 3: Pilihan Ekspedisi (Inline Radio Pills)
       ========================================================================= */}
-      <section aria-labelledby="courier-group-label" className="space-y-3">
-        <div className="border-b border-border-soft pb-2">
-          <h3 id="courier-group-label" className="text-label-md font-semibold text-text-primary">
-            3. Pilihan Ekspedisi
-          </h3>
-          <p className="text-body-sm text-text-secondary">
-            Pilih preferensi jasa pengiriman. Tarif ongkir final akan dikonfirmasi via WhatsApp.
-          </p>
-        </div>
-
+      <div className="space-y-1.5">
+        <label id="courier-group-label" className="block text-label-sm font-semibold text-text-primary">
+          Pilihan Ekspedisi
+        </label>
         <div
           role="radiogroup"
           aria-labelledby="courier-group-label"
-          className="grid grid-cols-2 gap-3"
+          className="grid grid-cols-2 gap-2"
         >
           {COURIER_OPTIONS.map((option) => {
             const isSelected = selectedCourier === option.id;
@@ -299,19 +272,15 @@ export function GuestCheckoutForm({
               <label
                 key={option.id}
                 className={[
-                  "relative flex min-h-12 cursor-pointer select-none flex-col justify-center rounded-lg border p-3 transition-all",
+                  "relative flex min-h-11 cursor-pointer select-none items-center justify-between rounded-md border px-3 py-2 text-label-sm transition-all",
                   isSelected
-                    ? "border-brand-forest bg-surface-sage/50 ring-2 ring-brand-forest ring-offset-1"
-                    : "border-border-soft bg-surface-white hover:border-brand-forest/40 hover:bg-surface-paper",
+                    ? "border-brand-forest bg-surface-sage/60 font-semibold text-brand-forest ring-1 ring-brand-forest"
+                    : "border-border-soft bg-surface-white text-text-primary hover:border-brand-forest/50 hover:bg-surface-paper",
                   isPending ? "cursor-not-allowed opacity-60" : "",
                 ].join(" ")}
               >
-                <span className="text-label-md font-semibold text-text-primary">
-                  {option.label}
-                </span>
-                <span className="mt-0.5 text-body-sm text-text-secondary">
-                  {option.desc}
-                </span>
+                <span>{option.label}</span>
+                <span className="text-caption text-text-secondary">{option.desc}</span>
                 <input
                   type="radio"
                   name="courier"
@@ -325,49 +294,72 @@ export function GuestCheckoutForm({
             );
           })}
         </div>
-      </section>
+      </div>
 
       {/* =========================================================================
-          SEKSI 4: Catatan & Submit
+          SEKSI 4: Catatan Pesanan (Progressive Disclosure)
       ========================================================================= */}
-      <section aria-labelledby="section-note-title" className="space-y-3">
-        <div className="border-b border-border-soft pb-2">
-          <h3 id="section-note-title" className="text-label-md font-semibold text-text-primary">
-            4. Catatan & Selesai
-          </h3>
-          <p className="text-body-sm text-text-secondary">
-            Tambahkan instruksi khusus untuk Customer Service jika ada.
-          </p>
-        </div>
-
-        <Textarea
-          id="guest-note"
-          name="note"
-          label="Catatan (opsional)"
-          placeholder="Contoh: Tolong bungkus rapi ya, Kak."
-          maxLength={500}
-          disabled={isPending}
-          error={fieldError(error, "note")}
-        />
-
-        {hasBlockingItem ? (
-          <PlaceholderNotice
-            title="Ada produk yang perlu disesuaikan dulu"
-            body="Satu atau lebih produk habis atau jumlahnya melebihi sisa stok. Sesuaikan jumlahnya sebelum melanjutkan."
-            variant="paper"
-          />
-        ) : null}
-
-        {error ? (
-          <div role="alert">
-            <PlaceholderNotice
-              title="Belum bisa menghubungi Customer Service"
-              body={error.message}
-              variant="paper"
+      <div>
+        {showNote ? (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label htmlFor="guest-note" className="block text-label-sm font-semibold text-text-primary">
+                Catatan Pesanan
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowNote(false)}
+                className="text-caption text-text-secondary hover:text-feedback-error transition-colors"
+              >
+                Batal
+              </button>
+            </div>
+            <Textarea
+              id="guest-note"
+              name="note"
+              label="Catatan"
+              hideLabel
+              placeholder="Contoh: Tolong bungkus rapi ya, Kak."
+              maxLength={500}
+              disabled={isPending}
+              error={fieldError(error, "note")}
+              autoFocus
             />
           </div>
-        ) : null}
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowNote(true)}
+            disabled={isPending}
+            className="inline-flex items-center text-label-sm font-semibold text-brand-forest hover:text-brand-deep underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
+          >
+            + Tambah catatan pesanan (opsional)
+          </button>
+        )}
+      </div>
 
+      {/* Peringatan stok jika ada yang bermasalah */}
+      {hasBlockingItem ? (
+        <PlaceholderNotice
+          title="Ada produk yang perlu disesuaikan dulu"
+          body="Satu atau lebih produk habis atau jumlahnya melebihi sisa stok. Sesuaikan jumlahnya sebelum melanjutkan."
+          variant="paper"
+        />
+      ) : null}
+
+      {/* Tampilan error action */}
+      {error ? (
+        <div role="alert">
+          <PlaceholderNotice
+            title="Belum bisa menghubungi Customer Service"
+            body={error.message}
+            variant="paper"
+          />
+        </div>
+      ) : null}
+
+      {/* Tombol Aksi & Microcopy Ringkas */}
+      <div className="pt-1 space-y-2">
         <button
           type="submit"
           disabled={isPending || hasBlockingItem}
@@ -383,10 +375,10 @@ export function GuestCheckoutForm({
           )}
         </button>
 
-        <p className="text-body-sm leading-relaxed text-text-secondary">
-          Pesananmu akan langsung kami teruskan ke WhatsApp CS. Pembayaran praktis via QRIS atau Transfer Bank akan dipandu langsung oleh tim kami, ya.
+        <p className="text-center text-caption leading-relaxed text-text-secondary">
+          🔒 Tim CS kami akan mengonfirmasi ketersediaan stok &amp; ongkir resmi sebelum Anda membayar via QRIS/Transfer Bank.
         </p>
-      </section>
+      </div>
     </form>
   );
 }
