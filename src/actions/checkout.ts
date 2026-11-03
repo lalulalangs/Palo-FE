@@ -149,15 +149,6 @@ export async function searchDestinationsAction(
   const keyword = query.trim();
   if (keyword.length < 3) return { destinations: [] };
 
-  if (!(await getToken())) {
-    return {
-      ok: false,
-      kind: "auth",
-      message: "Sesi masukmu berakhir. Yuk, masuk kembali untuk mencari wilayah pengiriman.",
-      fieldErrors: {},
-    };
-  }
-
   try {
     return { destinations: await searchDestinations(keyword) };
   } catch (error) {

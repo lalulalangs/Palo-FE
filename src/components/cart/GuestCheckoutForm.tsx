@@ -475,7 +475,9 @@ function GuestResultPanel({
             )}
           </strong>{" "}
           <span className="text-body-sm text-text-secondary">
-            (belum termasuk ongkos kirim)
+            {handoff.notice?.toLowerCase().includes("ongkir berhasil dihitung")
+              ? "(termasuk ongkos kirim)"
+              : "(belum termasuk ongkos kirim)"}
           </span>
         </p>
       ) : null}
