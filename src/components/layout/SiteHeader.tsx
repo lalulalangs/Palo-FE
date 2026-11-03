@@ -134,7 +134,7 @@ export function SiteHeader({
         <div className={`flex ${HEADER_HEIGHT_CLASS} items-center justify-between gap-3`}>
           <Link
             href="/"
-            className="flex min-w-0 items-center gap-3 rounded-md py-1"
+            className="flex min-w-0 items-center gap-3 py-1"
           >
             <BrandLogo className="h-11 w-11 shrink-0" preload />
             <span className="hidden min-w-0 flex-col text-left tablet:flex">
@@ -191,7 +191,7 @@ export function SiteHeader({
             <Link
               href="/produk"
               className={[
-                "flex h-11 w-11 items-center justify-center rounded-md transition-colors",
+                "flex h-11 w-11 items-center justify-center transition-colors",
                 transparan
                   ? "text-surface-white drop-shadow hover:bg-surface-white/15"
                   : "text-text-secondary hover:bg-surface-sage hover:text-brand-forest",
@@ -203,7 +203,7 @@ export function SiteHeader({
             <Link
               href={isLoggedIn ? "/me" : "/masuk"}
               className={[
-                "flex h-11 w-11 items-center justify-center rounded-md transition-colors",
+                "flex h-11 w-11 items-center justify-center transition-colors",
                 transparan
                   ? "text-surface-white drop-shadow hover:bg-surface-white/15"
                   : "text-text-secondary hover:bg-surface-sage hover:text-brand-forest",
@@ -217,7 +217,7 @@ export function SiteHeader({
             <Link
               href="/keranjang"
               className={[
-                "relative flex h-11 items-center gap-2 rounded-md border px-3 transition-colors",
+                "relative flex h-11 items-center gap-2 border px-3 transition-colors",
                 transparan
                   ? "border-surface-white/50 bg-surface-white/15 text-surface-white drop-shadow hover:bg-surface-white/25"
                   : "border-border-soft bg-surface-sage text-brand-forest hover:border-brand-forest",
@@ -236,7 +236,7 @@ export function SiteHeader({
               <summary
                 ref={summaryRef}
                 className={[
-                  "flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-md transition-colors [&::-webkit-details-marker]:hidden",
+                  "flex h-11 w-11 cursor-pointer list-none items-center justify-center transition-colors [&::-webkit-details-marker]:hidden",
                   transparan
                     ? "text-surface-white drop-shadow hover:bg-surface-white/15"
                     : "text-text-secondary hover:bg-surface-sage hover:text-brand-forest",
@@ -248,14 +248,14 @@ export function SiteHeader({
               <nav
                 aria-label="Navigasi utama seluler"
                 onClick={handleNavClick}
-                className="absolute right-0 top-14 z-50 w-60 rounded-lg border border-border-soft bg-surface-white p-2 shadow-editorial-strong"
+                className="absolute right-0 top-14 z-50 w-60 border border-border-soft bg-surface-white p-2 shadow-editorial-strong"
               >
                 <ul className="flex flex-col">
                   {PRIMARY_NAV.map((link) => (
                     <li key={link.href}>
                       <ActiveLink
                         href={link.href}
-                        className="flex min-h-11 items-center rounded-md px-3 text-label-md text-text-primary transition-colors hover:bg-surface-sage"
+                        className="flex min-h-11 items-center px-3 text-label-md text-text-primary transition-colors hover:bg-surface-sage"
                         activeClassName="bg-surface-sage font-semibold text-brand-forest"
                         inactiveClassName=""
                       >
@@ -266,7 +266,7 @@ export function SiteHeader({
                   <li>
                     <Link
                       href={isLoggedIn ? "/me" : "/daftar"}
-                      className="flex min-h-11 items-center rounded-md px-3 text-label-md text-text-primary transition-colors hover:bg-surface-sage"
+                      className="flex min-h-11 items-center px-3 text-label-md text-text-primary transition-colors hover:bg-surface-sage"
                     >
                       {isLoggedIn ? "Akun Saya" : "Buat Akun"}
                     </Link>

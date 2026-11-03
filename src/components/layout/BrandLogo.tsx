@@ -54,7 +54,7 @@ export function BrandLogo({
   return (
     <span
       className={[
-        "flex shrink-0 items-center justify-center rounded-md bg-surface-white p-1",
+        "flex shrink-0 items-center justify-center bg-surface-white p-1",
         className ?? "",
       ]
         .filter(Boolean)

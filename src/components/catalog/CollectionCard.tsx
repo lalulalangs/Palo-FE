@@ -60,7 +60,7 @@ export function CollectionCard({
         <h2 className="text-title-lg text-text-primary transition-colors group-hover:text-brand-forest">
           <Link
             href={`/koleksi/${collection.slug}`}
-            className="rounded-sm after:absolute after:inset-0 after:content-['']"
+            className="after:absolute after:inset-0 after:content-['']"
           >
             {name}
           </Link>

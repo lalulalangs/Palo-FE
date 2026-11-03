@@ -66,8 +66,8 @@ export function buttonClass(options?: {
     className = "",
   } = options ?? {};
   return [
-    // Radius 8 px (`--radius-lg`, design.md:57) — 6 px ada di bawah skala.
-    "inline-flex items-center justify-center rounded-lg font-semibold tracking-wide",
+    // Tepi siku (border radius: 0) sesuai design system Palo Rinjani
+    "inline-flex items-center justify-center font-semibold tracking-wide",
     "transition-colors duration-150",
     "disabled:cursor-not-allowed",
     // Varian `blocked` sudah menyatakan keadaannya lewat warna permukaan;

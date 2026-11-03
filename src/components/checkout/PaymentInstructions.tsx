@@ -54,7 +54,7 @@ export function PaymentInstructions({ payment }: { payment: PaymentInfo }) {
       ) : null}
 
       {vaNumber ? (
-        <div className="rounded-md border border-border-soft bg-surface-paper p-4">
+        <div className="border border-border-soft bg-surface-paper p-4">
           <p className="text-caption uppercase tracking-widest text-text-secondary">
             {bankName ? `Virtual Account ${bankName}` : "Nomor Virtual Account"}
           </p>
@@ -65,7 +65,7 @@ export function PaymentInstructions({ payment }: { payment: PaymentInfo }) {
       ) : null}
 
       {qrString ? (
-        <div className="rounded-md border border-border-soft bg-surface-paper p-4">
+        <div className="border border-border-soft bg-surface-paper p-4">
           <p className="text-caption uppercase tracking-widest text-text-secondary">
             {bankName ? `QRIS ${bankName}` : "QRIS"}
           </p>

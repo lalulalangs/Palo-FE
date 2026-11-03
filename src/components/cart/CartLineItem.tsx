@@ -69,7 +69,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
         isPending ? "opacity-60" : "",
       ].join(" ")}
     >
-      <div className="relative aspect-4/5 w-24 shrink-0 overflow-hidden rounded-md border border-border-soft bg-surface-sage tablet:w-28">
+      <div className="relative aspect-4/5 w-24 shrink-0 overflow-hidden border border-border-soft bg-surface-sage tablet:w-28">
         <ImageWithFallback
           src={item.image}
           alt={item.product_name}
@@ -89,7 +89,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
               {productHref ? (
                 <Link
                   href={productHref}
-                  className="rounded-sm underline-offset-4 hover:text-brand-forest hover:underline"
+                  className="underline-offset-4 hover:text-brand-forest hover:underline"
                 >
                   {item.product_name}
                 </Link>
@@ -114,7 +114,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
             onClick={remove}
             disabled={isPending}
             aria-label={`Hapus ${item.product_name} dari keranjang`}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border-soft text-text-secondary transition-colors hover:border-feedback-error hover:text-feedback-error disabled:opacity-50"
+            className="flex h-11 w-11 shrink-0 items-center justify-center border border-border-soft text-text-secondary transition-colors hover:border-feedback-error hover:text-feedback-error disabled:opacity-50"
           >
             <svg
               viewBox="0 0 24 24"
@@ -135,7 +135,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
         </div>
 
         {state === "habis" ? (
-          <p className="mt-2 rounded-md bg-surface-paper px-3 py-2 text-label-sm font-semibold text-feedback-warn">
+          <p className="mt-2 bg-surface-paper px-3 py-2 text-label-sm font-semibold text-feedback-warn">
             Yah, stok produk ini lagi habis. Yuk, hapus dulu dari keranjang biar kamu bisa lanjut checkout produk lainnya!
           </p>
         ) : null}
@@ -147,7 +147,7 @@ export function CartLineItem({ item }: { item: CartItem }) {
           hanya "Maksimal N per pesanan".
         */}
         {state === "kurang" ? (
-          <div className="mt-2 rounded-md bg-surface-paper px-3 py-2">
+          <div className="mt-2 bg-surface-paper px-3 py-2">
             <p className="text-label-sm font-semibold text-feedback-warn">
               Jumlah belanjaanmu melebihi sisa stok yang ada. Yuk, sesuaikan jumlahnya dulu!
             </p>

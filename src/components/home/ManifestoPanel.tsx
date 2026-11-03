@@ -56,7 +56,7 @@ export function ManifestoPanel({ content }: { content: ManifestoContent }) {
           {/* ---------- Kartu manifesyo ---------- */}
           {image ? (
             <div className="flex justify-center lg:col-span-5">
-              <div className="group relative aspect-[3/4] w-full max-w-[420px] overflow-hidden rounded border border-brand-forest/40 bg-brand-deep shadow-2xl">
+              <div className="group relative aspect-[3/4] w-full max-w-[420px] overflow-hidden border border-brand-forest/40 bg-brand-deep shadow-2xl">
                 <Image
                   src={image}
                   alt={title ?? "Kartu manifesto Palo Mountain Goods"}

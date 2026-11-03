@@ -208,8 +208,8 @@ export function AddressForm({
           aria-atomic="true"
           className={
             quoteError.kind === "address"
-              ? "rounded-md border border-feedback-error bg-feedback-error-soft/40 p-3"
-              : "rounded-md border border-feedback-warn bg-surface-paper p-3"
+              ? "border border-feedback-error bg-feedback-error-soft/40 p-3"
+              : "border border-feedback-warn bg-surface-paper p-3"
           }
         >
           <p

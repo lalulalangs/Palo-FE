@@ -49,7 +49,7 @@ export function Pagination({
         <Link
           href={buildHref(Math.max(currentPage - 1, 1))}
           rel="prev"
-          className="flex h-11 min-w-11 items-center justify-center rounded-md border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary transition-colors hover:bg-surface-sage"
+          className="flex h-11 min-w-11 items-center justify-center border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary transition-colors hover:bg-surface-sage"
         >
           <span aria-hidden="true">←</span>
           <span className="sr-only">Halaman sebelumnya</span>
@@ -74,7 +74,7 @@ export function Pagination({
               {page === currentPage ? (
                 <span
                   aria-current="page"
-                  className="flex h-11 min-w-11 items-center justify-center rounded-md bg-brand-forest px-3 text-label-sm font-semibold text-surface-white"
+                  className="flex h-11 min-w-11 items-center justify-center bg-brand-forest px-3 text-label-sm font-semibold text-surface-white"
                 >
                   {formatAngka(page)}
                 </span>
@@ -82,7 +82,7 @@ export function Pagination({
                 <Link
                   href={buildHref(page)}
                   aria-label={`Halaman ${formatAngka(page)}`}
-                  className="flex h-11 min-w-11 items-center justify-center rounded-md border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary transition-colors hover:bg-surface-sage"
+                  className="flex h-11 min-w-11 items-center justify-center border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary transition-colors hover:bg-surface-sage"
                 >
                   {formatAngka(page)}
                 </Link>
@@ -96,7 +96,7 @@ export function Pagination({
         <Link
           href={buildHref(Math.min(currentPage + 1, lastPage))}
           rel="next"
-          className="flex h-11 min-w-11 items-center justify-center rounded-md border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary transition-colors hover:bg-surface-sage"
+          className="flex h-11 min-w-11 items-center justify-center border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary transition-colors hover:bg-surface-sage"
         >
           <span aria-hidden="true">→</span>
           <span className="sr-only">Halaman berikutnya</span>

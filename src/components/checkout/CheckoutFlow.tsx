@@ -208,7 +208,7 @@ export function CheckoutFlow({
           {step === 0 ? (
             <section
               aria-labelledby="langkah-alamat"
-              className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+              className="border border-border-soft bg-surface-white p-5 tablet:p-6"
             >
               <h2
                 id="langkah-alamat"
@@ -248,7 +248,7 @@ export function CheckoutFlow({
           {step === 1 ? (
             <section
               aria-labelledby="langkah-ongkir"
-              className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+              className="border border-border-soft bg-surface-white p-5 tablet:p-6"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -268,7 +268,7 @@ export function CheckoutFlow({
                     setShippingError(null);
                     setStep(0);
                   }}
-                  className="min-h-11 rounded-md px-3 text-label-sm font-semibold text-brand-forest underline underline-offset-4"
+                  className="min-h-11 px-3 text-label-sm font-semibold text-brand-forest underline underline-offset-4"
                 >
                   Ubah alamat
                 </button>
@@ -329,7 +329,7 @@ export function CheckoutFlow({
           {step === 2 ? (
             <section
               aria-labelledby="langkah-bayar"
-              className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+              className="border border-border-soft bg-surface-white p-5 tablet:p-6"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <h2
@@ -344,7 +344,7 @@ export function CheckoutFlow({
                     setOrderError(null);
                     setStep(1);
                   }}
-                  className="min-h-11 rounded-md px-3 text-label-sm font-semibold text-brand-forest underline underline-offset-4"
+                  className="min-h-11 px-3 text-label-sm font-semibold text-brand-forest underline underline-offset-4"
                 >
                   Ubah pengiriman
                 </button>
@@ -359,7 +359,7 @@ export function CheckoutFlow({
                 <div className="grid gap-3 tablet:grid-cols-2">
                   {/* Opsi 1: Online */}
                   <label
-                    className={`relative flex cursor-pointer flex-col justify-between rounded-lg border p-4 transition-all ${
+                    className={`relative flex cursor-pointer flex-col justify-between border p-4 transition-all ${
                       paymentMethod === "online"
                         ? "border-brand-forest bg-surface-sage/30 ring-1 ring-brand-forest"
                         : "border-border-soft bg-surface-white hover:border-brand-forest/40"
@@ -388,7 +388,7 @@ export function CheckoutFlow({
 
                   {/* Opsi 2: COD */}
                   <label
-                    className={`relative flex cursor-pointer flex-col justify-between rounded-lg border p-4 transition-all ${
+                    className={`relative flex cursor-pointer flex-col justify-between border p-4 transition-all ${
                       paymentMethod === "cod"
                         ? "border-brand-forest bg-surface-sage/30 ring-1 ring-brand-forest"
                         : "border-border-soft bg-surface-white hover:border-brand-forest/40"
@@ -418,7 +418,7 @@ export function CheckoutFlow({
 
                 {/* Kotak Info COD (Callout) */}
                 {paymentMethod === "cod" ? (
-                  <div className="mt-3 rounded-lg border border-accent-earth/40 bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
+                  <div className="mt-3 border border-accent-earth/40 bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
                     <span className="font-semibold text-text-primary">
                       Konfirmasi Cepat 1-Klik via WhatsApp
                     </span>{" "}
@@ -446,7 +446,7 @@ export function CheckoutFlow({
               {orderError?.kind === "price-changed" ? (
                 <div
                   role="alert"
-                  className="mt-6 rounded-lg border border-feedback-warn/40 bg-surface-paper p-4"
+                  className="mt-6 border border-feedback-warn/40 bg-surface-paper p-4"
                 >
                   <h3 className="text-title-md font-semibold text-text-primary">
                     Harga berubah sejak keranjang dibuka
@@ -546,7 +546,7 @@ export function CheckoutFlow({
                 </button>
                 <Link
                   href="/keranjang"
-                  className="inline-flex min-h-12 items-center justify-center rounded-lg border border-brand-forest/25 bg-surface-sage px-6 font-semibold tracking-wide text-brand-forest shadow-xs transition-colors duration-150 hover:border-brand-forest/40 hover:bg-surface-sage/70 hover:text-brand-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
+                  className="inline-flex min-h-12 items-center justify-center border border-brand-forest/25 bg-surface-sage px-6 font-semibold tracking-wide text-brand-forest shadow-xs transition-colors duration-150 hover:border-brand-forest/40 hover:bg-surface-sage/70 hover:text-brand-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
                 >
                   Kembali
                 </Link>

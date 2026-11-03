@@ -77,7 +77,7 @@ export function QuantityStepper({
 
   return (
     <div className={className}>
-      <div className="inline-flex items-stretch overflow-hidden rounded-md border border-border-soft bg-surface-white">
+      <div className="inline-flex items-stretch overflow-hidden border border-border-soft bg-surface-white">
         <button
           type="button"
           onClick={() => commit(value - 1)}

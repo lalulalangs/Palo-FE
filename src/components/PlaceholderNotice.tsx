@@ -28,7 +28,7 @@ export function PlaceholderNotice({
       // hasil katalog dimuat ulang, tanpa memindahkan fokus pengguna.
       role="status"
       className={[
-        "flex gap-3 rounded-lg border border-border-soft p-4",
+        "flex gap-3 border border-border-soft p-4",
         variant === "sage" ? "bg-surface-sage" : "bg-surface-paper",
         className,
       ]

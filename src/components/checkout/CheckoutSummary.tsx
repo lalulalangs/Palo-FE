@@ -59,7 +59,7 @@ export function CheckoutSummary({
   return (
     <aside
       aria-labelledby="ringkasan-checkout"
-      className="rounded-lg border border-border-soft bg-surface-white p-5 desktop:sticky desktop:top-28 tablet:p-6"
+      className="border border-border-soft bg-surface-white p-5 desktop:sticky desktop:top-28 tablet:p-6"
     >
       <h2
         id="ringkasan-checkout"
@@ -76,7 +76,7 @@ export function CheckoutSummary({
       <ul className="divide-y divide-border-soft border-y border-border-soft">
         {cart.map((item) => (
           <li key={item.sku_id} className="flex gap-3 py-4">
-            <div className="relative aspect-4/5 w-16 shrink-0 overflow-hidden rounded-md border border-border-soft bg-surface-sage">
+            <div className="relative aspect-4/5 w-16 shrink-0 overflow-hidden border border-border-soft bg-surface-sage">
               <ImageWithFallback
                 src={item.image}
                 alt={item.product_name}

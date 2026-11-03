@@ -26,7 +26,7 @@ import type { GuestWhatsAppResult } from "@/lib/types";
  */
 
 const CARD =
-  "rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6";
+  "border border-border-soft bg-surface-white p-5 tablet:p-6";
 
 const PREFILL_NOTE =
   "Nama terisi otomatis dari profil akunmu dan masih bisa kamu ubah. Lengkapi nomor WhatsApp aktifmu ya!";
@@ -121,7 +121,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
 
         {result.notice ? (
           // Keterangan server, bukan janji kita — ditampilkan apa adanya.
-          <div className="mt-4 rounded-lg border border-border-soft bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
+          <div className="mt-4 border border-border-soft bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
             {result.notice}
           </div>
         ) : null}
@@ -214,7 +214,7 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
       {error && copy ? (
         <div
           role="alert"
-          className="mt-4 rounded-lg border border-border-soft bg-surface-paper p-4"
+          className="mt-4 border border-border-soft bg-surface-paper p-4"
         >
           <p className="text-label-md font-semibold text-feedback-error">
             {copy.title}

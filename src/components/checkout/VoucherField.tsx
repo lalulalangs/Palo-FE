@@ -176,7 +176,7 @@ function VoucherChip({
   removeRef: RefObject<HTMLButtonElement | null>;
 }) {
   return (
-    <div className="rounded-md border border-brand-forest/40 bg-surface-sage p-3">
+    <div className="border border-brand-forest/40 bg-surface-sage p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="text-label-md font-semibold text-brand-forest">
           Kode {voucher.code} dipakai.
@@ -241,7 +241,7 @@ function VoucherError({
         : error.message;
 
   return (
-    <div className="rounded-md border border-feedback-error/40 bg-feedback-error-soft/40 p-3">
+    <div className="border border-feedback-error/40 bg-feedback-error-soft/40 p-3">
       <p className="text-label-md font-semibold text-feedback-error">{title}</p>
       <p className="mt-1 text-body-sm leading-relaxed text-text-secondary">
         {body}

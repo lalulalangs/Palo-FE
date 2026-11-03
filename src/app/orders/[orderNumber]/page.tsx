@@ -149,14 +149,14 @@ export default async function OrderDetailPage({
             hitung mundur di browser.
           */}
           {step.waitingForPayment && detail.payment_expires_at ? (
-            <p className="rounded-lg border border-accent-earth/50 bg-surface-paper p-4 text-body-md text-text-primary">
+            <p className="border border-accent-earth/50 bg-surface-paper p-4 text-body-md text-text-primary">
               <span className="font-semibold">Batas akhir pembayaran:</span>{" "}
               {formatWaktu(detail.payment_expires_at)}
             </p>
           ) : null}
 
           {detail.needs_reconciliation ? (
-            <p className="rounded-lg border border-feedback-error/40 bg-surface-paper p-4 text-body-md text-text-primary">
+            <p className="border border-feedback-error/40 bg-surface-paper p-4 text-body-md text-text-primary">
               <span className="font-semibold">Pembayaran sedang kami verifikasi.</span>{" "}
               Tim Customer Service kami lagi mencocokkan data pembayaranmu. Nggak perlu bayar ulang ya, kamu bisa hubungi kami dengan menyebutkan nomor pesanan di atas jika butuh bantuan!
             </p>
@@ -164,7 +164,7 @@ export default async function OrderDetailPage({
 
           <section
             aria-labelledby="ringkasan-biaya"
-            className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+            className="border border-border-soft bg-surface-white p-5 tablet:p-6"
           >
             <h2 id="ringkasan-biaya" className="text-headline-sm text-brand-deep">
               Ringkasan biaya

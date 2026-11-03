@@ -72,12 +72,17 @@
   --color-feedback-error-soft: #ffdad6;
   --color-feedback-warn: #7c572a; /* DESIGN.md `secondary` */
 
-  /* --- Radius --------------------------------------------------------------- */
-  --radius-sm: 0.125rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  /* Lihat catatan 2 di atas: nilai ini WAJIB pill, bukan 0.75rem. */
+  /* --- Radius (Design System: Tepi Siku / Border Radius 0) ------------------- */
+  --radius: 0px;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+  /* Nilai pill untuk icon circular */
   --radius-full: 9999px;
 
   /* --- Shadow --------------------------------------------------------------- */
@@ -217,7 +222,7 @@
   :focus-visible {
     outline: 2px solid var(--color-brand-forest);
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: 0px;
   }
 
   /* Jangan pernah membuang outline dari elemen yang punya fokus programatis. */

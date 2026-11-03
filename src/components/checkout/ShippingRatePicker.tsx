@@ -48,7 +48,7 @@ export function ShippingRatePicker({
             <label
               key={key}
               className={[
-                "flex min-h-11 cursor-pointer items-center justify-between gap-4 rounded-md border p-4 transition-colors",
+                "flex min-h-11 cursor-pointer items-center justify-between gap-4 border p-4 transition-colors",
                 isSelected
                   ? "border-brand-forest bg-surface-sage"
                   : "border-border-soft bg-surface-white hover:bg-surface-paper",

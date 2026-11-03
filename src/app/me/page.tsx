@@ -128,7 +128,7 @@ export default async function AccountPage() {
                   </div>
                 </div>
               ) : (
-                <ul className="divide-y divide-border-soft rounded-lg border border-border-soft bg-surface-white">
+                <ul className="divide-y divide-border-soft border border-border-soft bg-surface-white">
                   {orders.map((order) => (
                     <li key={order.order_number} className="p-5 tablet:p-6">
                       <div className="flex flex-col gap-3 tablet:flex-row tablet:items-start tablet:justify-between">
@@ -240,7 +240,7 @@ export default async function AccountPage() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="flex min-h-11 items-center gap-3 rounded-md px-3 text-label-md font-semibold text-text-primary transition-colors hover:bg-surface-sage"
+                      className="flex min-h-11 items-center gap-3 px-3 text-label-md font-semibold text-text-primary transition-colors hover:bg-surface-sage"
                     >
                       <LineIcon name={link.icon} />
                       <span className="min-w-0">{link.label}</span>

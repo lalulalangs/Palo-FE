@@ -12,7 +12,7 @@ export function MaintenanceScreen({ brand }: MaintenanceScreenProps) {
     <div className="flex min-h-[calc(100vh-2rem)] flex-col justify-between py-12 tablet:py-24">
       <Container width="wide" className="flex flex-col items-center text-center">
         {/* Brand Logo Container */}
-        <div className="mb-8 inline-flex rounded-xl bg-surface-white p-3.5 shadow-editorial border border-border-soft">
+        <div className="mb-8 inline-flex bg-surface-white p-3.5 shadow-editorial border border-border-soft">
           <BrandLogo size={64} />
         </div>
 
@@ -29,7 +29,7 @@ export function MaintenanceScreen({ brand }: MaintenanceScreenProps) {
         </h1>
 
         {/* Friendly Microcopy */}
-        <div className="mt-8 w-full max-w-2xl text-left border border-border-soft bg-surface-white p-6 rounded-lg shadow-editorial">
+        <div className="mt-8 w-full max-w-2xl text-left border border-border-soft bg-surface-white p-6 shadow-editorial">
           <p className="text-body-md text-text-primary leading-relaxed">
             Palo Mountain Goods sedang menyiapkan pengalaman belanja yang lebih nyaman, cepat, dan praktis buat kamu. Kami akan segera kembali menemani setiap langkah dan aktivitasmu!
           </p>

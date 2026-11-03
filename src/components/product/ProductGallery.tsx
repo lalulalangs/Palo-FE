@@ -30,7 +30,7 @@ export function ProductGallery({
       {images.length === 0 ? (
         <div
           data-pdp-gallery="empty"
-          className="flex h-[220px] flex-col justify-center rounded-xl border border-dashed border-border-soft bg-surface-paper p-6 tablet:h-[280px]"
+          className="flex h-[220px] flex-col justify-center border border-dashed border-border-soft bg-surface-paper p-6 tablet:h-[280px]"
         >
           <p className="text-label-md font-semibold text-text-primary">
             Foto produk belum tersedia
@@ -40,7 +40,7 @@ export function ProductGallery({
           </p>
         </div>
       ) : (
-        <div className="relative aspect-square tablet:aspect-4/3 desktop:aspect-4/3 max-h-[480px] desktop:max-h-[520px] w-full overflow-hidden rounded-xl border border-border-soft bg-surface-sage">
+        <div className="relative aspect-square tablet:aspect-4/3 desktop:aspect-4/3 max-h-[480px] desktop:max-h-[520px] w-full overflow-hidden border border-border-soft bg-surface-sage">
           <ImageWithFallback
             src={active.url}
             alt={active.alt ?? `${productName} — foto 1`}
@@ -50,7 +50,7 @@ export function ProductGallery({
             className="object-cover object-center"
           />
           {badge ? (
-            <span className="absolute left-4 top-4 rounded-md border border-border-soft bg-surface-white/95 px-2 py-1 text-caption font-semibold text-brand-forest">
+            <span className="absolute left-4 top-4 border border-border-soft bg-surface-white/95 px-2 py-1 text-caption font-semibold text-brand-forest">
               {badge}
             </span>
           ) : null}
@@ -73,7 +73,7 @@ export function ProductGallery({
                   aria-pressed={isActive}
                   aria-label={`Tampilkan foto ${index + 1} dari ${images.length}`}
                   className={[
-                    "relative block h-16 w-16 tablet:h-20 tablet:w-20 overflow-hidden rounded-lg border-2 bg-surface-sage transition-all",
+                    "relative block h-16 w-16 tablet:h-20 tablet:w-20 overflow-hidden border-2 bg-surface-sage transition-all",
                     isActive
                       ? "border-brand-forest ring-2 ring-brand-forest/20"
                       : "border-border-soft hover:border-brand-pine",

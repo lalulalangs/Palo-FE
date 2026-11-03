@@ -119,14 +119,14 @@ export default async function ContactPage() {
           <section className="tablet:col-span-6">
             <SectionHeading eyebrow="Lokasi" title="Alamat gerai" />
 
-            <div className="mt-4 rounded-xl border border-border-soft bg-surface-white p-5">
+            <div className="mt-4 border border-border-soft bg-surface-white p-5">
               {/* Google Maps Embed Interaktif */}
               <iframe
                 src={OFFICIAL_MAPS_EMBED_URL}
                 title="Peta Lokasi PALO RINJANI Senaru"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="h-[280px] w-full rounded-xl border border-border-soft tablet:h-[340px]"
+                className="h-[280px] w-full border border-border-soft tablet:h-[340px]"
               />
 
               <address className="mt-5 space-y-3 text-body-md not-italic text-text-secondary">
@@ -175,7 +175,7 @@ export default async function ContactPage() {
               </a>
             </div>
 
-            <div className="mt-4 rounded-xl border border-border-soft bg-surface-white p-5">
+            <div className="mt-4 border border-border-soft bg-surface-white p-5">
               <h3 className="text-title-md text-text-primary">
                 Kunjungi Basecamp Kami
               </h3>
@@ -201,7 +201,7 @@ export default async function ContactPage() {
 
             <div className="mt-4 space-y-4">
               {/* WhatsApp CS Utama */}
-              <div className="rounded-xl border border-border-soft bg-surface-white p-5">
+              <div className="border border-border-soft bg-surface-white p-5">
                 <h3 className="text-title-md text-brand-deep">
                   WhatsApp Customer Service
                 </h3>
@@ -236,7 +236,7 @@ export default async function ContactPage() {
               </div>
 
               {/* Media Sosial Resmi (Circular Horizontal, No Horizontal Scroll) */}
-              <div className="rounded-xl border border-border-soft bg-surface-white p-5">
+              <div className="border border-border-soft bg-surface-white p-5">
                 <h3 className="text-title-md text-brand-deep">
                   Media Sosial Resmi
                 </h3>

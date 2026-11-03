@@ -114,7 +114,7 @@ export function PaymentRedirectCard({
     <div
       role="region"
       aria-label="Pengalihan Pembayaran DOKU"
-      className="overflow-hidden rounded-xl border-2 border-brand-forest bg-surface-white shadow-editorial transition-all"
+      className="overflow-hidden border-2 border-brand-forest bg-surface-white shadow-editorial transition-all"
     >
       {/* Progress bar di bagian atas kartu (hanya aktif pada kunjungan pertama) */}
       <div
@@ -137,12 +137,12 @@ export function PaymentRedirectCard({
           <div className="min-w-0 flex-1 space-y-1.5">
             <div className="flex items-center gap-2">
               {hasReturned ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-paper border border-border-soft px-2.5 py-0.5 text-caption font-medium text-text-secondary">
+                <span className="inline-flex items-center gap-1.5 bg-surface-paper border border-border-soft px-2.5 py-0.5 text-caption font-medium text-text-secondary">
                   <ClockIcon className="h-3.5 w-3.5" />
                   Menunggu Pembayaran
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
+                <span className="inline-flex items-center gap-1.5 bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
                   <LockIcon className="h-3.5 w-3.5" />
                   Pembayaran Aman DOKU
                 </span>

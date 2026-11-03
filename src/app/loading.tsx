@@ -25,16 +25,16 @@ export default function RootLoading() {
       <span className="sr-only">Memuat halaman…</span>
 
       <div className="mx-auto w-full max-w-[1400px] px-4 tablet:px-8 desktop:px-12">
-        <div className="h-4 w-40 rounded bg-surface-paper" />
-        <div className="mt-3 h-10 w-full max-w-lg rounded-md bg-surface-sage" />
-        <div className="mt-3 h-5 w-full max-w-xl rounded bg-surface-paper" />
+        <div className="h-4 w-40 bg-surface-paper" />
+        <div className="mt-3 h-10 w-full max-w-lg bg-surface-sage" />
+        <div className="mt-3 h-5 w-full max-w-xl bg-surface-paper" />
       </div>
 
       <div
         className="mx-auto mt-8 w-full max-w-[1400px] px-4 tablet:px-8 desktop:px-12"
         aria-hidden="true"
       >
-        <div className="h-64 rounded-lg border border-border-soft bg-surface-white" />
+        <div className="h-64 border border-border-soft bg-surface-white" />
       </div>
     </div>
   );

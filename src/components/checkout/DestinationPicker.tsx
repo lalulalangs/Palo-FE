@@ -202,7 +202,7 @@ export function DestinationPicker({
         <p className="block text-label-md font-semibold text-text-primary">
           Wilayah pengiriman
         </p>
-        <div className="rounded-md border border-brand-forest bg-surface-sage p-3">
+        <div className="border border-brand-forest bg-surface-sage p-3">
           <div className="flex items-start gap-2">
             <LineIcon name="pin" className="mt-0.5 shrink-0 text-brand-forest" />
             <div className="min-w-0 break-words">
@@ -289,7 +289,7 @@ export function DestinationPicker({
                 type="button"
                 disabled={disabled}
                 onClick={() => handleQuickSelect(name)}
-                className="rounded-full border border-border-soft bg-surface-paper px-3 py-1 text-label-sm font-medium text-text-primary transition-colors hover:border-brand-forest hover:bg-surface-sage hover:text-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest disabled:cursor-not-allowed disabled:opacity-60"
+                className="border border-border-soft bg-surface-paper px-3 py-1 text-label-sm font-medium text-text-primary transition-colors hover:border-brand-forest hover:bg-surface-sage hover:text-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {name}
               </button>
@@ -325,7 +325,7 @@ export function DestinationPicker({
             <p className="text-body-sm text-text-secondary">
               {results.length} wilayah ditemukan.
             </p>
-            <ul className="mt-2 divide-y divide-border-soft rounded-md border border-border-soft">
+            <ul className="mt-2 divide-y divide-border-soft border border-border-soft">
               {results.map((destination) => (
                 <li key={destination.id}>
                   <button

@@ -33,9 +33,9 @@ export function AuthAside() {
   return (
     <section
       aria-label="Tentang akun Palo Mountain Goods"
-      className="flex h-full flex-col justify-center rounded-lg border border-border-soft bg-brand-deep p-6 text-surface-paper tablet:p-8"
+      className="flex h-full flex-col justify-center border border-border-soft bg-brand-deep p-6 text-surface-paper tablet:p-8"
     >
-      <p className="inline-flex w-fit items-center rounded-full border border-brand-forest bg-brand-forest/40 px-3 py-1 text-caption uppercase tracking-widest text-surface-paper">
+      <p className="inline-flex w-fit items-center border border-brand-forest bg-brand-forest/40 px-3 py-1 text-caption uppercase tracking-widest text-surface-paper">
         Akun Palo Mountain Goods
       </p>
 

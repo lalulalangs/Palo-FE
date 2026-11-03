@@ -71,7 +71,7 @@ export default async function ProductDetailPage({
           />
           <Link
             href="/produk"
-            className="mt-6 inline-flex min-h-11 items-center rounded-md border border-brand-forest bg-brand-forest px-5 text-label-md font-semibold text-surface-white transition-colors hover:bg-brand-deep"
+            className="mt-6 inline-flex min-h-11 items-center border border-brand-forest bg-brand-forest px-5 text-label-md font-semibold text-surface-white transition-colors hover:bg-brand-deep"
           >
             Kembali ke katalog
           </Link>
@@ -130,7 +130,7 @@ export default async function ProductDetailPage({
 
           {/* Kolom Kanan: Sticky Purchase Panel */}
           <div className="desktop:col-span-5 desktop:sticky desktop:top-24 desktop:self-start">
-            <div className="rounded-xl border border-border-soft bg-surface-white p-5 tablet:p-6 shadow-editorial">
+            <div className="border border-border-soft bg-surface-white p-5 tablet:p-6 shadow-editorial">
               <ProductPurchasePanel product={product} />
             </div>
           </div>
@@ -147,7 +147,7 @@ export default async function ProductDetailPage({
               action={
                 <Link
                   href="/produk"
-                  className="inline-flex min-h-11 items-center rounded-md px-3 text-label-md font-semibold text-brand-forest underline underline-offset-4 transition-colors hover:text-brand-deep"
+                  className="inline-flex min-h-11 items-center px-3 text-label-md font-semibold text-brand-forest underline underline-offset-4 transition-colors hover:text-brand-deep"
                 >
                   Lihat semua
                 </Link>

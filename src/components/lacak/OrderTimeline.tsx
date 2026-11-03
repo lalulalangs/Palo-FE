@@ -46,7 +46,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6">
+      <section className="border border-border-soft bg-surface-white p-5 tablet:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-caption uppercase tracking-widest text-text-secondary">
@@ -61,7 +61,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
           </div>
           <span
             className={[
-              "inline-flex items-center rounded-full border border-border-soft px-3 py-1 text-caption font-semibold",
+              "inline-flex items-center border border-border-soft px-3 py-1 text-caption font-semibold",
               STATUS_TONE[order.status] ?? "bg-surface-paper text-text-secondary",
             ].join(" ")}
           >
@@ -133,7 +133,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
       {order.payment && order.payment_method !== "cod" ? (
         <section
           aria-labelledby="instruksi-pembayaran"
-          className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+          className="border border-border-soft bg-surface-white p-5 tablet:p-6"
         >
           <h2
             id="instruksi-pembayaran"
@@ -155,7 +155,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
 
       <section
         aria-labelledby="linimasa-status"
-        className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+        className="border border-border-soft bg-surface-white p-5 tablet:p-6"
       >
         <h2 id="linimasa-status" className="text-headline-sm text-brand-deep">
           Riwayat status
@@ -197,7 +197,7 @@ export function OrderTimeline({ order }: { order: OrderDetail }) {
 
       <section
         aria-labelledby="rincian-pesanan"
-        className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+        className="border border-border-soft bg-surface-white p-5 tablet:p-6"
       >
         <h2 id="rincian-pesanan" className="text-headline-sm text-brand-deep">
           Rincian produk

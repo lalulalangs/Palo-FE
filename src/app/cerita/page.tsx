@@ -128,7 +128,7 @@ export default async function StoryPage() {
           </div>
 
           <aside className="tablet:col-span-5">
-            <div className="rounded-lg border border-border-soft bg-surface-white p-5">
+            <div className="border border-border-soft bg-surface-white p-5">
               <h2 className="text-title-lg text-brand-deep">Identitas brand</h2>
               <dl className="mt-3 divide-y divide-border-soft text-body-sm">
                 <div className="flex flex-wrap gap-x-2 py-2">
@@ -180,7 +180,7 @@ export default async function StoryPage() {
                 key={item.number}
                 className="border-l-2 border-brand-forest pl-5"
               >
-                <p className="inline-flex items-center rounded-full bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
+                <p className="inline-flex items-center bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
                   {item.number}
                 </p>
                 <h3 className="mt-2 text-title-lg text-text-primary">

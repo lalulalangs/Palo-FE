@@ -150,7 +150,7 @@ export function ActiveGuestOrderBanner() {
       <div
         role="status"
         aria-live="polite"
-        className="mb-8 flex items-center justify-between rounded-xl border border-brand-forest/20 bg-surface-sage/70 p-4 text-body-md text-brand-forest shadow-editorial"
+        className="mb-8 flex items-center justify-between border border-brand-forest/20 bg-surface-sage/70 p-4 text-body-md text-brand-forest shadow-editorial"
       >
         <span className="font-medium">{noticeMessage}</span>
         <button
@@ -171,12 +171,12 @@ export function ActiveGuestOrderBanner() {
       <div
         role="region"
         aria-label="Pesanan Tamu Aktif"
-        className="mb-8 overflow-hidden rounded-xl border-2 border-brand-forest bg-surface-paper p-5 shadow-editorial tablet:p-6"
+        className="mb-8 overflow-hidden border-2 border-brand-forest bg-surface-paper p-5 shadow-editorial tablet:p-6"
       >
         <div className="flex flex-col gap-4 tablet:flex-row tablet:items-center tablet:justify-between">
           <div className="space-y-1.5 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
+              <span className="bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">
                 Menunggu Konfirmasi CS
               </span>
               {handoff.order_number ? (
@@ -246,7 +246,7 @@ export function ActiveGuestOrderBanner() {
             aria-modal="true"
             aria-labelledby={dialogTitleId}
             aria-describedby={dialogDescId}
-            className="relative w-full max-w-md rounded-xl border border-border-soft bg-surface-white p-6 shadow-editorial-strong space-y-4"
+            className="relative w-full max-w-md border border-border-soft bg-surface-white p-6 shadow-editorial-strong space-y-4"
           >
             <div className="space-y-2">
               <h3
@@ -278,7 +278,7 @@ export function ActiveGuestOrderBanner() {
             {cancelError ? (
               <div
                 role="alert"
-                className="rounded-md bg-feedback-error-soft p-3 text-label-sm font-medium text-feedback-error"
+                className="bg-feedback-error-soft p-3 text-label-sm font-medium text-feedback-error"
               >
                 {cancelError}
               </div>

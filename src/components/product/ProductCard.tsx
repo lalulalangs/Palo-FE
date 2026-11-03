@@ -166,7 +166,7 @@ export function ProductCard({
         <h3 className="line-clamp-1 text-body-sm font-semibold uppercase tracking-tight text-text-primary transition-colors group-hover:text-brand-forest tablet:text-body-md">
           <Link
             href={`/produk/${product.slug}`}
-            className="rounded-sm after:absolute after:inset-0 after:content-['']"
+            className="after:absolute after:inset-0 after:content-['']"
           >
             {/* Nama produk sudah terbaca sebagai teks link, jadi tidak ada
                 `aria-label` tambahan — label tambahan justru menyembunyikan

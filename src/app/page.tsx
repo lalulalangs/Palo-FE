@@ -212,7 +212,7 @@ export default async function HomePage() {
                 <li key={category.slug}>
                   <Link
                     href={`/kategori/${category.slug}`}
-                    className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border-soft bg-surface-paper px-4 py-3 text-title-md text-text-primary transition-colors hover:border-brand-pine hover:bg-surface-sage"
+                    className="flex min-h-11 items-center justify-between gap-3 border border-border-soft bg-surface-paper px-4 py-3 text-title-md text-text-primary transition-colors hover:border-brand-pine hover:bg-surface-sage"
                   >
                     <span>{category.name}</span>
                     {category.products_count !== null ? (

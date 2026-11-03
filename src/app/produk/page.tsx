@@ -130,7 +130,7 @@ export default async function CatalogPage({
           { name: "Katalog", href: "/produk" },
         ]}
       >
-        <div className="mt-6 rounded-lg border border-border-soft bg-surface-paper p-3 tablet:p-4">
+        <div className="mt-6 border border-border-soft bg-surface-paper p-3 tablet:p-4">
           <Suspense
             // `useSearchParams` pada Client Component memaksa bailout ke
             // render sisi-klien; `Suspense` menjaga agar shell tetap

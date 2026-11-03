@@ -88,7 +88,7 @@ export function CatalogSearch({ initialQuery }: { initialQuery: string }) {
           onBlur={() => push(value.trim())}
           placeholder="Cari nama produk…"
           autoComplete="off"
-          className="min-h-11 w-full min-w-0 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-body-md text-text-primary placeholder:text-text-secondary/60 focus:border-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
+          className="min-h-11 w-full min-w-0 border border-border-soft bg-surface-white px-4 py-2 text-body-md text-text-primary placeholder:text-text-secondary/60 focus:border-brand-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
         />
         {isPending ? (
           <span className="absolute inset-y-0 right-3 flex items-center text-body-sm text-text-secondary">
@@ -105,14 +105,14 @@ export function CatalogSearch({ initialQuery }: { initialQuery: string }) {
               setValue("");
               push("");
             }}
-            className="min-h-11 rounded-md border border-border-soft bg-surface-white px-4 text-label-md font-semibold text-text-primary transition-colors hover:bg-surface-sage"
+            className="min-h-11 border border-border-soft bg-surface-white px-4 text-label-md font-semibold text-text-primary transition-colors hover:bg-surface-sage"
           >
             Bersihkan
           </button>
         ) : null}
         <button
           type="submit"
-          className="min-h-11 rounded-md border border-brand-forest bg-brand-forest px-5 text-label-md font-semibold text-surface-white transition-colors hover:bg-brand-deep"
+          className="min-h-11 border border-brand-forest bg-brand-forest px-5 text-label-md font-semibold text-surface-white transition-colors hover:bg-brand-deep"
         >
           Cari
         </button>
@@ -189,7 +189,7 @@ export function CategoryPills({
 
 function pillClass(isActive: boolean): string {
   return [
-    "min-h-11 shrink-0 whitespace-nowrap rounded-full px-4 text-label-sm font-medium transition-colors",
+    "min-h-11 shrink-0 whitespace-nowrap px-4 text-label-sm font-medium transition-colors",
     isActive
       ? "bg-brand-forest text-surface-white"
       : "border border-border-soft bg-surface-white text-text-primary hover:bg-surface-sage",
@@ -235,7 +235,7 @@ export function CatalogSort({ value }: { value: SortKey }) {
             });
           });
         }}
-        className="min-h-11 cursor-pointer rounded-md border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary disabled:opacity-60"
+        className="min-h-11 cursor-pointer border border-border-soft bg-surface-white px-3 text-label-sm font-medium text-text-primary disabled:opacity-60"
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
@@ -302,7 +302,7 @@ export function CatalogRefinements() {
             })
           }
           className={[
-            "min-h-11 rounded-full px-4 text-label-sm font-medium transition-colors",
+            "min-h-11 px-4 text-label-sm font-medium transition-colors",
             inStock
               ? "bg-brand-forest text-surface-white"
               : "border border-border-soft bg-surface-white text-text-primary hover:bg-surface-sage",
@@ -344,7 +344,7 @@ export function CatalogRefinements() {
                   value={localMin}
                   onChange={(event) => setLocalMin(event.target.value)}
                   disabled={isPending}
-                  className="min-h-11 w-full min-w-0 rounded-md border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
+                  className="min-h-11 w-full min-w-0 border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
                 />
               </div>
               <span aria-hidden="true" className="shrink-0 text-text-secondary">
@@ -364,13 +364,13 @@ export function CatalogRefinements() {
                   value={localMax}
                   onChange={(event) => setLocalMax(event.target.value)}
                   disabled={isPending}
-                  className="min-h-11 w-full min-w-0 rounded-md border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
+                  className="min-h-11 w-full min-w-0 border border-border-soft bg-surface-white px-3 text-label-sm text-text-primary disabled:opacity-60"
                 />
               </div>
             </div>
             <button
               type="submit"
-              className="min-h-11 w-full shrink-0 rounded-md border border-brand-forest bg-brand-forest px-4 text-label-sm font-semibold text-surface-white transition-colors hover:bg-brand-deep tablet:w-auto"
+              className="min-h-11 w-full shrink-0 border border-brand-forest bg-brand-forest px-4 text-label-sm font-semibold text-surface-white transition-colors hover:bg-brand-deep tablet:w-auto"
             >
               Terapkan
             </button>
@@ -386,7 +386,7 @@ export function ClearFilters({ href }: { href: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex min-h-11 items-center rounded-md px-3 text-label-sm font-semibold text-brand-forest underline underline-offset-4 transition-colors hover:text-brand-deep"
+      className="inline-flex min-h-11 items-center px-3 text-label-sm font-semibold text-brand-forest underline underline-offset-4 transition-colors hover:text-brand-deep"
     >
       Hapus semua filter
     </Link>

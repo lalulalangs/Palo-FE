@@ -115,13 +115,13 @@ export default async function CartPage() {
               aria-label="Produk di keranjang"
               className="desktop:col-span-7"
             >
-              <div className="divide-y divide-border-soft rounded-lg border border-border-soft bg-surface-white">
+              <div className="divide-y divide-border-soft border border-border-soft bg-surface-white">
                 {items.map((item) => (
                   <CartLineItem key={item.sku_id} item={item} />
                 ))}
               </div>
 
-              <p className="mt-4 rounded-md bg-surface-sage/70 p-3 text-label-sm leading-relaxed text-text-secondary">
+              <p className="mt-4 bg-surface-sage/70 p-3 text-label-sm leading-relaxed text-text-secondary">
                 Produk di keranjang belum otomatis terpesan, ya. Yuk, lanjut checkout sekarang biar stok dan harganya aman!
               </p>
             </section>

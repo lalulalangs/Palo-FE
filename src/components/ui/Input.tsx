@@ -27,7 +27,7 @@ export interface InputProps
 }
 
 export const inputClassName =
-  "w-full min-h-11 rounded-md border border-border-soft bg-surface-white px-3 py-2 text-body-md text-text-primary placeholder:text-text-secondary/60 transition-colors focus:border-brand-forest focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-feedback-error";
+  "w-full min-h-11 border border-border-soft bg-surface-white px-3 py-2 text-body-md text-text-primary placeholder:text-text-secondary/60 transition-colors focus:border-brand-forest focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-feedback-error";
 
 export function Input({
   id,

@@ -149,7 +149,7 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
           {highlightBadges.map((badge) => (
             <span
               key={badge}
-              className="inline-flex items-center rounded-md border border-border-soft/80 bg-surface-sage/50 px-2.5 py-1 text-caption font-medium text-brand-deep"
+              className="inline-flex items-center border border-border-soft/80 bg-surface-sage/50 px-2.5 py-1 text-caption font-medium text-brand-deep"
             >
               {badge}
             </span>
@@ -364,7 +364,7 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
       </div>
 
       {/* S7 — compact trust card: pengiriman & pembayaran */}
-      <div className="rounded-lg border border-border-soft bg-surface-paper/70 p-3.5">
+      <div className="border border-border-soft bg-surface-paper/70 p-3.5">
         <div className="space-y-2.5 text-label-sm">
           <div className="flex items-start gap-2.5">
             <svg
@@ -481,7 +481,7 @@ function RadioRow({
       />
       <span
         className={[
-          "flex min-h-14 items-center justify-between gap-3 rounded-lg px-4 py-3 text-label-md font-semibold transition-colors",
+          "flex min-h-14 items-center justify-between gap-3 px-4 py-3 text-label-md font-semibold transition-colors",
           disabled
             ? "cursor-not-allowed border border-dashed border-border-soft bg-surface-paper text-text-secondary"
             : "border border-brand-pine bg-surface-white text-text-primary hover:bg-surface-sage",
@@ -510,7 +510,7 @@ function chipClass({
   tall: boolean;
 }): string {
   return [
-    "flex min-w-16 flex-col items-center justify-center rounded-lg px-4 text-label-md font-semibold transition-colors",
+    "flex min-w-16 flex-col items-center justify-center px-4 text-label-md font-semibold transition-colors",
     tall ? "min-h-14" : "min-h-12",
     available
       ? "border border-brand-pine bg-surface-white text-text-primary hover:bg-surface-sage"

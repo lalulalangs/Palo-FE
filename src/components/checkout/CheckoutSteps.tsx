@@ -30,7 +30,7 @@ export function CheckoutSteps({
               <span
                 aria-hidden="true"
                 className={[
-                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-label-sm font-semibold",
+                  "flex h-9 w-9 shrink-0 items-center justify-center text-label-sm font-semibold",
                   isDone
                     ? "bg-brand-forest text-surface-white"
                     : isCurrent

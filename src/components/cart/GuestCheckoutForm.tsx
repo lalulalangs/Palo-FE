@@ -272,7 +272,7 @@ export function GuestCheckoutForm({
               <label
                 key={option.id}
                 className={[
-                  "relative flex min-h-11 cursor-pointer select-none items-center justify-between rounded-md border px-3 py-2 text-label-sm transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-forest",
+                  "relative flex min-h-11 cursor-pointer select-none items-center justify-between border px-3 py-2 text-label-sm transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-forest",
                   isSelected
                     ? "border-brand-forest bg-surface-sage/60 font-semibold text-brand-forest ring-1 ring-brand-forest"
                     : "border-border-soft bg-surface-white text-text-primary hover:border-brand-forest/50 hover:bg-surface-paper",
@@ -435,7 +435,7 @@ function GuestResultPanel({
         Pesananmu sudah siap diteruskan!
       </h2>
 
-      <div className="rounded-lg border-2 border-accent-earth/50 bg-surface-paper p-4">
+      <div className="border-2 border-accent-earth/50 bg-surface-paper p-4">
         <p className="mt-2 text-title-md text-brand-deep">Tinggal satu langkah lagi!</p>
         <p className="mt-2 text-body-md text-text-secondary">{handoff.notice}</p>
         <p className="mt-2 text-body-sm leading-relaxed text-text-secondary">
@@ -443,7 +443,7 @@ function GuestResultPanel({
         </p>
       </div>
 
-      <div className="rounded-lg border border-border-soft bg-surface-white p-4">
+      <div className="border border-border-soft bg-surface-white p-4">
         {handoff.order_number ? (
           <>
             <p className="text-caption uppercase tracking-widest text-text-secondary">

@@ -41,7 +41,7 @@ export function AuthForm({
   const isRegister = mode === "register";
 
   return (
-    <div className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-8">
+    <div className="border border-border-soft bg-surface-white p-5 tablet:p-8">
       <nav
         aria-label="Pilih formulir"
         className="mb-6 flex gap-1 border-b border-border-soft"
@@ -50,7 +50,7 @@ export function AuthForm({
           href={withRedirect("/masuk", redirectTo)}
           aria-current={isRegister ? undefined : "page"}
           className={[
-            "flex min-h-11 items-center rounded-t-md border-b-2 px-4 text-label-md font-semibold transition-colors",
+            "flex min-h-11 items-center border-b-2 px-4 text-label-md font-semibold transition-colors",
             isRegister
               ? "border-transparent text-text-secondary hover:text-text-primary"
               : "border-brand-forest text-brand-forest",
@@ -62,7 +62,7 @@ export function AuthForm({
           href={withRedirect("/daftar", redirectTo)}
           aria-current={isRegister ? "page" : undefined}
           className={[
-            "flex min-h-11 items-center rounded-t-md border-b-2 px-4 text-label-md font-semibold transition-colors",
+            "flex min-h-11 items-center border-b-2 px-4 text-label-md font-semibold transition-colors",
             isRegister
               ? "border-brand-forest text-brand-forest"
               : "border-transparent text-text-secondary hover:text-text-primary",
@@ -152,7 +152,7 @@ export function AuthForm({
               name="remember"
               type="checkbox"
               disabled={isPending}
-              className="h-5 w-5 rounded-sm border border-border-soft accent-brand-forest"
+              className="h-5 w-5 border border-border-soft accent-brand-forest"
             />
             <label
               htmlFor="auth-remember"
@@ -193,7 +193,7 @@ export function AuthForm({
         formulir memastikan orang yang tidak ingin membuat akun tidak terjebak
         di halaman auth.
       */}
-      <div className="mt-6 rounded-md bg-surface-sage/70 p-3">
+      <div className="mt-6 bg-surface-sage/70 p-3">
         <p className="text-body-sm leading-relaxed text-text-secondary">
           Mau belanja lebih praktis tanpa akun? Kamu tetap bisa pesan langsung via
           WhatsApp Customer Service dari halaman keranjang, lho!

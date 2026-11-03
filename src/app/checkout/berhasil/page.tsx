@@ -157,7 +157,7 @@ export default async function CheckoutSuccessPage({
           { name: "Selesai", href: "/checkout/berhasil" },
         ]}
         aside={
-          <span className="inline-flex w-fit items-center rounded-full border border-border-soft bg-surface-sage px-3 py-1 text-caption font-semibold text-brand-forest">
+          <span className="inline-flex w-fit items-center border border-border-soft bg-surface-sage px-3 py-1 text-caption font-semibold text-brand-forest">
             {labelStatusOrder(detail.status)}
           </span>
         }
@@ -174,7 +174,7 @@ export default async function CheckoutSuccessPage({
             />
           ) : null}
 
-          <section className="rounded-lg border-2 border-brand-forest bg-surface-paper p-5 tablet:p-6">
+          <section className="border-2 border-brand-forest bg-surface-paper p-5 tablet:p-6">
             <p className="text-caption uppercase tracking-widest text-text-secondary">
               Nomor pesanan
             </p>
@@ -193,7 +193,7 @@ export default async function CheckoutSuccessPage({
           {!isCod ? (
             <section
               aria-labelledby="instruksi-pembayaran"
-              className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+              className="border border-border-soft bg-surface-white p-5 tablet:p-6"
             >
               <h2
                 id="instruksi-pembayaran"
@@ -232,7 +232,7 @@ export default async function CheckoutSuccessPage({
 
           <section
             aria-labelledby="ringkasan-item"
-            className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6"
+            className="border border-border-soft bg-surface-white p-5 tablet:p-6"
           >
             <h2
               id="ringkasan-item"

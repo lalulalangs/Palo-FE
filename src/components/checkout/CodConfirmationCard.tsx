@@ -213,7 +213,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
   return (
     <section
       aria-label="Konfirmasi Pesanan COD"
-      className="overflow-hidden rounded-xl border border-border-soft bg-surface-white shadow-xs"
+      className="overflow-hidden border border-border-soft bg-surface-white shadow-xs"
     >
       {/* Banner Status Atas */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-soft bg-surface-paper px-5 py-3.5 text-body-sm">
@@ -247,13 +247,13 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
               href={finalWhatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-lg bg-brand-forest px-6 py-3.5 text-center text-title-md font-bold text-surface-white shadow-sm transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest focus:ring-offset-2 active:scale-[0.99]"
+              className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-brand-forest px-6 py-3.5 text-center text-title-md font-bold text-surface-white shadow-sm transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest focus:ring-offset-2 active:scale-[0.99]"
             >
               <span>Konfirmasi Pesanan via WhatsApp 1-Klik</span>
             </a>
           </div>
         ) : (
-          <div className="rounded-lg border border-border-soft bg-surface-paper p-5 text-body-md text-text-secondary">
+          <div className="border border-border-soft bg-surface-paper p-5 text-body-md text-text-secondary">
             <p className="font-semibold text-text-primary">
               Nomor WhatsApp konfirmasi belum tersedia otomatis.
             </p>
@@ -263,7 +263,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
             <div className="mt-3">
               <Link
                 href="/kontak"
-                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-forest px-5 py-2.5 text-label-md font-semibold text-surface-white transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest"
+                className="inline-flex min-h-11 items-center justify-center bg-brand-forest px-5 py-2.5 text-label-md font-semibold text-surface-white transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest"
               >
                 Hubungi Customer Service di Halaman Kontak
               </Link>
@@ -272,14 +272,14 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
         )}
 
         {/* Info Penenang Timer 24 Jam */}
-        <div className="rounded-lg border border-border-soft border-l-4 border-l-brand-forest bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
+        <div className="border border-border-soft border-l-4 border-l-brand-forest bg-surface-paper p-4 text-body-sm leading-relaxed text-text-secondary">
           <p>
             Stok produkmu aman selama <strong className="font-semibold text-text-primary">24 jam</strong> ke depan. Silakan kirim konfirmasi agar pesananmu segera disiapkan.
           </p>
         </div>
 
         {/* Kotak Info Uang Tunai */}
-        <div className="rounded-lg border border-accent-earth/40 bg-surface-sage/20 p-4 text-body-sm leading-relaxed text-text-secondary">
+        <div className="border border-accent-earth/40 bg-surface-sage/20 p-4 text-body-sm leading-relaxed text-text-secondary">
           <p className="font-semibold text-title-sm text-text-primary">
             Siapkan Uang Tunai Pas Saat Kurir Tiba:{" "}
             <span className="font-bold text-brand-forest">{totalFormatted}</span>.
@@ -290,7 +290,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
         </div>
 
         {/* Akordeon Bantuan (Fallback 3-Lapis) */}
-        <details className="group rounded-lg border border-border-soft bg-surface-white transition">
+        <details className="group border border-border-soft bg-surface-white transition">
           <summary className="flex cursor-pointer list-none items-center justify-between p-4 text-body-sm font-semibold text-brand-forest hover:text-brand-deep">
             <span>Kendala membuka WhatsApp otomatis? Klik di sini untuk bantuan manual</span>
             <svg
@@ -315,14 +315,14 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
               <span className="block font-medium text-text-primary">
                 1. Salin pesan konfirmasi resmi:
               </span>
-              <pre className="max-h-40 overflow-y-auto rounded-md border border-border-soft bg-surface-paper p-3 text-caption font-mono leading-relaxed text-text-secondary whitespace-pre-wrap">
+              <pre className="max-h-40 overflow-y-auto border border-border-soft bg-surface-paper p-3 text-caption font-mono leading-relaxed text-text-secondary whitespace-pre-wrap">
                 {extractedMessage}
               </pre>
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={handleCopyMessage}
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
+                  className="inline-flex min-h-11 items-center gap-1.5 border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
                 >
                   {copiedMessage
                     ? "Tersalin"
@@ -348,7 +348,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
                   <button
                     type="button"
                     onClick={handleCopyPhone}
-                    className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
+                    className="inline-flex min-h-11 items-center gap-1.5 border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-brand-forest hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
                   >
                     {copiedPhone
                       ? "Tersalin"
@@ -362,7 +362,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
                       href={whatsappWebUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-text-primary hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
+                      className="inline-flex min-h-11 items-center gap-1.5 border border-border-soft bg-surface-white px-4 py-2 text-label-sm font-semibold text-text-primary hover:bg-surface-sage/30 focus:outline-none focus:ring-2 focus:ring-brand-forest"
                     >
                       Buka WhatsApp Web
                     </a>
@@ -375,7 +375,7 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
                   ) : null}
                 </div>
               ) : (
-                <div className="rounded-md border border-border-soft bg-surface-paper p-3 text-body-sm text-text-secondary">
+                <div className="border border-border-soft bg-surface-paper p-3 text-body-sm text-text-secondary">
                   <p>
                     Nomor WhatsApp CS tidak terlampir pada detail pesanan ini. Silakan kunjungi{" "}
                     <Link

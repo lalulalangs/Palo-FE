@@ -128,7 +128,7 @@ export function ProductAccordion({ description }: ProductAccordionProps) {
           hidden={!openSections.sizeChart}
           className={`pb-5 pt-1 ${!openSections.sizeChart ? "hidden" : "block"}`}
         >
-          <div className="overflow-x-auto rounded-lg border border-border-soft">
+          <div className="overflow-x-auto border border-border-soft">
             <table className="w-full border-collapse text-left text-label-sm">
               <thead className="border-b border-border-soft bg-surface-sage/50">
                 <tr>

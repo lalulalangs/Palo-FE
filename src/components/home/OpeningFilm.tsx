@@ -144,7 +144,7 @@ export function OpeningFilm({ content }: { content: FilmContent }) {
         <div className="grid grid-cols-1 items-center gap-8 tablet:gap-14 lg:grid-cols-12">
           {/* ---------- Frame video vertikal ---------- */}
           <div className="flex justify-center lg:col-span-5">
-            <div className="group relative aspect-[9/16] w-full max-w-[360px] overflow-hidden rounded border border-border-soft bg-brand-deep shadow-lg">
+            <div className="group relative aspect-[9/16] w-full max-w-[360px] overflow-hidden border border-border-soft bg-brand-deep shadow-lg">
               <video
                 ref={videoRef}
                 className="h-full w-full object-cover object-center"

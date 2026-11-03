@@ -49,7 +49,7 @@ export function CartCheckoutHub({
   return (
     <aside
       aria-labelledby="hub-summary-title"
-      className="rounded-lg border border-border-soft bg-surface-white p-5 tablet:p-6 desktop:sticky desktop:top-24"
+      className="border border-border-soft bg-surface-white p-5 tablet:p-6 desktop:sticky desktop:top-24"
     >
       {/* 1. Compact Summary Header */}
       <div className="border-b border-border-soft pb-4">
@@ -98,7 +98,7 @@ export function CartCheckoutHub({
         <div
           role="alert"
           id="checkout-blocked-alert"
-          className="mt-4 flex items-start gap-2.5 rounded-lg border border-feedback-warn/40 bg-surface-paper p-3 text-label-sm font-semibold leading-relaxed text-feedback-warn"
+          className="mt-4 flex items-start gap-2.5 border border-feedback-warn/40 bg-surface-paper p-3 text-label-sm font-semibold leading-relaxed text-feedback-warn"
         >
           <span
             aria-hidden="true"
@@ -114,7 +114,7 @@ export function CartCheckoutHub({
       <div
         role="tablist"
         aria-label="Pilihan Jalur Pemesanan"
-        className="mt-4 grid grid-cols-2 gap-1 rounded-lg border border-border-soft bg-surface-paper p-1"
+        className="mt-4 grid grid-cols-2 gap-1 border border-border-soft bg-surface-paper p-1"
       >
         <button
           id="tab-wa"
@@ -126,7 +126,7 @@ export function CartCheckoutHub({
           onClick={() => setActiveTab("wa")}
           onKeyDown={(e) => handleTabKeyDown(e, "wa")}
           className={[
-            "flex min-h-11 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-label-sm font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest",
+            "flex min-h-11 items-center justify-center gap-1.5 px-3 py-2 text-label-sm font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest",
             activeTab === "wa"
               ? "border border-border-soft/80 bg-surface-white text-brand-forest shadow-xs"
               : "text-text-secondary hover:text-text-primary",
@@ -145,7 +145,7 @@ export function CartCheckoutHub({
           onClick={() => setActiveTab("online")}
           onKeyDown={(e) => handleTabKeyDown(e, "online")}
           className={[
-            "flex min-h-11 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-label-sm font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest",
+            "flex min-h-11 items-center justify-center gap-1.5 px-3 py-2 text-label-sm font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest",
             activeTab === "online"
               ? "border border-border-soft/80 bg-surface-white text-brand-forest shadow-xs"
               : "text-text-secondary hover:text-text-primary",
@@ -183,7 +183,7 @@ export function CartCheckoutHub({
           }
         >
           {/* Kartu kelebihan checkout online */}
-          <div className="space-y-2.5 rounded-lg border border-border-soft bg-surface-paper/70 p-4">
+          <div className="space-y-2.5 border border-border-soft bg-surface-paper/70 p-4">
             <h3 className="flex items-center gap-1.5 text-label-md font-semibold text-text-primary">
               <span>Keuntungan Bayar Online</span>
             </h3>
