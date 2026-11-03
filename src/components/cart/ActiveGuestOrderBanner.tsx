@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { cancelGuestOrderAction } from "@/actions/storefront";
+import { cancelGuestOrderAction, getGuestOrderStatusAction } from "@/actions/storefront";
 import { buttonClass } from "@/components/ui/Button";
 import { formatHarga } from "@/lib/format";
 import type { GuestResultHandoff } from "@/lib/guest-handoff";
@@ -58,6 +58,7 @@ export function ActiveGuestOrderBanner() {
 
   const cancelTriggerRef = useRef<HTMLButtonElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
+  const checkedOrderKeyRef = useRef<string | null>(null);
 
   const dialogTitleId = useId();
   const dialogDescId = useId();
@@ -70,6 +71,77 @@ export function ActiveGuestOrderBanner() {
       return null;
     }
   }, [storedHandoffJson, isDismissed]);
+
+  // Revalidasi status pesanan ringan on-mount
+  useEffect(() => {
+    let isMounted = true;
+    if (!handoff?.order_number || !handoff?.reference_code || isDismissed) {
+      return;
+    }
+
+    const orderKey = `${handoff.order_number}:${handoff.reference_code}`;
+    if (checkedOrderKeyRef.current === orderKey) {
+      return;
+    }
+    checkedOrderKeyRef.current = orderKey;
+
+    const checkStatus = async () => {
+      try {
+        const result = await getGuestOrderStatusAction({
+          orderNumber: handoff.order_number!,
+          referenceCode: handoff.reference_code,
+        });
+
+        if (!isMounted) return;
+
+        if (!result.ok) {
+          // Jika order tidak ditemukan (404)
+          const errorMsg = result.message?.toLowerCase() ?? "";
+          if (errorMsg.includes("tidak ditemukan")) {
+            try {
+              sessionStorage.removeItem(ACTIVE_GUEST_ORDER_KEY);
+              window.dispatchEvent(new Event("storage"));
+            } catch {
+              // Abaikan bila sessionStorage diblokir
+            }
+            setIsDismissed(true);
+          }
+          return;
+        }
+
+        const currentStatus = result.data.status;
+        if (currentStatus !== "awaiting_confirmation") {
+          try {
+            sessionStorage.removeItem(ACTIVE_GUEST_ORDER_KEY);
+            window.dispatchEvent(new Event("storage"));
+          } catch {
+            // Abaikan bila sessionStorage diblokir
+          }
+          setIsDismissed(true);
+
+          if (currentStatus === "cancelled") {
+            setNoticeMessage("Pesanan ini telah dibatalkan dari sistem.");
+          } else if (
+            currentStatus === "processing" ||
+            currentStatus === "shipped" ||
+            currentStatus === "completed"
+          ) {
+            setNoticeMessage(
+              "Pesananmu telah dikonfirmasi dan diproses oleh tim Customer Service kami.",
+            );
+          }
+        }
+      } catch {
+        // Fail-safe jika jaringan offline saat render awal
+      }
+    };
+
+    checkStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [handoff?.order_number, handoff?.reference_code, isDismissed]);
 
   // Kelola fokus, scroll, dan tombol ESC saat modal dibuka
   useEffect(() => {
@@ -93,6 +165,16 @@ export function ActiveGuestOrderBanner() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isModalOpen, isCancelling]);
+
+  const handleDismissManual = () => {
+    try {
+      sessionStorage.removeItem(ACTIVE_GUEST_ORDER_KEY);
+      window.dispatchEvent(new Event("storage"));
+    } catch {
+      // Abaikan bila sessionStorage diblokir
+    }
+    setIsDismissed(true);
+  };
 
   const handleOpenModal = () => {
     setCancelError(null);
@@ -118,6 +200,28 @@ export function ActiveGuestOrderBanner() {
       });
 
       if (!result.ok) {
+        const errorMsg = result.message?.toLowerCase() ?? "";
+        const isAlreadyProcessedOrNotAwaiting =
+          errorMsg.includes("tidak dalam status menunggu konfirmasi") ||
+          errorMsg.includes("sudah diproses") ||
+          errorMsg.includes("selesai") ||
+          errorMsg.includes("order_already_processed");
+
+        if (isAlreadyProcessedOrNotAwaiting) {
+          try {
+            sessionStorage.removeItem(ACTIVE_GUEST_ORDER_KEY);
+            window.dispatchEvent(new Event("storage"));
+          } catch {
+            // Abaikan bila sessionStorage diblokir
+          }
+          setIsModalOpen(false);
+          setIsDismissed(true);
+          setNoticeMessage(
+            "Pesananmu sudah diproses atau diselesaikan oleh tim Customer Service kami, sehingga kartu pesanan aktif telah dibersihkan.",
+          );
+          return;
+        }
+
         setCancelError(result.message);
         setIsCancelling(false);
         return;
@@ -171,9 +275,33 @@ export function ActiveGuestOrderBanner() {
       <div
         role="region"
         aria-label="Pesanan Tamu Aktif"
-        className="mb-8 overflow-hidden border-2 border-brand-forest bg-surface-paper p-5 shadow-editorial tablet:p-6"
+        className="relative mb-8 overflow-hidden border-2 border-brand-forest bg-surface-paper p-5 shadow-editorial tablet:p-6"
       >
-        <div className="flex flex-col gap-4 tablet:flex-row tablet:items-center tablet:justify-between">
+        {/* Tombol Tutup / Dismiss Manual */}
+        <button
+          type="button"
+          onClick={handleDismissManual}
+          aria-label="Tutup pemberitahuan pesanan"
+          className="absolute top-4 right-4 p-1.5 text-text-secondary hover:text-text-primary hover:bg-surface-sage/60 focus-visible:outline-2 focus-visible:outline-brand-forest transition-colors cursor-pointer"
+        >
+          <span className="sr-only">Tutup</span>
+          <svg
+            className="size-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        <div className="flex flex-col gap-4 pr-8 tablet:flex-row tablet:items-center tablet:justify-between tablet:pr-10">
           <div className="space-y-1.5 min-w-0">
             <div className="flex items-center gap-2">
               <span className="bg-surface-sage px-2.5 py-0.5 text-caption font-semibold text-brand-forest">

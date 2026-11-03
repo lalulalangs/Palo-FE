@@ -848,6 +848,23 @@ export interface CancelGuestOrderResult {
   message: string;
 }
 
+export interface GuestOrderStatus {
+  order_number: string;
+  reference_code: string;
+  status: OrderStatus | string;
+  status_label: string | null;
+  can_cancel: boolean;
+  payment_method: string | null;
+  total: number;
+  created_at: string | null;
+  confirmed_at: string | null;
+}
+
+export interface GuestOrderStatusResponse {
+  success: boolean;
+  data: GuestOrderStatus;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Auth                                                                       */
 /* -------------------------------------------------------------------------- */

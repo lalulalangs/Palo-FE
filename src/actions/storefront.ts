@@ -12,6 +12,7 @@ import {
   clearGuestToken,
   createCustomInquiry,
   createGuestWhatsAppCheckout,
+  getGuestOrderStatus,
   getToken,
   login,
   register,
@@ -24,7 +25,7 @@ import type {
   GuestResultHandoff,
 } from "@/lib/guest-handoff";
 import type { ActionError, ActionResult } from "@/lib/action-result";
-import type { GuestWhatsAppResult } from "@/lib/types";
+import type { GuestOrderStatus, GuestWhatsAppResult } from "@/lib/types";
 
 /**
  * Server Actions untuk seluruh mutasi storefront.
@@ -381,6 +382,34 @@ export async function cancelGuestOrderAction(input: {
     revalidatePath("/");
 
     return { ok: true, data: result };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+/**
+ * Ambil status pesanan WhatsApp tamu terkini secara real-time.
+ */
+export async function getGuestOrderStatusAction(input: {
+  orderNumber: string;
+  referenceCode: string;
+}): Promise<ActionResult<GuestOrderStatus>> {
+  if (!input.orderNumber?.trim() || !input.referenceCode?.trim()) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Nomor pesanan dan kode referensi wajib diisi.",
+      fieldErrors: {},
+    };
+  }
+
+  try {
+    const response = await getGuestOrderStatus(
+      input.orderNumber.trim(),
+      input.referenceCode.trim(),
+    );
+
+    return { ok: true, data: response.data };
   } catch (error) {
     return toActionError(error);
   }

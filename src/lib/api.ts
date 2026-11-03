@@ -23,6 +23,8 @@ import type {
   CollectionSeoMeta,
   CreatedOrder,
   CustomInquiryRequest,
+  GuestOrderStatus,
+  GuestOrderStatusResponse,
   GuestWhatsAppRequest,
   GuestWhatsAppResult,
   HeroSliderItem,
@@ -1613,6 +1615,26 @@ export async function cancelGuestOrder(
         ? payload.message
         : "Pesanan berhasil dibatalkan.",
   };
+}
+
+/**
+ * `GET /guest/orders/{orderNumber}?reference_code=...`
+ * Mengambil status terkini dan metadata pesanan WhatsApp tamu secara real-time.
+ */
+export async function getGuestOrderStatus(
+  orderNumber: string,
+  referenceCode: string,
+): Promise<GuestOrderStatusResponse> {
+  const payload = await apiRequest<GuestOrderStatusResponse>(
+    `/guest/orders/${encodeURIComponent(orderNumber)}`,
+    {
+      method: "GET",
+      query: { reference_code: referenceCode },
+      guestToken: await getGuestToken(),
+      forwardCookies: true,
+    },
+  );
+  return payload;
 }
 
 /* -------------------------------------------------------------------------- */
