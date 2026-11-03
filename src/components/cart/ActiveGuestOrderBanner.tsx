@@ -202,6 +202,7 @@ export function ActiveGuestOrderBanner() {
       if (!result.ok) {
         const errorMsg = result.message?.toLowerCase() ?? "";
         const isAlreadyProcessedOrNotAwaiting =
+          result.errorCode === "ORDER_ALREADY_PROCESSED" ||
           errorMsg.includes("tidak dalam status menunggu konfirmasi") ||
           errorMsg.includes("sudah diproses") ||
           errorMsg.includes("selesai") ||

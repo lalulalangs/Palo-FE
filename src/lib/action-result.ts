@@ -15,6 +15,8 @@ export interface ActionError {
   ok: false;
   /** Pesan utama dari backend — selalu Bahasa Indonesia (KONTRAK-API). */
   message: string;
+  /** Kode mesin error dari backend jika ada (misal `ORDER_ALREADY_PROCESSED`). */
+  errorCode?: string | null;
   /** Error per field, kalau backend mengirim objek `errors`. */
   fieldErrors: Record<string, string[]>;
   /**
@@ -134,6 +136,7 @@ export function toActionError(error: unknown): ActionError {
         ok: false,
         kind: classificationFor422(error),
         message: error.message,
+        errorCode: error.errorCode,
         fieldErrors: error.fieldErrors,
       };
     }

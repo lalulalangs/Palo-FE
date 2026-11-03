@@ -332,7 +332,11 @@ function readErrorPayload(payload: unknown): {
     message,
     errors: readFieldErrors(payload.errors),
     errorCode:
-      typeof payload.error_code === "string" ? payload.error_code : null,
+      typeof payload.error_code === "string"
+        ? payload.error_code
+        : typeof payload.code === "string"
+          ? payload.code
+          : null,
     priceChanges: readPriceChanges(payload.changes),
     newGrandTotal,
   };
