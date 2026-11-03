@@ -1189,9 +1189,10 @@ const DESTINATION_SEARCH_LIMIT = 8;
 export async function searchDestinations(
   query: string,
 ): Promise<ShippingDestination[]> {
+  const token = await getToken();
   const payload = await apiRequest<unknown>("/shipping/destinations", {
     query: { search: query, limit: DESTINATION_SEARCH_LIMIT },
-    token: await getToken(),
+    token: token ?? undefined,
   });
   // Balasan `ShippingController::destinations`: `{ data: { destinations: [...] } }`.
   const data = unwrap<Record<string, unknown>>(payload, "data");
@@ -1557,9 +1558,8 @@ function normalizeAddressSnapshot(
 /* -------------------------------------------------------------------------- */
 
 /**
- * `POST /guest/whatsapp-checkout` — BUKAN order (KONTRAK-API §5). Yang terjadi
- * hanya pencatatan niat menghubungi CS di `guest_checkout_logs`, tanpa
- * reservasi stok dan tanpa payment gateway.
+ * `POST /guest/whatsapp-checkout` — Membuat order tamu berstatus `awaiting_confirmation`
+ * dengan auto-quote tarif ongkir server-side, mencatat log, dan menyiapkan tautan WhatsApp CS.
  */
 export async function createGuestWhatsAppCheckout(
   request: GuestWhatsAppRequest,
