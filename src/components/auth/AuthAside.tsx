@@ -23,10 +23,6 @@ const KEUNGGULAN = [
     title: "Pantau Riwayat Belanja",
     body: "Semua daftar transaksi dan bukti pembelian tersimpan rapi di akunmu, kapan pun kamu ingin mengeceknya.",
   },
-  {
-    title: "Pengiriman Lebih Cepat",
-    body: "Alamat favorit tersimpan otomatis, jadi kamu nggak perlu repot mengetik ulang di pesanan berikutnya.",
-  },
 ] as const;
 
 export function AuthAside() {
