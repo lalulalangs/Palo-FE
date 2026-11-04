@@ -128,17 +128,17 @@ export function SiteFooter({ brand }: { brand: ResolvedBrand | null }) {
                 { href: "/produk", label: "Katalog" },
                 { href: "/cerita", label: "Cerita Palo" },
                 { href: "/kontak", label: "Toko Senaru" },
-                { href: "/lacak", label: "Lacak Pesanan" },
+                { href: "/lacak", label: "Lacak Pesanan", rel: "nofollow" },
               ]}
             />
             <FooterLinkGroup
               headingId="footer-akun"
               heading="Akun"
               links={[
-                { href: "/keranjang", label: "Keranjang" },
-                { href: "/masuk", label: "Masuk" },
-                { href: "/daftar", label: "Buat Akun" },
-                { href: "/checkout", label: "Checkout" },
+                { href: "/keranjang", label: "Keranjang", rel: "nofollow" },
+                { href: "/masuk", label: "Masuk", rel: "nofollow" },
+                { href: "/daftar", label: "Buat Akun", rel: "nofollow" },
+                { href: "/checkout", label: "Checkout", rel: "nofollow" },
               ]}
             />
           </nav>
@@ -210,7 +210,7 @@ function FooterLinkGroup({
 }: {
   headingId: string;
   heading: string;
-  links: Array<{ href: string; label: string }>;
+  links: Array<{ href: string; label: string; rel?: string }>;
 }) {
   return (
     <div>
@@ -225,6 +225,7 @@ function FooterLinkGroup({
           <li key={link.href}>
             <Link
               href={link.href}
+              rel={link.rel}
               className="inline-flex min-h-11 items-center text-surface-paper/85 transition-colors hover:text-surface-white"
             >
               {link.label}

@@ -64,7 +64,6 @@ export function ImageWithFallback({
       onError={() => setErrored(true)}
       style={position ? { objectPosition: position } : undefined}
       className={className}
-      unoptimized={usable.startsWith("http") && !usable.startsWith("/")}
     />
   );
 }

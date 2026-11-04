@@ -124,6 +124,7 @@ export default async function ProductDetailPage({
               badge={product.badge}
             />
             <div className="mt-8 tablet:mt-10">
+              <h2 className="sr-only">Informasi Produk</h2>
               <ProductAccordion description={product.description} />
             </div>
           </div>
