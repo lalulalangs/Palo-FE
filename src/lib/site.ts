@@ -24,7 +24,7 @@ export const SITE_LEGAL_NAME = "PALORINJANI";
 export const SITE_DESCRIPTION =
   "Palo Mountain Goods (PALORINJANI) — merchandise penjelajahan dari Senaru, kaki Gunung Rinjani, Lombok Utara. Dua jalur pemesanan: WhatsApp Customer Service atau pembayaran online dengan akun.";
 
-export const SITE_OG_IMAGE = "/placeholder-brand.svg";
+export const SITE_OG_IMAGE = "/og-image.png";
 
 /** URL absolut dari path relatif. */
 export function absoluteUrl(path: string): string {

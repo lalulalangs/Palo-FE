@@ -22,11 +22,14 @@ export default function robots(): MetadataRoute.Robots {
           "/lacak",
           "/masuk",
           "/daftar",
-          // Query param katalog: mengindeks tiap kombinasi filter membuat
-          // crawler terjebak di ruang parameter yang praktis tak berujung
-          // (PRD §3.3 tetap bisa dibagikan lewat URL, tapi tidak perlu
-          // diindeks satu per satu).
-          "/produk?",
+          "/me",
+          "/orders/",
+          "/api/",
+          // Query param katalog, kategori & koleksi: mengindeks tiap kombinasi filter
+          // membuat crawler terjebak di ruang parameter tak berujung dan boros kuota crawl.
+          "/produk?*",
+          "/kategori/*?*",
+          "/koleksi/*?*",
         ],
       },
     ],

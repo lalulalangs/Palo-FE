@@ -115,7 +115,7 @@ export function webSiteJsonLd(): JsonLdObject {
 
 export interface ProductJsonLdOptions {
   product: ProductDetail;
-  brandName: string | null;
+  brandName?: string | null;
 }
 
 /**
@@ -159,15 +159,28 @@ export function productJsonLd(options: ProductJsonLdOptions): JsonLdObject | nul
     if (sku) {
       node.sku = sku.code;
     }
-    node.offers = {
+    const offers: JsonLdObject = {
       "@type": "AggregateOffer",
       priceCurrency: "IDR",
+      price: product.price_min,
+      lowPrice: product.price_min,
+      itemCondition: "https://schema.org/NewCondition",
       offerCount: Math.max(skuCount, 1),
       availability:
         product.is_out_of_stock
           ? "https://schema.org/OutOfStock"
           : "https://schema.org/InStock",
+      seller: {
+        "@type": "Organization",
+        name: options.brandName ?? SITE_NAME,
+      },
     };
+
+    if (product.price_max > product.price_min) {
+      offers.highPrice = product.price_max;
+    }
+
+    node.offers = offers;
   }
 
   return node;

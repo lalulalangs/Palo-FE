@@ -22,38 +22,31 @@ import { absoluteUrl } from "@/lib/site";
  * `noIndex`, jadi mendaftarkan satu nomor pesanan di sini salah di dua hal
  * sekaligus. `/doku` juga tidak masuk: itu cuma pengalihan ke route tersebut.
  *
- * `lastModified` sengaja dibiarkan `new Date()` di halaman statis, karena
- * katalog bisa berubah kapan saja. Untuk URL produk tidak ada field
- * `updated_at` di kontrak API, jadi tidak ada yang bisa diklaim.
+ * `lastModified` menggunakan konstanta tanggal statis (`STATIC_LAST_MODIFIED`)
+ * untuk rute statis. Untuk rute dinamis (koleksi, kategori, produk), `lastModified`
+ * dihilangkan karena belum ada field `updated_at` di kontrak API, mencegah Googlebot
+ * mengabaikan tag `lastmod` akibat pemalsuan waktu runtime.
  */
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
+const STATIC_LAST_MODIFIED = new Date("2026-11-01T00:00:00Z");
 
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticEntries: MetadataRoute.Sitemap = [
-    { url: absoluteUrl("/"), lastModified: now, changeFrequency: "daily", priority: 1 },
-    { url: absoluteUrl("/produk"), lastModified: now, changeFrequency: "daily", priority: 0.9 },
-    { url: absoluteUrl("/koleksi"), lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: absoluteUrl("/cerita"), lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: absoluteUrl("/kontak"), lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: absoluteUrl("/"), lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 1 },
+    { url: absoluteUrl("/produk"), lastModified: STATIC_LAST_MODIFIED, changeFrequency: "daily", priority: 0.9 },
+    { url: absoluteUrl("/koleksi"), lastModified: STATIC_LAST_MODIFIED, changeFrequency: "weekly", priority: 0.8 },
+    { url: absoluteUrl("/cerita"), lastModified: STATIC_LAST_MODIFIED, changeFrequency: "monthly", priority: 0.6 },
+    { url: absoluteUrl("/kontak"), lastModified: STATIC_LAST_MODIFIED, changeFrequency: "monthly", priority: 0.6 },
   ];
 
   const [categories, allProducts, collections] = await Promise.all([
     getCategories(),
     fetchAllProducts(),
-    /*
-     * Satu request mengembalikan SEMUA koleksi aktif (maks 100, tanpa
-     * paginasi), dan `Collection::active()` sudah menyaring `is_active`,
-     * `published_at <= now`, `ended_at >= now`. Jadi daftar sitemap menyusut
-     * sendiri saat koleksi berakhir — tanpa cron, tanpa edit manual.
-     * `null` (backend mati saat build) = tidak ada entri ditambahkan.
-     */
     getCollectionList(),
   ]);
 
   const collectionEntries: MetadataRoute.Sitemap = (collections ?? []).map(
     (collection) => ({
       url: absoluteUrl(`/koleksi/${collection.slug}`),
-      lastModified: now,
       changeFrequency: "weekly",
       priority: 0.7,
       ...(collection.banner_desktop
@@ -65,7 +58,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categoryEntries: MetadataRoute.Sitemap = (categories ?? []).map(
     (category) => ({
       url: absoluteUrl(`/kategori/${category.slug}`),
-      lastModified: now,
       changeFrequency: "weekly",
       priority: 0.7,
     }),
@@ -73,7 +65,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const productEntries: MetadataRoute.Sitemap = allProducts.map((product) => ({
       url: absoluteUrl(`/produk/${product.slug}`),
-      lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
       // `images` diisi hanya kalau produk benar-benar punya gambar. Kalau
