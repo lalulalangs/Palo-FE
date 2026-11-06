@@ -51,20 +51,22 @@ export function organizationJsonLd(options: OrganizationOptions): JsonLdObject {
     };
   }
 
-  const contact: JsonLdObject = {};
-  if (options.email) contact.email = options.email;
+  if (options.email) {
+    node.email = options.email;
+  }
+
   if (options.whatsapp) {
-    contact.contactPoint = [
+    node.contactPoint = [
       {
         "@type": "ContactPoint",
         contactType: "customer service",
         telephone: options.whatsapp,
+        ...(options.email ? { email: options.email } : {}),
         areaServed: "ID",
         availableLanguage: ["id"],
       },
     ];
   }
-  if (Object.keys(contact).length > 0) node.contactPoint = contact.contactPoint;
 
   // `sameAs` memberi mesin pencari daftar akun resmi brand. Hanya kanal
   // yang benar-benar terisi yang dimasukkan — nilai `null` akan muncul
@@ -226,6 +228,16 @@ export function collectionPageJsonLd(options: {
 
 /** `ContactPage` untuk halaman toko/kontak. */
 export function contactPageJsonLd(brand: BrandInfo): JsonLdObject {
+  const sameAs: string[] = [];
+  for (const url of [
+    brand.instagram_url,
+    brand.facebook_url,
+    brand.tiktok_url,
+    brand.threads_url,
+  ]) {
+    if (url) sameAs.push(url);
+  }
+
   return {
     "@context": "https://schema.org",
     "@type": "ContactPage",
@@ -252,13 +264,90 @@ export function contactPageJsonLd(brand: BrandInfo): JsonLdObject {
                 "@type": "ContactPoint",
                 contactType: "customer service",
                 telephone: brand.whatsapp_cs,
+                ...(brand.email ? { email: brand.email } : {}),
                 areaServed: "ID",
                 availableLanguage: ["id"],
               },
             ],
           }
         : {}),
-      ...(brand.instagram_url ? { sameAs: [brand.instagram_url] } : {}),
+      ...(sameAs.length > 0 ? { sameAs } : {}),
     },
   };
+}
+
+export type StoreJsonLd = JsonLdObject;
+
+/**
+ * `ClothingStore` untuk toko fisik di Senaru (PRD §4.4).
+ *
+ * Mengaitkan entitas lokal gerai Senaru dengan titik koordinat geo,
+ * alamat lengkap, jam operasional, tautan Google Maps, serta kanal kontak.
+ */
+export function storeJsonLd(brand: BrandInfo): JsonLdObject {
+  const sameAs: string[] = [];
+  for (const url of [
+    brand.instagram_url,
+    brand.facebook_url,
+    brand.tiktok_url,
+    brand.threads_url,
+  ]) {
+    if (url) sameAs.push(url);
+  }
+
+  const node: JsonLdObject = {
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    "@id": `${SITE_URL}/kontak#store`,
+    name: brand.store_name ?? brand.brand_name ?? SITE_NAME,
+    url: absoluteUrl("/kontak"),
+    hasMap: "https://maps.app.goo.gl/E5vjb4TYu3x9obSR9",
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: -8.3013169,
+      longitude: 116.4080834,
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress:
+        brand.store_address ??
+        "Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat",
+      addressLocality: "Lombok Utara",
+      addressRegion: "Nusa Tenggara Barat",
+      addressCountry: "ID",
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "08:00",
+        closes: "20:00",
+      },
+    ],
+    openingHours: "Mo-Su 08:00-20:00",
+    priceRange: "$$",
+  };
+
+  if (brand.whatsapp_cs) {
+    node.telephone = brand.whatsapp_cs;
+  }
+  if (brand.email) {
+    node.email = brand.email;
+  }
+  if (brand.logo_url) {
+    node.image = absoluteUrl(brand.logo_url);
+  }
+  if (sameAs.length > 0) {
+    node.sameAs = sameAs;
+  }
+
+  return node;
 }

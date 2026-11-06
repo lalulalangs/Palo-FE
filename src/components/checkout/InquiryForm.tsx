@@ -154,6 +154,18 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
       action={formAction}
       className={CARD}
     >
+      {/* Honeypot anti-bot: disembunyikan visual dan ARIA */}
+      <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+        <label htmlFor="inquiry-organization">Organisasi</label>
+        <input
+          id="inquiry-organization"
+          name="hp_organization"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       {defaultName ? (
         <p className="mb-4 text-body-sm leading-relaxed text-text-secondary">
           {PREFILL_NOTE}
