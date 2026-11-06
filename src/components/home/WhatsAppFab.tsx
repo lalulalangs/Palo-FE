@@ -1,4 +1,7 @@
+"use client";
+
 import { LineIcon } from "@/components/ui/LineIcon";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * Tombol WhatsApp mengambang.
@@ -37,6 +40,13 @@ export function WhatsAppFab({ href }: { href: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Buka percakapan WhatsApp dengan Customer Service"
+      onClick={() =>
+        trackEvent({
+          event: "track_whatsapp_click",
+          placement: "fab_home",
+          label: "Floating WhatsApp Button",
+        })
+      }
       className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-surface-white/20 bg-brand-forest text-surface-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-brand-deep"
     >
       <LineIcon name="chat" className="h-6 w-6" />

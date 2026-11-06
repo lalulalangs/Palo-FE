@@ -8,6 +8,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { fieldError, isActionError } from "@/lib/action-result";
 import type { ActionError } from "@/lib/action-result";
 import type { GuestWhatsAppResult } from "@/lib/types";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * Form inquiry grosir / ekspedisi / reseller (PRD §6A).
@@ -78,6 +79,16 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
     if (showSuccess) headingRef.current?.focus();
   }, [showSuccess]);
 
+  useEffect(() => {
+    if (result) {
+      trackEvent({
+        event: "form_submit",
+        form_name: "contact_inquiry",
+        status: "success",
+      });
+    }
+  }, [result]);
+
   if (result && showSuccess) {
     return (
       <div
@@ -111,6 +122,12 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           href={result.wa_url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() =>
+            trackEvent({
+              event: "track_whatsapp_click",
+              placement: "inquiry_form",
+            })
+          }
           className={buttonClass({ size: "lg", fullWidth: true, className: "mt-6" })}
         >
           Lanjut Chat ke WhatsApp

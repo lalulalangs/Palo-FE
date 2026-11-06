@@ -5,6 +5,7 @@ import { HeroCarousel, type HeroSlide } from "@/components/hero/HeroCarousel";
 import { LookbookSplit } from "@/components/home/LookbookSplit";
 import { ManifestoPanel } from "@/components/home/ManifestoPanel";
 import { OpeningFilm } from "@/components/home/OpeningFilm";
+import { WhatsAppFab } from "@/components/home/WhatsAppFab";
 import { JsonLd } from "@/components/JsonLd";
 import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { Container } from "@/components/layout/Container";
@@ -244,6 +245,8 @@ export default async function HomePage() {
           ) : null}
         </Container>
       </section>
+
+      {waHref ? <WhatsAppFab href={waHref} /> : null}
     </>
   );
 }
