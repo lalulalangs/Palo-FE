@@ -6,6 +6,7 @@ import { useState, type KeyboardEvent } from "react";
 import { Button, buttonClass } from "@/components/ui/Button";
 import { formatHarga, pluralItem } from "@/lib/format";
 import type { CartItem, CartSummary as CartSummaryData } from "@/lib/types";
+import { trackEvent } from "@/lib/analytics";
 import { GuestCheckoutForm } from "./GuestCheckoutForm";
 
 export interface CartCheckoutHubProps {
@@ -233,6 +234,13 @@ export function CartCheckoutHub({
           ) : isLoggedIn ? (
             <Link
               href="/checkout"
+              onClick={() =>
+                trackEvent({
+                  event: "begin_checkout",
+                  item_count: summary.item_count,
+                  subtotal: summary.subtotal,
+                })
+              }
               className={buttonClass({ fullWidth: true, size: "lg" })}
             >
               Lanjut ke checkout online

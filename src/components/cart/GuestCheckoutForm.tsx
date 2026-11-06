@@ -16,6 +16,7 @@ import type {
 } from "@/lib/guest-handoff";
 import { stockStateOf } from "@/lib/cart-stock";
 import type { CartItem, ShippingDestination } from "@/lib/types";
+import { trackEvent } from "@/lib/analytics";
 
 const ACTIVE_GUEST_ORDER_KEY = "palorinjani_active_guest_order";
 const ACTIVE_ORDER_TTL_MS = 60 * 60 * 1000; // 1 jam
@@ -139,6 +140,24 @@ export function GuestCheckoutForm({
       }
     }
   }, [handoff]);
+
+  useEffect(() => {
+    if (!state) return;
+    if (state.ok) {
+      trackEvent({
+        event: "form_submit",
+        form_name: "guest_checkout",
+        status: "success",
+      });
+    } else {
+      trackEvent({
+        event: "form_submit",
+        form_name: "guest_checkout",
+        status: "error",
+        error_message: state.message,
+      });
+    }
+  }, [state]);
 
   const handleNewOrder = () => {
     try {
@@ -486,6 +505,12 @@ function GuestResultPanel({
         href={handoff.wa_url}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() =>
+          trackEvent({
+            event: "track_whatsapp_click",
+            placement: "guest_checkout",
+          })
+        }
         className={buttonClass({ size: "lg", fullWidth: true })}
       >
         Lanjut Chat ke WhatsApp

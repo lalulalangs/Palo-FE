@@ -1,3 +1,5 @@
+export const revalidate = 86400;
+
 import type { MetadataRoute } from "next";
 
 import { getCategories, getCollectionList, getProducts } from "@/lib/api";
@@ -47,6 +49,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const collectionEntries: MetadataRoute.Sitemap = (collections ?? []).map(
     (collection) => ({
       url: absoluteUrl(`/koleksi/${collection.slug}`),
+      lastModified: collection.published_at
+        ? new Date(collection.published_at)
+        : STATIC_LAST_MODIFIED,
       changeFrequency: "weekly",
       priority: 0.7,
       ...(collection.banner_desktop

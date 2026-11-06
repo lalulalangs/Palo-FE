@@ -436,6 +436,17 @@ export async function createCustomInquiryAction(
   _prev: ActionResult<GuestWhatsAppResult> | null,
   formData: FormData,
 ): Promise<ActionResult<GuestWhatsAppResult>> {
+  // Honeypot anti-bot: tolak langsung jika field terisi
+  const honeypot = readOptionalText(formData, "hp_organization");
+  if (honeypot) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Permintaan tidak dapat diproses saat ini.",
+      fieldErrors: {},
+    };
+  }
+
   const quantityRaw = readText(formData, "quantity");
   let quantity: number | null = null;
 

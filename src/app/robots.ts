@@ -15,7 +15,12 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        allow: [
+          "/",
+          "/produk?page=*",
+          "/kategori/*?page=*",
+          "/koleksi/*?page=*",
+        ],
         disallow: [
           "/keranjang",
           "/checkout",
@@ -25,15 +30,14 @@ export default function robots(): MetadataRoute.Robots {
           "/me",
           "/orders/",
           "/api/",
-          // Query param katalog, kategori & koleksi: mengindeks tiap kombinasi filter
-          // membuat crawler terjebak di ruang parameter tak berujung dan boros kuota crawl.
-          "/produk?*",
-          "/kategori/*?*",
-          "/koleksi/*?*",
+          "/*?*sort=*",
+          "/*?*min_price=*",
+          "/*?*max_price=*",
+          "/*?*in_stock=*",
+          "/*?*q=*",
         ],
       },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
-    host: absoluteUrl("/"),
   };
 }

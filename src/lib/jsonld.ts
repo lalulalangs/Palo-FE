@@ -11,7 +11,7 @@ import type { BrandInfo, ProductDetail } from "./types";
 
 export type JsonLdObject = Record<string, unknown>;
 
-const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+const STORE_ID = `${SITE_URL}/#store`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
 
 export interface OrganizationOptions {
@@ -24,47 +24,106 @@ export interface OrganizationOptions {
   tiktokUrl: string | null;
   threadsUrl?: string | null;
   whatsapp: string | null;
+  phone?: string | null;
 }
 
 /**
- * `Organization` untuk layout root.
- *
- * Note: nomor telepon, alamat, dan Instagram TIDAK pernah di-hardcode. Kalau
- * `GET /brand` belum mengembalikan nilainya, field-nya dihilangkan dari
- * structured data — lebih baik tidak ada daripada menyesatkan crawlers.
+ * Normalisasi nomor telepon ke format E.164 (+62...) yang disyaratkan Google.
+ * Mengubah format nomor berawalan `08` menjadi `+628`.
+ */
+export function normalizePhoneNumber(phone: string): string {
+  const trimmed = phone.trim();
+  if (trimmed.startsWith("+")) {
+    return trimmed;
+  }
+  if (trimmed.startsWith("08")) {
+    return `+628${trimmed.slice(2)}`;
+  }
+  if (trimmed.startsWith("628")) {
+    return `+${trimmed}`;
+  }
+  return trimmed;
+}
+
+/**
+ * `ClothingStore` & `OnlineStore` hybrid omnichannel untuk layout root.
+ * Menghasilkan Google Rich Results terverifikasi untuk entitas brand & toko fisik/online.
  */
 export function organizationJsonLd(options: OrganizationOptions): JsonLdObject {
   const name = options.brandName ?? SITE_NAME;
 
   const node: JsonLdObject = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": ORGANIZATION_ID,
+    "@type": ["ClothingStore", "OnlineStore"],
+    "@id": STORE_ID,
     name,
+    alternateName: "PALORINJANI",
+    description: SITE_DESCRIPTION,
     url: SITE_URL,
+    priceRange: "$$",
+    currenciesAccepted: "IDR",
+    paymentAccepted: "Cash, QRIS, Bank Transfer, Online Payment",
+    image: absoluteUrl(options.logoUrl ?? "/og-image.png"),
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: -8.3013169,
+      longitude: 116.4080834,
+    },
+    hasMap: "https://maps.app.goo.gl/E5vjb4TYu3x9obSR9",
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "08:00",
+        closes: "21:00",
+      },
+    ],
+    openingHours: "Mo-Su 08:00-21:00",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress:
+        options.address ??
+        "Jl. Pariwisata Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat",
+      addressLocality: "Lombok Utara",
+      addressRegion: "Nusa Tenggara Barat",
+      postalCode: "83354",
+      addressCountry: "ID",
+    },
+    logo: {
+      "@type": "ImageObject",
+      "@id": `${SITE_URL}/#logo`,
+      url: absoluteUrl(options.logoUrl ?? "/palo-rinjani-logo.png"),
+      caption: `Logo ${name}`,
+    },
   };
 
-  if (options.logoUrl) {
-    node.logo = {
-      "@type": "ImageObject",
-      url: absoluteUrl(options.logoUrl),
-    };
+  if (options.email) {
+    node.email = options.email;
   }
 
-  const contact: JsonLdObject = {};
-  if (options.email) contact.email = options.email;
-  if (options.whatsapp) {
-    contact.contactPoint = [
+  const rawPhone = options.phone ?? options.whatsapp;
+  if (rawPhone) {
+    const telephone = normalizePhoneNumber(rawPhone);
+    node.telephone = telephone;
+    node.contactPoint = [
       {
         "@type": "ContactPoint",
         contactType: "customer service",
-        telephone: options.whatsapp,
+        telephone,
+        ...(options.email ? { email: options.email } : {}),
         areaServed: "ID",
         availableLanguage: ["id"],
       },
     ];
   }
-  if (Object.keys(contact).length > 0) node.contactPoint = contact.contactPoint;
 
   // `sameAs` memberi mesin pencari daftar akun resmi brand. Hanya kanal
   // yang benar-benar terisi yang dimasukkan — nilai `null` akan muncul
@@ -80,14 +139,6 @@ export function organizationJsonLd(options: OrganizationOptions): JsonLdObject {
   }
   if (sameAs.length > 0) node.sameAs = sameAs;
 
-  if (options.address) {
-    node.address = {
-      "@type": "PostalAddress",
-      streetAddress: options.address,
-      addressCountry: "ID",
-    };
-  }
-
   return node;
 }
 
@@ -101,7 +152,7 @@ export function webSiteJsonLd(): JsonLdObject {
     url: SITE_URL,
     description: SITE_DESCRIPTION,
     inLanguage: "id-ID",
-    publisher: { "@id": ORGANIZATION_ID },
+    publisher: { "@id": STORE_ID },
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -226,6 +277,16 @@ export function collectionPageJsonLd(options: {
 
 /** `ContactPage` untuk halaman toko/kontak. */
 export function contactPageJsonLd(brand: BrandInfo): JsonLdObject {
+  const sameAs: string[] = [];
+  for (const url of [
+    brand.instagram_url,
+    brand.facebook_url,
+    brand.tiktok_url,
+    brand.threads_url,
+  ]) {
+    if (url) sameAs.push(url);
+  }
+
   return {
     "@context": "https://schema.org",
     "@type": "ContactPage",
@@ -252,13 +313,90 @@ export function contactPageJsonLd(brand: BrandInfo): JsonLdObject {
                 "@type": "ContactPoint",
                 contactType: "customer service",
                 telephone: brand.whatsapp_cs,
+                ...(brand.email ? { email: brand.email } : {}),
                 areaServed: "ID",
                 availableLanguage: ["id"],
               },
             ],
           }
         : {}),
-      ...(brand.instagram_url ? { sameAs: [brand.instagram_url] } : {}),
+      ...(sameAs.length > 0 ? { sameAs } : {}),
     },
   };
+}
+
+export type StoreJsonLd = JsonLdObject;
+
+/**
+ * `ClothingStore` untuk toko fisik di Senaru (PRD §4.4).
+ *
+ * Mengaitkan entitas lokal gerai Senaru dengan titik koordinat geo,
+ * alamat lengkap, jam operasional, tautan Google Maps, serta kanal kontak.
+ */
+export function storeJsonLd(brand: BrandInfo): JsonLdObject {
+  const sameAs: string[] = [];
+  for (const url of [
+    brand.instagram_url,
+    brand.facebook_url,
+    brand.tiktok_url,
+    brand.threads_url,
+  ]) {
+    if (url) sameAs.push(url);
+  }
+
+  const node: JsonLdObject = {
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    "@id": `${SITE_URL}/kontak#store`,
+    name: brand.store_name ?? brand.brand_name ?? SITE_NAME,
+    url: absoluteUrl("/kontak"),
+    hasMap: "https://maps.app.goo.gl/E5vjb4TYu3x9obSR9",
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: -8.3013169,
+      longitude: 116.4080834,
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress:
+        brand.store_address ??
+        "Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat",
+      addressLocality: "Lombok Utara",
+      addressRegion: "Nusa Tenggara Barat",
+      addressCountry: "ID",
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "08:00",
+        closes: "20:00",
+      },
+    ],
+    openingHours: "Mo-Su 08:00-20:00",
+    priceRange: "$$",
+  };
+
+  if (brand.whatsapp_cs) {
+    node.telephone = normalizePhoneNumber(brand.whatsapp_cs);
+  }
+  if (brand.email) {
+    node.email = brand.email;
+  }
+  if (brand.logo_url) {
+    node.image = absoluteUrl(brand.logo_url);
+  }
+  if (sameAs.length > 0) {
+    node.sameAs = sameAs;
+  }
+
+  return node;
 }
