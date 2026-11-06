@@ -8,6 +8,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { fieldError, isActionError } from "@/lib/action-result";
 import type { ActionError } from "@/lib/action-result";
 import type { GuestWhatsAppResult } from "@/lib/types";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * Form inquiry grosir / ekspedisi / reseller (PRD §6A).
@@ -78,6 +79,16 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
     if (showSuccess) headingRef.current?.focus();
   }, [showSuccess]);
 
+  useEffect(() => {
+    if (result) {
+      trackEvent({
+        event: "form_submit",
+        form_name: "contact_inquiry",
+        status: "success",
+      });
+    }
+  }, [result]);
+
   if (result && showSuccess) {
     return (
       <div
@@ -111,6 +122,12 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
           href={result.wa_url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() =>
+            trackEvent({
+              event: "track_whatsapp_click",
+              placement: "inquiry_form",
+            })
+          }
           className={buttonClass({ size: "lg", fullWidth: true, className: "mt-6" })}
         >
           Lanjut Chat ke WhatsApp
@@ -154,6 +171,18 @@ export function InquiryForm({ defaultName }: { defaultName: string }) {
       action={formAction}
       className={CARD}
     >
+      {/* Honeypot anti-bot: disembunyikan visual dan ARIA */}
+      <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+        <label htmlFor="inquiry-organization">Organisasi</label>
+        <input
+          id="inquiry-organization"
+          name="hp_organization"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       {defaultName ? (
         <p className="mb-4 text-body-sm leading-relaxed text-text-secondary">
           {PREFILL_NOTE}

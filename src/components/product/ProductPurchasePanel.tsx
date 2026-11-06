@@ -10,6 +10,7 @@ import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import type { ActionError } from "@/lib/action-result";
 import { formatAngka, formatHarga } from "@/lib/format";
 import type { ProductDetail, ProductSku, ProductVariant } from "@/lib/types";
+import { trackEvent } from "@/lib/analytics";
 
 const AXIS_LABEL: Record<string, string> = { size: "Ukuran", color: "Warna" };
 
@@ -110,6 +111,13 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
         setError(result);
         return;
       }
+      trackEvent({
+        event: "add_to_cart",
+        sku_id: selectedSku.id,
+        product_name: product.name,
+        price: selectedSku.price,
+        quantity,
+      });
       setNotice({
         text: `${capitalize(phrase ?? "Varian")} ditambahkan ke keranjang.`,
         cart: true,

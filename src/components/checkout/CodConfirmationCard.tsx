@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatHarga } from "@/lib/format";
 import type { OrderDetail } from "@/lib/types";
 import { safeWhatsappUrl } from "@/lib/url";
+import { trackEvent } from "@/lib/analytics";
 
 /**
  * Format nomor telepon 628xxx / 08xxx menjadi format tampilan Indonesia yang ramah (08xx-xxxx-xxxx).
@@ -247,6 +248,13 @@ Mohon diproses untuk pengiriman. Terima kasih!`;
               href={finalWhatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackEvent({
+                  event: "track_whatsapp_click",
+                  placement: "cod_confirmation",
+                  label: "Konfirmasi Pesanan via WhatsApp 1-Klik",
+                })
+              }
               className="flex min-h-[52px] w-full items-center justify-center gap-2 bg-brand-forest px-6 py-3.5 text-center text-title-md font-bold text-surface-white shadow-sm transition hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-forest focus:ring-offset-2 active:scale-[0.99]"
             >
               <span>Konfirmasi Pesanan via WhatsApp 1-Klik</span>

@@ -10,7 +10,11 @@ import { PlaceholderNotice } from "@/components/PlaceholderNotice";
 import { buttonClass } from "@/components/ui/Button";
 import { getBrand, getCurrentUser } from "@/lib/api";
 import { resolveBrand, whatsappLink } from "@/lib/brand";
-import { breadcrumbJsonLd, contactPageJsonLd } from "@/lib/jsonld";
+import {
+  breadcrumbJsonLd,
+  contactPageJsonLd,
+  storeJsonLd,
+} from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/metadata";
 
 /**
@@ -105,6 +109,7 @@ export default async function ContactPage() {
     <>
       <JsonLd data={breadcrumbJsonLd(crumbs)} />
       {brand ? <JsonLd data={contactPageJsonLd(brand)} /> : null}
+      {brand ? <JsonLd data={storeJsonLd(brand)} /> : null}
 
       <PageHeader
         eyebrow="Gerai basecamp Senaru"
