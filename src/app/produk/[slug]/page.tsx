@@ -31,7 +31,7 @@ export async function generateMetadata({
 
   return buildMetadata({
     title: name,
-    description: description.slice(0, 200),
+    description: description.slice(0, 155),
     path: `/produk/${slug}`,
     image: product?.images[0]?.url,
     ...(product ? {} : { noIndex: true }),
