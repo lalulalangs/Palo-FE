@@ -378,10 +378,10 @@ export function storeJsonLd(brand: BrandInfo): JsonLdObject {
           "Sunday",
         ],
         opens: "08:00",
-        closes: "20:00",
+        closes: "21:00",
       },
     ],
-    openingHours: "Mo-Su 08:00-20:00",
+    openingHours: "Mo-Su 08:00-21:00",
     priceRange: "$$",
   };
 
