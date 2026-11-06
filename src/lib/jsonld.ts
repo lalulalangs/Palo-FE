@@ -11,7 +11,7 @@ import type { BrandInfo, ProductDetail } from "./types";
 
 export type JsonLdObject = Record<string, unknown>;
 
-const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+const STORE_ID = `${SITE_URL}/#store`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
 
 export interface OrganizationOptions {
@@ -24,43 +24,100 @@ export interface OrganizationOptions {
   tiktokUrl: string | null;
   threadsUrl?: string | null;
   whatsapp: string | null;
+  phone?: string | null;
 }
 
 /**
- * `Organization` untuk layout root.
- *
- * Note: nomor telepon, alamat, dan Instagram TIDAK pernah di-hardcode. Kalau
- * `GET /brand` belum mengembalikan nilainya, field-nya dihilangkan dari
- * structured data — lebih baik tidak ada daripada menyesatkan crawlers.
+ * Normalisasi nomor telepon ke format E.164 (+62...) yang disyaratkan Google.
+ * Mengubah format nomor berawalan `08` menjadi `+628`.
+ */
+export function normalizePhoneNumber(phone: string): string {
+  const trimmed = phone.trim();
+  if (trimmed.startsWith("+")) {
+    return trimmed;
+  }
+  if (trimmed.startsWith("08")) {
+    return `+628${trimmed.slice(2)}`;
+  }
+  if (trimmed.startsWith("628")) {
+    return `+${trimmed}`;
+  }
+  return trimmed;
+}
+
+/**
+ * `ClothingStore` & `OnlineStore` hybrid omnichannel untuk layout root.
+ * Menghasilkan Google Rich Results terverifikasi untuk entitas brand & toko fisik/online.
  */
 export function organizationJsonLd(options: OrganizationOptions): JsonLdObject {
   const name = options.brandName ?? SITE_NAME;
 
   const node: JsonLdObject = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": ORGANIZATION_ID,
+    "@type": ["ClothingStore", "OnlineStore"],
+    "@id": STORE_ID,
     name,
+    alternateName: "PALORINJANI",
+    description: SITE_DESCRIPTION,
     url: SITE_URL,
-  };
-
-  if (options.logoUrl) {
-    node.logo = {
+    priceRange: "$$",
+    currenciesAccepted: "IDR",
+    paymentAccepted: "Cash, QRIS, Bank Transfer, Online Payment",
+    image: absoluteUrl(options.logoUrl ?? "/og-image.png"),
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: -8.3013169,
+      longitude: 116.4080834,
+    },
+    hasMap: "https://maps.app.goo.gl/E5vjb4TYu3x9obSR9",
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        opens: "08:00",
+        closes: "21:00",
+      },
+    ],
+    openingHours: "Mo-Su 08:00-21:00",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress:
+        options.address ??
+        "Jl. Pariwisata Senaru, Bayan, Lombok Utara, Nusa Tenggara Barat",
+      addressLocality: "Lombok Utara",
+      addressRegion: "Nusa Tenggara Barat",
+      postalCode: "83354",
+      addressCountry: "ID",
+    },
+    logo: {
       "@type": "ImageObject",
-      url: absoluteUrl(options.logoUrl),
-    };
-  }
+      "@id": `${SITE_URL}/#logo`,
+      url: absoluteUrl(options.logoUrl ?? "/palo-rinjani-logo.png"),
+      caption: `Logo ${name}`,
+    },
+  };
 
   if (options.email) {
     node.email = options.email;
   }
 
-  if (options.whatsapp) {
+  const rawPhone = options.phone ?? options.whatsapp;
+  if (rawPhone) {
+    const telephone = normalizePhoneNumber(rawPhone);
+    node.telephone = telephone;
     node.contactPoint = [
       {
         "@type": "ContactPoint",
         contactType: "customer service",
-        telephone: options.whatsapp,
+        telephone,
         ...(options.email ? { email: options.email } : {}),
         areaServed: "ID",
         availableLanguage: ["id"],
@@ -82,14 +139,6 @@ export function organizationJsonLd(options: OrganizationOptions): JsonLdObject {
   }
   if (sameAs.length > 0) node.sameAs = sameAs;
 
-  if (options.address) {
-    node.address = {
-      "@type": "PostalAddress",
-      streetAddress: options.address,
-      addressCountry: "ID",
-    };
-  }
-
   return node;
 }
 
@@ -103,7 +152,7 @@ export function webSiteJsonLd(): JsonLdObject {
     url: SITE_URL,
     description: SITE_DESCRIPTION,
     inLanguage: "id-ID",
-    publisher: { "@id": ORGANIZATION_ID },
+    publisher: { "@id": STORE_ID },
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -337,7 +386,7 @@ export function storeJsonLd(brand: BrandInfo): JsonLdObject {
   };
 
   if (brand.whatsapp_cs) {
-    node.telephone = brand.whatsapp_cs;
+    node.telephone = normalizePhoneNumber(brand.whatsapp_cs);
   }
   if (brand.email) {
     node.email = brand.email;

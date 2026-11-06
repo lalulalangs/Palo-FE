@@ -49,7 +49,7 @@ export const PLACEHOLDER_BRAND = {
   tiktokUrl: null,
   threadsUrl: null,
   threadsHandle: null,
-  logo: "/placeholder-brand.svg",
+  logo: "/palo-rinjani-logo.png",
 } as const;
 
 export const EMPTY_BRAND_CONTACT = {
