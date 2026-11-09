@@ -116,19 +116,7 @@ export default async function CheckoutSuccessPage({
     (detail.status === "awaiting_confirmation" ||
       detail.status === "menunggu_konfirmasi_cs");
 
-  const status = detail.status as string;
-  const isPaid =
-    status === "paid" ||
-    status === "dibayar" ||
-    status === "sudah_dibayar" ||
-    status === "processing" ||
-    status === "diproses" ||
-    status === "shipped" ||
-    status === "dikirim" ||
-    status === "completed" ||
-    status === "selesai";
-
-  const paymentUrl = isCod || isPaid ? null : paymentRedirectUrl(detail);
+  const paymentUrl = isCod ? null : paymentRedirectUrl(detail);
 
   const instructions = detail.payment_expires_at
     ? `Selesaikan pembayaran sebelum ${formatWaktu(detail.payment_expires_at)} agar pesananmu tetap aman, ya.`
@@ -139,12 +127,7 @@ export default async function CheckoutSuccessPage({
   let headerDescription =
     "Nomor pesanan dan instruksi pembayaranmu sudah tercatat rapi. Status pembayaran akan otomatis terupdate begitu transaksi selesai diverifikasi.";
 
-  if (isPaid) {
-    headerEyebrow = "Pembayaran Selesai";
-    headerTitle = "Pembayaran Berhasil Diterima!";
-    headerDescription =
-      "Terima kasih! Pembayaranmu telah berhasil diverifikasi secara otomatis. Pesananmu sedang disiapkan dari gudang Senaru.";
-  } else if (isCod) {
+  if (isCod) {
     if (isAwaitingCodConfirmation) {
       headerEyebrow = "Checkout selesai";
       headerTitle = "Pesanan berhasil tercatat!";
@@ -175,43 +158,14 @@ export default async function CheckoutSuccessPage({
         ]}
         aside={
           <span className="inline-flex w-fit items-center border border-border-soft bg-surface-sage px-3 py-1 text-caption font-semibold text-brand-forest">
-            {isPaid
-              ? "Sudah Dibayar"
-              : labelStatusOrder(detail.status)}
+            {labelStatusOrder(detail.status)}
           </span>
         }
       />
 
       <Container className="py-8 tablet:py-12">
         <div className="mx-auto max-w-3xl space-y-6">
-          {isPaid ? (
-            <section
-              aria-label="Konfirmasi Pembayaran Berhasil"
-              className="overflow-hidden border-2 border-brand-forest bg-surface-white shadow-editorial"
-            >
-              <div className="border-b border-border-soft bg-surface-sage px-5 py-3.5 tablet:px-6">
-                <span className="flex items-center gap-2 font-semibold text-brand-forest">
-                  <CheckCircleIcon className="h-5 w-5 text-brand-forest" />
-                  Pembayaran Terverifikasi
-                </span>
-              </div>
-              <div className="p-5 tablet:p-6">
-                <h3 className="font-headline text-headline-sm font-semibold text-brand-deep">
-                  Terima kasih! Pembayaranmu berhasil kami terima
-                </h3>
-                <p className="mt-2 text-body-md leading-relaxed text-text-secondary">
-                  Pesananmu dengan nomor{" "}
-                  <strong className="font-mono font-bold text-text-primary">
-                    {detail.order_number}
-                  </strong>{" "}
-                  telah lunas dan kini sedang dipersiapkan oleh tim ekspedisi kami dari gudang Senaru. Kamu tidak perlu melakukan konfirmasi manual.
-                </p>
-                <div className="mt-4 border-l-4 border-brand-forest bg-surface-paper p-3.5 text-body-sm text-text-secondary">
-                  Perkembangan pengiriman akan kami perbarui secara berkala. Simpan nomor pesanan untuk memantau status pesanan kapan saja.
-                </div>
-              </div>
-            </section>
-          ) : isAwaitingCodConfirmation ? (
+          {isAwaitingCodConfirmation ? (
             <CodConfirmationCard order={detail} />
           ) : paymentUrl ? (
             <PaymentRedirectCard
@@ -236,7 +190,7 @@ export default async function CheckoutSuccessPage({
             </p>
           </section>
 
-          {!isCod && !isPaid && status !== "cancelled" && status !== "dibatalkan" && status !== "expired" ? (
+          {!isCod ? (
             <section
               aria-labelledby="instruksi-pembayaran"
               className="border border-border-soft bg-surface-white p-5 tablet:p-6"
@@ -329,23 +283,5 @@ export default async function CheckoutSuccessPage({
         </div>
       </Container>
     </>
-  );
-}
-
-function CheckCircleIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
   );
 }
