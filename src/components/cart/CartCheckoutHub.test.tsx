@@ -142,4 +142,45 @@ describe("CartCheckoutHub", () => {
     expect(waTab).toHaveAttribute("aria-selected", "true");
     expect(onlineTab).toHaveAttribute("aria-selected", "false");
   });
+
+  it("renders dynamic courier options when couriers prop is provided", () => {
+    const mockCouriers = [
+      { id: "jne", name: "JNE", label: "JNE", desc: "Reguler / YES" },
+      { id: "pos", name: "POS Indonesia", label: "POS Indonesia", desc: "Kilat Khusus" },
+    ];
+
+    render(
+      <CartCheckoutHub
+        items={mockItems}
+        summary={mockSummary}
+        isLoggedIn={false}
+        blockedLength={0}
+        couriers={mockCouriers}
+      />,
+    );
+
+    expect(screen.getByText("POS Indonesia")).toBeInTheDocument();
+    expect(screen.getByText("Kilat Khusus")).toBeInTheDocument();
+  });
+
+  it("updates online benefit courier copywriting dynamically", () => {
+    const mockCouriers = [
+      { id: "jne", name: "JNE", label: "JNE", desc: "Reguler / YES" },
+      { id: "pos", name: "POS Indonesia", label: "POS Indonesia", desc: "Kilat Khusus" },
+    ];
+
+    render(
+      <CartCheckoutHub
+        items={mockItems}
+        summary={mockSummary}
+        isLoggedIn={true}
+        blockedLength={0}
+        couriers={mockCouriers}
+      />,
+    );
+
+    expect(
+      screen.getByText(/Hitung ongkos kirim real-time langsung dari berbagai ekspedisi resmi \(JNE, POS Indonesia\)\./i),
+    ).toBeInTheDocument();
+  });
 });

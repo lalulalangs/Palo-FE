@@ -5,7 +5,7 @@ import { useState, type KeyboardEvent } from "react";
 
 import { Button, buttonClass } from "@/components/ui/Button";
 import { formatHarga, pluralItem } from "@/lib/format";
-import type { CartItem, CartSummary as CartSummaryData } from "@/lib/types";
+import type { CartItem, CartSummary as CartSummaryData, ShippingCourierOption } from "@/lib/types";
 import { trackEvent } from "@/lib/analytics";
 import { GuestCheckoutForm } from "./GuestCheckoutForm";
 
@@ -16,6 +16,7 @@ export interface CartCheckoutHubProps {
   blockedReason?: string | null;
   blockedLength: number;
   shippingNote?: string;
+  couriers?: ShippingCourierOption[];
 }
 
 export function CartCheckoutHub({
@@ -25,10 +26,16 @@ export function CartCheckoutHub({
   blockedReason,
   blockedLength,
   shippingNote,
+  couriers,
 }: CartCheckoutHubProps) {
   const [activeTab, setActiveTab] = useState<"wa" | "online">(
     isLoggedIn ? "online" : "wa",
   );
+
+  const activeCourierLabels =
+    couriers && couriers.length > 0
+      ? couriers.map((c) => c.name || c.label || c.id.toUpperCase()).join(", ")
+      : "JNE, J&T";
 
   const totalLabel = formatHarga(summary.subtotal, summary.subtotal_display);
 
@@ -167,7 +174,7 @@ export function CartCheckoutHub({
           tabIndex={0}
           className={activeTab === "wa" ? "focus-visible:outline-none" : "hidden"}
         >
-          <GuestCheckoutForm items={items} />
+          <GuestCheckoutForm items={items} couriers={couriers} />
         </div>
 
         {/* Tab Online */}
@@ -202,7 +209,7 @@ export function CartCheckoutHub({
                   ✓
                 </span>
                 <span>
-                  Hitung ongkos kirim real-time langsung dari berbagai ekspedisi resmi (JNE, J&amp;T).
+                  Hitung ongkos kirim real-time langsung dari berbagai ekspedisi resmi ({activeCourierLabels}).
                 </span>
               </li>
               <li className="flex items-start gap-2">

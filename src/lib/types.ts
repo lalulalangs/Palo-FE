@@ -413,6 +413,13 @@ export interface Cart {
 /* Checkout, pengiriman, pembayaran                                          */
 /* -------------------------------------------------------------------------- */
 
+export interface ShippingCourierOption {
+  id: string;
+  name: string;
+  label?: string;
+  desc?: string;
+}
+
 export interface ShippingService {
   courier: string;
   service: string;

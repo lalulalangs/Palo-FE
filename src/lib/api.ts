@@ -44,6 +44,7 @@ import type {
   ProductVariant,
   RegisterRequest,
   ShippingAddressSnapshot,
+  ShippingCourierOption,
   ShippingDestination,
   ShippingQuote,
   ShippingQuoteRequest,
@@ -1233,6 +1234,51 @@ export async function getShippingQuote(
       isRecord(item) && typeof item.courier === "string",
     ),
   };
+}
+
+export const DEFAULT_COURIER_OPTIONS: ShippingCourierOption[] = [
+  {
+    id: "jne",
+    name: "JNE",
+    label: "JNE",
+    desc: "Reguler / YES",
+  },
+  {
+    id: "jnt",
+    name: "J&T Express",
+    label: "J&T Express",
+    desc: "Reguler / EZ",
+  },
+];
+
+/**
+ * `GET /shipping/couriers` — daftar ekspedisi aktif untuk opsi pengiriman.
+ *
+ * Menerapkan prinsip tahan banting (resilience): bila backend atau jaringan
+ * bermasalah, fungsi ini secara aman fallback ke `DEFAULT_COURIER_OPTIONS`
+ * (JNE dan J&T Express) agar SSR tidak gagal (500).
+ */
+export async function getShippingCouriers(): Promise<ShippingCourierOption[]> {
+  try {
+    const payload = await apiRequest<unknown>("/shipping/couriers");
+    const data = unwrap<unknown[]>(payload, "data");
+    if (!Array.isArray(data)) {
+      return DEFAULT_COURIER_OPTIONS;
+    }
+    const list = data
+      .filter(isRecord)
+      .map((item) => ({
+        id: readString(item, "id") ?? "",
+        name: readString(item, "name") ?? "",
+        label: readString(item, "label") ?? readString(item, "name") ?? "",
+        desc: readString(item, "desc") ?? "",
+      }))
+      .filter((c) => c.id.length > 0 && c.name.length > 0);
+
+    return list.length > 0 ? list : DEFAULT_COURIER_OPTIONS;
+  } catch {
+    return DEFAULT_COURIER_OPTIONS;
+  }
 }
 
 export async function createOrder(

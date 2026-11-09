@@ -15,24 +15,26 @@ import type {
   GuestResultHandoff,
 } from "@/lib/guest-handoff";
 import { stockStateOf } from "@/lib/cart-stock";
-import type { CartItem, ShippingDestination } from "@/lib/types";
+import type { CartItem, ShippingCourierOption, ShippingDestination } from "@/lib/types";
 import { trackEvent } from "@/lib/analytics";
 
 const ACTIVE_GUEST_ORDER_KEY = "palorinjani_active_guest_order";
 const ACTIVE_ORDER_TTL_MS = 60 * 60 * 1000; // 1 jam
 
-const COURIER_OPTIONS = [
+const DEFAULT_COURIER_OPTIONS: ShippingCourierOption[] = [
   {
     id: "jne",
+    name: "JNE",
     label: "JNE",
     desc: "Reguler / YES",
   },
   {
     id: "jnt",
+    name: "J&T Express",
     label: "J&T Express",
     desc: "Reguler / EZ",
   },
-] as const;
+];
 
 const EMPTY_DESTINATION: PickedDestination = {
   destination_id: 0,
@@ -88,9 +90,11 @@ function getActiveOrderServerSnapshot(): string | null {
 export function GuestCheckoutForm({
   items,
   variant = "primary",
+  couriers,
 }: {
   items: CartItem[];
   variant?: "primary" | "outline";
+  couriers?: ShippingCourierOption[];
 }) {
   const [state, formAction, isPending] = useActionState<
     GuestCheckoutActionState | null,
@@ -99,11 +103,24 @@ export function GuestCheckoutForm({
   const error = isActionError(state) ? state : null;
   const handoff = state?.ok ? state.handoff : null;
 
+  // Opsi kurir dinamis (dengan fallback aman)
+  const options =
+    couriers && couriers.length > 0 ? couriers : DEFAULT_COURIER_OPTIONS;
+
   // State alamat tujuan pengiriman
   const [destination, setDestination] = useState<PickedDestination>(EMPTY_DESTINATION);
 
-  // State pilihan kurir (default: jne)
-  const [selectedCourier, setSelectedCourier] = useState<string>("jne");
+  // State pilihan kurir (default: opsi pertama)
+  const [selectedCourier, setSelectedCourier] = useState<string>(
+    options[0]?.id ?? "jne",
+  );
+
+  // Re-sinkronisasi jika opsi kurir berubah dan kurir yang dipilih tidak lagi ada di opsi
+  useEffect(() => {
+    if (options.length > 0 && !options.some((c) => c.id === selectedCourier)) {
+      setSelectedCourier(options[0]?.id ?? "jne");
+    }
+  }, [options, selectedCourier]);
 
   // State progressive disclosure untuk catatan pesanan
   const [showNote, setShowNote] = useState(false);
@@ -283,23 +300,25 @@ export function GuestCheckoutForm({
         <div
           role="radiogroup"
           aria-labelledby="courier-group-label"
-          className="grid grid-cols-2 gap-2"
+          className={`grid gap-2 ${options.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}
         >
-          {COURIER_OPTIONS.map((option) => {
+          {options.map((option) => {
             const isSelected = selectedCourier === option.id;
             return (
               <label
                 key={option.id}
                 className={[
-                  "relative flex min-h-11 cursor-pointer select-none items-center justify-between border px-3 py-2 text-label-sm transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-forest",
+                  "relative flex min-h-11 cursor-pointer select-none items-center justify-between gap-2 border px-3 py-2 text-label-sm transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-forest",
                   isSelected
                     ? "border-brand-forest bg-surface-sage/60 font-semibold text-brand-forest ring-1 ring-brand-forest"
                     : "border-border-soft bg-surface-white text-text-primary hover:border-brand-forest/50 hover:bg-surface-paper",
                   isPending ? "cursor-not-allowed opacity-60" : "",
                 ].join(" ")}
               >
-                <span>{option.label}</span>
-                <span className="text-caption text-text-secondary">{option.desc}</span>
+                <span>{option.label || option.name}</span>
+                {option.desc ? (
+                  <span className="text-caption text-text-secondary">{option.desc}</span>
+                ) : null}
                 <input
                   type="radio"
                   name="courier"

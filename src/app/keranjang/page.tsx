@@ -9,7 +9,7 @@ import { ActiveGuestOrderBanner } from "@/components/cart/ActiveGuestOrderBanner
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { buttonClass } from "@/components/ui/Button";
-import { getCart, getToken } from "@/lib/api";
+import { getCart, getShippingCouriers, getToken } from "@/lib/api";
 import { stockStateOf } from "@/lib/cart-stock";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
 import { buildMetadata } from "@/lib/metadata";
@@ -31,7 +31,11 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function CartPage() {
-  const [cart, isLoggedIn] = await Promise.all([getCart(), getToken()]);
+  const [cart, isLoggedIn, couriers] = await Promise.all([
+    getCart(),
+    getToken(),
+    getShippingCouriers(),
+  ]);
   const crumbs = [
     { name: "Beranda", href: "/" },
     { name: "Keranjang", href: "/keranjang" },
@@ -134,6 +138,7 @@ export default async function CartPage() {
                 isLoggedIn={Boolean(isLoggedIn)}
                 blockedReason={blockedReason}
                 blockedLength={blocked.length}
+                couriers={couriers}
               />
             </div>
           </div>
