@@ -76,7 +76,7 @@ export function ProductCard({
 }) {
   const name =
     product.name.trim().length > 0 ? product.name : PLACEHOLDER.productName;
-  const categoryName = product.category?.name ?? PLACEHOLDER.collection;
+  const categoryName = product.category?.name?.trim() || "Katalog";
   const price = formatHarga(product.price_min, product.price_display);
   const ukuran = product.sizes ?? [];
   const gambar = product.image?.url ?? null;
