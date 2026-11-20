@@ -28,6 +28,7 @@ export type LineIconName =
   | "chat"
   | "film"
   | "play"
+  | "pause"
   | "volume-up"
   | "volume-off"
   | "expand"
@@ -131,6 +132,14 @@ export function LineIcon({
       return (
         <svg {...common} strokeWidth={1.4}>
           <path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor" />
+        </svg>
+      );
+
+    case "pause":
+      return (
+        <svg {...common} strokeWidth={1.4}>
+          <rect x="7" y="5.5" width="3.5" height="13" fill="currentColor" />
+          <rect x="13.5" y="5.5" width="3.5" height="13" fill="currentColor" />
         </svg>
       );
 

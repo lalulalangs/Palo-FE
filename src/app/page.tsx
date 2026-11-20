@@ -170,7 +170,7 @@ export default async function HomePage() {
       <section className="border-b border-border-soft bg-surface-white py-14 tablet:py-20">
         <Container>
           <CatalogHeader
-            title="PALO : T-SHIRT &amp; GRAFIK"
+            title="KATALOG UTAMA"
             ctaLabel="Lihat Semua"
             ctaHref="/produk"
           />
@@ -272,13 +272,16 @@ function CatalogHeader({
           <span className="block font-mono text-[11px] uppercase tracking-widest text-text-secondary">
             {eyebrow}
           </span>
-        ) : (
-          <span className="block font-mono text-[11px] uppercase tracking-widest text-text-secondary">
-            KATALOG UTAMA
-          </span>
-        )}
+        ) : null}
 
-        <h2 className="mt-1 text-base font-bold uppercase tracking-wider text-text-primary tablet:text-lg">
+        <h2
+          className={[
+            eyebrow ? "mt-1" : "",
+            "text-base font-bold uppercase tracking-wider text-text-primary tablet:text-lg",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
           {title}
         </h2>
       </div>

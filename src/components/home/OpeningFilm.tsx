@@ -94,6 +94,7 @@ export function OpeningFilm({ content }: { content: FilmContent }) {
       el.play().then(() => setPlaying(true)).catch(() => undefined);
     } else {
       el.pause();
+      setPlaying(false);
     }
   };
 
@@ -154,6 +155,8 @@ export function OpeningFilm({ content }: { content: FilmContent }) {
                 loop
                 playsInline
                 preload="metadata"
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
                 aria-label={caption ?? "Video Opening Film Palo Mountain Goods"}
               >
                 {/*
@@ -170,7 +173,7 @@ export function OpeningFilm({ content }: { content: FilmContent }) {
               />
 
               {/* pojok atas: chapter + tombol suara */}
-              <div className="absolute inset-x-4 top-4 z-10 flex items-center justify-between">
+              <div className="absolute inset-x-4 top-4 z-20 flex items-center justify-between">
                 {chapter ? (
                   <span className="border border-border-soft bg-surface-white/95 px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-brand-deep">
                     {chapter}
@@ -211,7 +214,7 @@ export function OpeningFilm({ content }: { content: FilmContent }) {
                     "group-hover:bg-brand-forest group-hover:text-surface-white",
                   ].join(" ")}
                 >
-                  <LineIcon name="play" className="h-8 w-8" strokeWidth={1.4} />
+                  <LineIcon name={playing ? "pause" : "play"} className="h-8 w-8" strokeWidth={1.4} />
                 </span>
               </button>
 
