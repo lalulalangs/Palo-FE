@@ -58,9 +58,6 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
     ? isPriceMissing(selectedSku.price, selectedSku.price_display)
     : isPriceMissing(product.price_min, product.price_display);
 
-  // Quick highlight badges diekstrak dari deskripsi atau menggunakan preset editorial
-  const highlightBadges = getHighlightBadges(product.description);
-
   // Urutan blocker = urutan S4 → S3 → S8 di ARSITEKTUR §4.
   const blockedReason: string | null = !hasSku
     ? "Pilihan varian atau ukuran produk ini sedang disiapkan, jadi belum bisa dipesan saat ini."
@@ -151,18 +148,6 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
                 : formatHarga(product.price_min, product.price_display)}
           </span>
         </p>
-
-        {/* Quick Highlight Badges */}
-        <div className="mt-2.5 flex flex-wrap items-center gap-1.5" aria-label="Spesifikasi cepat bahan">
-          {highlightBadges.map((badge) => (
-            <span
-              key={badge}
-              className="inline-flex items-center border border-border-soft/80 bg-surface-sage/50 px-2.5 py-1 text-caption font-medium text-brand-deep"
-            >
-              {badge}
-            </span>
-          ))}
-        </div>
       </div>
 
       {product.is_placeholder ? (
@@ -423,40 +408,6 @@ export function ProductPurchasePanel({ product }: { product: ProductDetail }) {
       </div>
     </div>
   );
-}
-
-function getHighlightBadges(description: string | null): string[] {
-  const candidateKeywords = [
-    "Cotton Combed 32s",
-    "Cotton Combed 30s",
-    "Cotton Combed 24s",
-    "180 GSM",
-    "200 GSM",
-    "220 GSM",
-    "Oversized Boxy Fit",
-    "Oversized Fit",
-    "Regular Fit",
-    "Stone Wash",
-    "Water Repellent",
-    "Quick Dry",
-    "Ripstop",
-    "Breathable",
-  ];
-
-  const found: string[] = [];
-  if (description) {
-    for (const kw of candidateKeywords) {
-      if (description.toLowerCase().includes(kw.toLowerCase())) {
-        found.push(kw);
-      }
-    }
-  }
-
-  if (found.length >= 2) {
-    return found.slice(0, 4);
-  }
-
-  return ["Cotton Combed 32s", "180 GSM", "Oversized Boxy Fit", "Stone Wash"];
 }
 
 function RadioRow({
